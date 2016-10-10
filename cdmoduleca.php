@@ -58,6 +58,7 @@ class CdModuleCA extends ModuleGrid
         $this->empty_message = $this->l('Pas d\'enregistrement disponible');
         $this->paging_message = sprintf($this->l('Affichage %1$s de %2$s'), '{0} - {1}', '{2}');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->table_charset = 'utf8';
 
         $this->columns = array(
             'id' => 'code',
@@ -71,6 +72,7 @@ class CdModuleCA extends ModuleGrid
     {
         if (!parent::install() ||
             !$this->alterGroupLangTable() ||
+            !$this->createCodeActionTable() ||
             !$this->installConfig() ||
             !$this->registerHook('AdminStatsModules')
         ) {
@@ -83,6 +85,7 @@ class CdModuleCA extends ModuleGrid
     public function uninstall()
     {
         if (!parent::uninstall() ||
+            !$this->removeCodeActionTable() ||
             !$this->alterGroupLangTable('remove') ||
             !$this->eraseConfig()
         ) {
@@ -193,18 +196,76 @@ class CdModuleCA extends ModuleGrid
                     $error .= $this->l('Erreur lors de la mise à jour des groupes');
                 }
             }
-
-            if ($error)
-                $this->html .= $this->displayError($error);
-            else
-                $this->html .= $this->displayConfirmation($this->l('Settings Updated'));
+        } elseif (Tools::isSubmit('submitUpdateCodeAction')) {
+            $codes_action = $this->getAllCodesAction();
+            foreach ($codes_action as $code) {
+                if (!Db::getInstance()->update('code_action',
+                    array('groupe' => Tools::getValue($code['id_code_action'])),
+                    'id_code_action = ' . $code['id_code_action'])
+                ) {
+                    $error .= $this->l('Erreur lors de la mise à jour des codes action.');
+                }
+            }
         }
+
+        if ($error)
+            $this->html .= $this->displayError($error);
+        else
+            $this->html .= $this->displayConfirmation($this->l('Groupement des codes action mis à jour.'));
     }
 
     private function displayForm()
     {
+        $this->html .= $this->generateFormCodeAction();
         $this->html .= $this->generateForm();
         $this->html .= $this->display(__FILE__, 'configuration.tpl');
+    }
+
+    private function generateFormCodeAction()
+    {
+        $codesAction = $this->getAllCodesAction();
+        $inputs = array();
+        foreach ($codesAction as $code => $value) {
+            $inputs[] = array(
+                'type' => 'select',
+                'label' => $value['description'] . ' (' . $value['name'] . ')',
+                'name' => $value['id_code_action'],
+                'options' => array(
+                    'query' => $codesAction,
+                    'id' => 'id_code_action',
+                    'name' => 'name'
+                ),
+            );
+        }
+        $fields_form = array(
+            'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Groupement des codes action.'),
+                    'icon' => 'icon-cogs'
+                ),
+                'input' => $inputs,
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                    'class' => 'btn btn-default pull-right',
+                    'name' => 'submitUpdateCodeAction'
+                )
+            )
+        );
+
+        $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
+        $helper = new HelperForm();
+        $helper->default_form_language = $lang->id;
+//        $helper->submit_action = 'submitUpdate';
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name
+            . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfigCodeAction(),
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id
+        );
+        return $helper->generateForm(array($fields_form));
+
     }
 
     private function generateForm()
@@ -235,7 +296,7 @@ class CdModuleCA extends ModuleGrid
         $fields_form = array(
             'form' => array(
                 'legend' => array(
-                    'title' => $this->l('Settings'),
+                    'title' => $this->l('Affecter un groupe en tant que parrain.'),
                     'icon' => 'icon-cogs'
                 ),
                 'input' => $inputs,
@@ -250,7 +311,7 @@ class CdModuleCA extends ModuleGrid
         $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
         $helper = new HelperForm();
         $helper->default_form_language = $lang->id;
-        $helper->submit_action = 'submitUpdate';
+//        $helper->submit_action = 'submitUpdate';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name
             . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
@@ -260,6 +321,17 @@ class CdModuleCA extends ModuleGrid
             'id_language' => $this->context->language->id
         );
         return $helper->generateForm(array($fields_form));
+    }
+
+    private function getConfigCodeAction()
+    {
+        $code_action = array();
+        $codes = $this->getAllCodesAction();
+        foreach ($codes as $code => $value) {
+            $code_action[$value['id_code_action']] = $value['groupe'];
+        }
+
+        return $code_action;
     }
 
     /**
@@ -283,12 +355,94 @@ class CdModuleCA extends ModuleGrid
      */
     public function getGroupsParrain()
     {
-        $groups = array();
         $sql = 'SELECT id_group, name, parrain FROM `' . _DB_PREFIX_ . 'group_lang` WHERE id_lang = ' .
             intval(Configuration::get('PS_LANG_DEFAULT'));
         $groups = Db::getInstance()->executeS($sql);
 
         return $groups;
+    }
+
+    private function createCodeActionTable()
+    {
+        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'code_action` (
+        `id_code_action` INT(12) NOT NULL AUTO_INCREMENT,
+        `name` VARCHAR(64) NOT NULL,
+        `description` VARCHAR(255) NULL,
+        `groupe` VARCHAR(64) NULL, 
+        PRIMARY KEY (`id_code_action`))
+          ENGINE =' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=' . $this->table_charset . ';';
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
+
+        $data = $this->dataCodeAction();
+        if (!Db::getInstance()->insert('code_action', $data)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function removeCodeActionTable()
+    {
+        if (!Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'code_action`')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function dataCodeAction()
+    {
+        $code_action = array(
+            'ABO' => array('Abonnement','1'),
+            'PROSP' => array('Prospection','2'),
+            'PROSP1' => array('Prospection tracer 1','2'),
+            'PROSP11' => array('Prospection tracer 11','2'),
+            'PROSP12' => array('Prospection tracer 12','2'),
+            'PROSP13' => array('Prospection tracer 13','2'),
+            'PROSP2' => array('Prospection tracer 2','2'),
+            'PROSP21' => array('Prospection tracer 21','2'),
+            'PROSP22' => array('Prospection tracer 22','2'),
+            'PROSP23' => array('Prospection tracer 23','2'),
+            'PROSP24' => array('Prospection tracer 24','2'),
+            'PROSP3' => array('Prospection tracer 3','2'),
+            'PROSP5' => array('Prospection tracer 5','2'),
+            'PROSP51' => array('Prospection tracer 51','2'),
+            'PROSP52' => array('Prospection tracer 52','2'),
+            'PROSP53' => array('Prospection tracer 53','2'),
+            'PROSP ENTR' => array('Contact entrant sans fiche client','2'),
+            'FID' => array('FID','18'),
+            'FID PROMO' => array('FID suite promo','18'),
+            'FID PROG F' => array('FID programme fidélité','18'),
+            'PAR' => array('Parrainage','21'),
+            'REACT+4M' => array('Reactivation fichier clients +4mois','22'),
+            'REACT+4MPROMO' => array('Reactivation fichier clients +4mois suite à promo','22'),
+            'REACT SPONT' => array('Reactivation client spontanée','22'),
+            'REACT SPONT PROMO' => array('Reactivation client spontanée suite à promo','22'),
+            'REACT AC FORM' => array('Reactivation client AC formulaire','22')
+        );
+        $data = array();
+        $c = 1;
+        foreach ($code_action as $key => $value) {
+            $data[] = array(
+                'id_code_action' => $c,
+                'name' => $key,
+                'description' => $value[0],
+                'groupe' => $value[1]
+            );
+            $c++;
+        }
+
+        return $data;
+    }
+
+    private function getAllCodesAction()
+    {
+        $sql = 'SELECT id_code_action, name, description, groupe FROM `' . _DB_PREFIX_ . 'code_action`';
+        $req = Db::getInstance()->executeS($sql);
+
+        return $req;
     }
 
 }
