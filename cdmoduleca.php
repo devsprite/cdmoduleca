@@ -50,6 +50,7 @@ class CdModuleCA extends ModuleGrid
         $this->version = '1.0.0';
         $this->author = 'Dominique';
         $this->need_instance = 0;
+        $this->bootstrap = true;
         parent::__construct();
 
         $this->displayName = $this->l('Module CA');
@@ -69,6 +70,7 @@ class CdModuleCA extends ModuleGrid
     public function install()
     {
         if (!parent::install() ||
+            !$this->alterGroupLangTable() ||
             !$this->installConfig() ||
             !$this->registerHook('AdminStatsModules')
         ) {
@@ -81,6 +83,7 @@ class CdModuleCA extends ModuleGrid
     public function uninstall()
     {
         if (!parent::uninstall() ||
+            !$this->alterGroupLangTable('remove') ||
             !$this->eraseConfig()
         ) {
             return false;
@@ -89,10 +92,23 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    private function alterGroupLangTable($method = 'add')
+    {
+        if ($method == 'add') {
+            $sql = 'ALTER TABLE ' . _DB_PREFIX_ . 'group_lang ADD `parrain` VARCHAR (255) NOT NULL DEFAULT 0';
+        } else {
+            $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'group_lang` DROP COLUMN `parrain`';
+        }
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
+
+        return true;
+    }
+
+
     private function installConfig()
     {
-        $this->initialyseConfigurationGroupsParrain();
-
         foreach ($this->config as $keyname => $value) {
             Configuration::updateValue($keyname, $value);
         }
@@ -102,8 +118,6 @@ class CdModuleCA extends ModuleGrid
 
     private function eraseConfig()
     {
-        $this->eraseConfigurationGroupsParrain();
-
         foreach ($this->config as $keyname => $value) {
             Configuration::deleteByName($keyname);
         }
@@ -113,11 +127,10 @@ class CdModuleCA extends ModuleGrid
 
     public function getContent()
     {
-        $groups_parrain = $this->getGroupsParrain();
+        $this->postProcess();
+        $this->displayForm();
 
-//        ddd($groups_parrain);
-
-        return 1;
+        return $this->html;
     }
 
     public function hookAdminStatsModules($params)
@@ -167,30 +180,115 @@ class CdModuleCA extends ModuleGrid
 
     }
 
-    private function getGroupsParrain()
+    private function postProcess()
     {
-        $lang = intval(Configuration::get('PS_LANG_DEFAULT'));
-        $sql = 'SELECT id_group FROM `' . _DB_PREFIX_ . 'group_lang` WHERE id_lang = ' . $lang;
+        $error = '';
+        if (Tools::isSubmit('submitUpdateGroups')) {
+            $groups = $this->getGroupsParrain();
+            foreach ($groups as $group) {
+                if (!Db::getInstance()->update('group_lang',
+                    array('parrain' => Tools::getValue($group['id_group'])),
+                    'id_group = ' . $group['id_group'])
+                ) {
+                    $error .= $this->l('Erreur lors de la mise à jour des groupes');
+                }
+            }
+
+            if ($error)
+                $this->html .= $this->displayError($error);
+            else
+                $this->html .= $this->displayConfirmation($this->l('Settings Updated'));
+        }
+    }
+
+    private function displayForm()
+    {
+        $this->html .= $this->generateForm();
+        $this->html .= $this->display(__FILE__, 'configuration.tpl');
+    }
+
+    private function generateForm()
+    {
+        $groupsParrain = $this->getGroupsParrain();
+        $inputs = array();
+        foreach ($groupsParrain as $group => $value) {
+            $inputs[] = array(
+                'type' => 'switch',
+                'label' => $value['name'],
+                'name' => $value['id_group'],
+                'desc' => $this->l('Groupe Parrain ?'),
+                'values' => array(
+                    array(
+                        'id' => 'active_on',
+                        'value' => 1,
+                        'label' => $this->l('Enabled')
+                    ),
+                    array(
+                        'id' => 'active_ff',
+                        'value' => 0,
+                        'label' => $this->l('Disabled')
+                    )
+                )
+            );
+        }
+
+        $fields_form = array(
+            'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Settings'),
+                    'icon' => 'icon-cogs'
+                ),
+                'input' => $inputs,
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                    'class' => 'btn btn-default pull-right',
+                    'name' => 'submitUpdateGroups'
+                )
+            )
+        );
+
+        $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
+        $helper = new HelperForm();
+        $helper->default_form_language = $lang->id;
+        $helper->submit_action = 'submitUpdate';
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name
+            . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfigGroupsParrain(),
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id
+        );
+        return $helper->generateForm(array($fields_form));
+    }
+
+    /**
+     * Retourne la configuration parrain de chaque group
+     * @return array (id_group => value_parrain)
+     */
+    private function getConfigGroupsParrain()
+    {
+        $groups_parrain = array();
+        $groups = $this->getGroupsParrain();
+        foreach ($groups as $group => $value) {
+            $groups_parrain[$value['id_group']] = $value['parrain'];
+        }
+
+        return $groups_parrain;
+    }
+
+    /**
+     * Retourn tous les groupes avec leurs configuration
+     * @return array (id_group, name, value_parrain)
+     */
+    public function getGroupsParrain()
+    {
+        $groups = array();
+        $sql = 'SELECT id_group, name, parrain FROM `' . _DB_PREFIX_ . 'group_lang` WHERE id_lang = ' .
+            intval(Configuration::get('PS_LANG_DEFAULT'));
         $groups = Db::getInstance()->executeS($sql);
 
         return $groups;
     }
 
-    private function initialyseConfigurationGroupsParrain()
-    {
-        $groups = $this->getGroupsParrain();
-        if (!empty($groups)) {
-            foreach ($groups as $group) {
-                Configuration::updateValue('CDMODULECA_GROUP_' . $group['id_group'], $group['id_group'] . ',' . '0');
-            }
-        }
-    }
-
-    private function eraseConfigurationGroupsParrain()
-    {
-        $groups_parrain = $this->getGroupsParrain();
-        foreach ($groups_parrain as $keyName => $value) {
-            Configuration::deleteByName('CDMODULECA_GROUP_' . $value['id_group']);
-        }
-    }
 }
