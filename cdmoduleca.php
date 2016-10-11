@@ -28,17 +28,19 @@ if (!defined('_PS_VERSION_')) {
     exit();
 }
 
+require_once(dirname(__FILE__) . '/controllers/admin/cdmoduleca.php');
+
 class CdModuleCA extends ModuleGrid
 {
-    protected $errors = array();
-    protected $html = '';
-    protected $query;
-    protected $columns;
-    protected $default_sort_column;
-    protected $default_sort_direction;
-    protected $empty_message;
-    protected $paging_message;
-    protected $config = array(
+    public $errors = array();
+    public $html = '';
+    public $query;
+    public $columns;
+    public $default_sort_column;
+    public $default_sort_direction;
+    public $empty_message;
+    public $paging_message;
+    public $config = array(
         'CDMODULECA' => '1'
     );
 
@@ -60,11 +62,28 @@ class CdModuleCA extends ModuleGrid
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->table_charset = 'utf8';
 
+        $this->default_sort_column = 'id';
+        $this->default_sort_direction = 'ASC';
+
         $this->columns = array(
-            'id' => 'code',
-            'header' => $this->l('Code'),
-            'dataIndex' => 'code',
-            'align' => 'left'
+            array(
+                'id' => 'id',
+                'header' => $this->l('id'),
+                'dataIndex' => 'id',
+                'align' => 'left'
+            ),
+            array(
+                'id' => 'nom',
+                'header' => $this->l('Name'),
+                'dataIndex' => 'nom',
+                'align' => 'left'
+            ),
+            array(
+                'id' => 'coach',
+                'header' => $this->l('Coach'),
+                'dataIndex' => 'coach',
+                'align' => 'left'
+            ),
         );
     }
 
@@ -136,56 +155,11 @@ class CdModuleCA extends ModuleGrid
         return $this->html;
     }
 
-    public function hookAdminStatsModules($params)
-    {
-        $engine_params = array(
-            'id' => 'id_product',
-            'title' => $this->displayName,
-            'columns' => $this->columns,
-            'defaultSortColumn' => $this->default_sort_column,
-            'defaultSortDirection' => $this->default_sort_direction,
-            'emptyMessage' => $this->empty_message,
-            'pagingMessage' => $this->paging_message
-        );
-
-        if (Tools::getValue('export'))
-            $this->csvExport($engine_params);
-
-        $this->html = '
-			<div class="panel-heading">
-				' . $this->displayName . '
-			</div>
-			' . $this->engine($engine_params) . '
-			<a class="btn btn-default export-csv" href="' . Tools::safeOutput($_SERVER['REQUEST_URI'] . '&export=1') . '">
-				<i class="icon-cloud-upload"></i> ' . $this->l('CSV Export') . '
-			</a>';
-
-        return $this->html;
-    }
-
-    protected function getData()
-    {
-        $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-
-        $this->query = 'SELECT SQL_CALC_FOUND_ROWS cr.code, ocr.name, COUNT(ocr.id_cart_rule) as total, ROUND(SUM(o.total_paid_real) / o.conversion_rate,2) as ca
-				FROM ' . _DB_PREFIX_ . 'order_cart_rule ocr
-				LEFT JOIN ' . _DB_PREFIX_ . 'orders o ON o.id_order = ocr.id_order
-				LEFT JOIN ' . _DB_PREFIX_ . 'cart_rule cr ON cr.id_cart_rule = ocr.id_cart_rule
-				WHERE o.valid = 1
-					' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o') . '
-					AND o.invoice_date BETWEEN ' . $this->getDate() . '
-				GROUP BY ocr.id_cart_rule';
-        $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
-        foreach ($values as &$value)
-            $value['ca'] = Tools::displayPrice($value['ca'], $currency);
-        $this->_values = $values;
-        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
-
-    }
-
     private function postProcess()
     {
         $error = '';
+
+        ddd('test');
         if (Tools::isSubmit('submitUpdateGroups')) {
             $groups = $this->getGroupsParrain();
             foreach ($groups as $group) {
@@ -255,7 +229,6 @@ class CdModuleCA extends ModuleGrid
         $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
         $helper = new HelperForm();
         $helper->default_form_language = $lang->id;
-//        $helper->submit_action = 'submitUpdate';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name
             . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
@@ -311,7 +284,6 @@ class CdModuleCA extends ModuleGrid
         $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
         $helper = new HelperForm();
         $helper->default_form_language = $lang->id;
-//        $helper->submit_action = 'submitUpdate';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name
             . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
@@ -395,32 +367,32 @@ class CdModuleCA extends ModuleGrid
     private function dataCodeAction()
     {
         $code_action = array(
-            'ABO' => array('Abonnement','1'),
-            'PROSP' => array('Prospection','2'),
-            'PROSP1' => array('Prospection tracer 1','2'),
-            'PROSP11' => array('Prospection tracer 11','2'),
-            'PROSP12' => array('Prospection tracer 12','2'),
-            'PROSP13' => array('Prospection tracer 13','2'),
-            'PROSP2' => array('Prospection tracer 2','2'),
-            'PROSP21' => array('Prospection tracer 21','2'),
-            'PROSP22' => array('Prospection tracer 22','2'),
-            'PROSP23' => array('Prospection tracer 23','2'),
-            'PROSP24' => array('Prospection tracer 24','2'),
-            'PROSP3' => array('Prospection tracer 3','2'),
-            'PROSP5' => array('Prospection tracer 5','2'),
-            'PROSP51' => array('Prospection tracer 51','2'),
-            'PROSP52' => array('Prospection tracer 52','2'),
-            'PROSP53' => array('Prospection tracer 53','2'),
-            'PROSP ENTR' => array('Contact entrant sans fiche client','2'),
-            'FID' => array('FID','18'),
-            'FID PROMO' => array('FID suite promo','18'),
-            'FID PROG F' => array('FID programme fidélité','18'),
-            'PAR' => array('Parrainage','21'),
-            'REACT+4M' => array('Reactivation fichier clients +4mois','22'),
-            'REACT+4MPROMO' => array('Reactivation fichier clients +4mois suite à promo','22'),
-            'REACT SPONT' => array('Reactivation client spontanée','22'),
-            'REACT SPONT PROMO' => array('Reactivation client spontanée suite à promo','22'),
-            'REACT AC FORM' => array('Reactivation client AC formulaire','22')
+            'ABO' => array('Abonnement', '1'),
+            'PROSP' => array('Prospection', '2'),
+            'PROSP1' => array('Prospection tracer 1', '2'),
+            'PROSP11' => array('Prospection tracer 11', '2'),
+            'PROSP12' => array('Prospection tracer 12', '2'),
+            'PROSP13' => array('Prospection tracer 13', '2'),
+            'PROSP2' => array('Prospection tracer 2', '2'),
+            'PROSP21' => array('Prospection tracer 21', '2'),
+            'PROSP22' => array('Prospection tracer 22', '2'),
+            'PROSP23' => array('Prospection tracer 23', '2'),
+            'PROSP24' => array('Prospection tracer 24', '2'),
+            'PROSP3' => array('Prospection tracer 3', '2'),
+            'PROSP5' => array('Prospection tracer 5', '2'),
+            'PROSP51' => array('Prospection tracer 51', '2'),
+            'PROSP52' => array('Prospection tracer 52', '2'),
+            'PROSP53' => array('Prospection tracer 53', '2'),
+            'PROSP ENTR' => array('Contact entrant sans fiche client', '2'),
+            'FID' => array('FID', '18'),
+            'FID PROMO' => array('FID suite promo', '18'),
+            'FID PROG F' => array('FID programme fidélité', '18'),
+            'PAR' => array('Parrainage', '21'),
+            'REACT+4M' => array('Reactivation fichier clients +4mois', '22'),
+            'REACT+4MPROMO' => array('Reactivation fichier clients +4mois suite à promo', '22'),
+            'REACT SPONT' => array('Reactivation client spontanée', '22'),
+            'REACT SPONT PROMO' => array('Reactivation client spontanée suite à promo', '22'),
+            'REACT AC FORM' => array('Reactivation client AC formulaire', '22')
         );
         $data = array();
         $c = 1;
@@ -443,6 +415,19 @@ class CdModuleCA extends ModuleGrid
         $req = Db::getInstance()->executeS($sql);
 
         return $req;
+    }
+
+    public function hookAdminStatsModules($params)
+    {
+        $this->html = StatsCdModuleCa::hookAdminStatsModules($this);
+
+        return $this->html;
+    }
+
+    protected function getData()
+    {
+        $this->_values = StatsCdModuleCa::getDataCdModuleCa($this);
+        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
     }
 
 }
