@@ -159,7 +159,6 @@ class CdModuleCA extends ModuleGrid
     {
         $error = '';
 
-        ddd('test');
         if (Tools::isSubmit('submitUpdateGroups')) {
             $groups = $this->getGroupsParrain();
             foreach ($groups as $group) {
@@ -182,10 +181,12 @@ class CdModuleCA extends ModuleGrid
             }
         }
 
-        if ($error)
+        if ($error) {
             $this->html .= $this->displayError($error);
-        else
-            $this->html .= $this->displayConfirmation($this->l('Groupement des codes action mis à jour.'));
+        } else {
+//            $this->html .= $this->displayConfirmation($this->l('Groupement des codes action mis à jour.'));
+
+        }
     }
 
     private function displayForm()
