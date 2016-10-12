@@ -33,7 +33,7 @@ class StatsCdModuleCa extends ModuleGrid
     public static function hookAdminStatsModules($object)
     {
         $engine_params = array(
-            'id' => 'id_carnet',
+            'id' => 'id_order',
             'title' => $object->displayName,
             'columns' => $object->columns,
             'defaultSortColumn' => $object->default_sort_column,
@@ -59,9 +59,14 @@ class StatsCdModuleCa extends ModuleGrid
 
     public static function getDataCdModuleCa($object)
     {
-        $object->query = 'SELECT SQL_CALC_FOUND_ROWS id_carnet as id, customer_name as nom, name_contact as coach
-				FROM ' . _DB_PREFIX_ . 'carnet
-				WHERE date_add BETWEEN ' . $object->getDate();
+        $object->query = '
+          SELECT SQL_CALC_FOUND_ROWS ROUND(SUM(o.total_products - o.total_discounts_tax_excl),2) as total 
+				FROM ' . _DB_PREFIX_ . 'orders AS o
+				WHERE valid = 1
+				AND id_employee = 30
+				AND date_add BETWEEN ' . $object->getDate();
+
+
         if (Validate::IsName($object->_sort)) {
             $object->query .= ' ORDER BY `' . bqSQL($object->_sort) . '`';
             if (isset($object->_direction) && (Tools::strtoupper($object->_direction) == 'ASC' || Tools::strtoupper($object->_direction) == 'DESC'))

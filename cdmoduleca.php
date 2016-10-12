@@ -62,28 +62,17 @@ class CdModuleCA extends ModuleGrid
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->table_charset = 'utf8';
 
-        $this->default_sort_column = 'id';
-        $this->default_sort_direction = 'ASC';
+        $this->default_sort_column = 'id_order';
+        $this->default_sort_direction = 'DESC';
 
         $this->columns = array(
             array(
-                'id' => 'id',
+                'id' => 'total',
                 'header' => $this->l('id'),
-                'dataIndex' => 'id',
-                'align' => 'left'
+                'dataIndex' => 'total',
+                'align' => 'center'
             ),
-            array(
-                'id' => 'nom',
-                'header' => $this->l('Name'),
-                'dataIndex' => 'nom',
-                'align' => 'left'
-            ),
-            array(
-                'id' => 'coach',
-                'header' => $this->l('Coach'),
-                'dataIndex' => 'coach',
-                'align' => 'left'
-            ),
+
         );
     }
 
