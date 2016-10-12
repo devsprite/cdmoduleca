@@ -91,9 +91,12 @@ class CdModuleCA extends ModuleGrid
     {
         if (!parent::install() ||
             !$this->alterGroupLangTable() ||
+            !$this->alterOrderTable() ||
             !$this->createCodeActionTable() ||
+            !$this->updateOrdersTable() ||
             !$this->installConfig() ||
-            !$this->registerHook('AdminStatsModules')
+            !$this->registerHook('AdminStatsModules') ||
+            !$this->registerHook('ActionValidateOrder')
         ) {
             return false;
         }
@@ -106,6 +109,7 @@ class CdModuleCA extends ModuleGrid
         if (!parent::uninstall() ||
             !$this->removeCodeActionTable() ||
             !$this->alterGroupLangTable('remove') ||
+            !$this->alterOrderTable('remove') ||
             !$this->eraseConfig()
         ) {
             return false;
@@ -128,6 +132,21 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    private function alterOrderTable($method = 'add')
+    {
+        if ($method == 'add') {
+            $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'orders` ADD `id_code_action` INT (12) NULL,
+             ADD `id_employee` INT (12) NULL';
+        } else {
+            $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'orders` DROP COLUMN `id_code_action`, 
+             DROP COLUMN `id_employee`';
+        }
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
+
+        return true;
+    }
 
     private function installConfig()
     {
@@ -410,6 +429,43 @@ class CdModuleCA extends ModuleGrid
         return $data;
     }
 
+    private function updateOrdersTable()
+    {
+        $this->updateOrdersTableIdEmployee();
+        $this->updateOrdersTableIdCodeAction();
+
+        return true;
+    }
+
+    private function updateOrdersTableIdEmployee()
+    {
+        $reqCoachs = new DbQuery();
+        $reqCoachs->select('DISTINCT coach, e.id_employee')
+            ->from('orders')
+            ->leftJoin('employee', 'e', 'e.lastname = coach');
+
+        $listCoachs = Db::getInstance()->executeS($reqCoachs);
+
+        foreach ($listCoachs as $coach) {
+            if (!empty($coach['id_employee'])) {
+                $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET id_employee = ' . $coach['id_employee'] . '
+            WHERE coach = "' . $coach['coach'] . '"';
+                Db::getInstance()->execute($sql);
+            }
+        }
+    }
+
+    private function updateOrdersTableIdCodeAction()
+    {
+        $listCodesAction = $this->getAllCodesAction();
+
+        foreach ($listCodesAction as $code) {
+            $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET id_code_action = ' . $code['id_code_action'] . '
+            WHERE  code_action = "' . $code['name'] . '"';
+            Db::getInstance()->execute($sql);
+        }
+    }
+
     private function getAllCodesAction()
     {
         $sql = 'SELECT id_code_action, name, description, groupe FROM `' . _DB_PREFIX_ . 'code_action`';
@@ -425,10 +481,56 @@ class CdModuleCA extends ModuleGrid
         return $this->html;
     }
 
+    public function hookActionValidateOrder($params)
+    {
+        $employee = (isset($this->context->employee->id)) ? $this->context->employee->id : false;
+        if ($employee) {
+            $idOrder = Order::getOrderByCartId($this->context->cart->id);
+            $reqOrder = new DbQuery();
+            $reqOrder->select('id_order, coach, code_action')
+                ->from('orders')
+                ->where('id_order = ' . $idOrder);
+            $order = Db::getInstance()->getRow($reqOrder);
+
+            if (!empty($order)) {
+                $id_coach = $this->getIdCoach($order['coach']);
+                $id_code_action = $this->getIdCodeAction($order['code_action']);
+
+                if (!empty($id_coach) && !empty($id_code_action)) {
+                    $req = 'UPDATE `' . _DB_PREFIX_ . 'orders`
+                    SET id_employee = ' . $id_coach . ', id_code_action = ' . $id_code_action . ' 
+                    WHERE id_order = ' . $order['id_order'];
+
+                    Db::getInstance()->execute($req);
+                }
+            }
+        }
+    }
+
     protected function getData()
     {
         $this->_values = StatsCdModuleCa::getDataCdModuleCa($this);
         $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
+    }
+
+    private function getIdCoach($coach)
+    {
+        $req = new DbQuery();
+        $req->select('id_employee')
+            ->from('employee')
+            ->where('lastname = ' . $coach);
+
+        return Db::getInstance()->getValue($req);
+    }
+
+    private function getIdCodeAction($code_action)
+    {
+        $req = new DbQuery();
+        $req->select('id_code_action')
+            ->from('code_action')
+            ->where('name = ' . $code_action);
+
+        return Db::getInstance()->getValue($req);
     }
 
 }
