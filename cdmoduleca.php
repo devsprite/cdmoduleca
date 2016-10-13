@@ -41,6 +41,7 @@ class CdModuleCA extends ModuleGrid
     public $paging_message;
     public $viewAllCoachs;
     public $idFilterCoach;
+    public $idFilterCodeAction;
     public $config = array(
         'CDMODULECA' => '1'
     );
@@ -474,6 +475,27 @@ class CdModuleCA extends ModuleGrid
         return $req;
     }
 
+    private function getCodeAction($id)
+    {
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE id_code_action = '. (intval($id));
+
+        return Db::getInstance()->getRow($sql);
+    }
+
+    private function getAllGroupeCodesAction()
+    {
+        $sql = 'SELECT DISTINCT groupe FROM `' . _DB_PREFIX_ . 'code_action`
+        ';
+        $groupes = Db::getInstance()->executeS($sql);
+
+        $listGroupes = array();
+        foreach ($groupes as $groupe) {
+            $listGroupes[] = $this->getCodeAction($groupe['groupe']);
+        }
+
+        return $listGroupes;
+    }
+
     public function hookAdminStatsModules($params)
     {
         $engine_params = array(
@@ -589,6 +611,19 @@ class CdModuleCA extends ModuleGrid
 
     private function syntheseCoachsFilter()
     {
+        $linkFilterCoachs = AdminController::$currentIndex . '&module=' . $this->name
+            . '&token=' . Tools::getValue('token');
+        $this->smarty->assign(array(
+            'linkFilter' => $linkFilterCoachs,
+        ));
+        $this->syntheseCoachsFilterCoach();
+        $this->syntheseCoachsFilterCodeAction();
+        return $this->display(__FILE__, 'synthesecoachs/synthesecoachsfilter.tpl');
+
+    }
+
+    private function syntheseCoachsFilterCoach()
+    {
         $this->idFilterCoach = (int)$this->context->employee->id;
         $idProfil = $this->context->employee->id_profile;
 
@@ -604,16 +639,30 @@ class CdModuleCA extends ModuleGrid
             }
             $this->idFilterCoach = $this->context->cookie->cdmoculeca_id_filter_coach;
 
-            $linkFilterCoachs = AdminController::$currentIndex . '&module=' . $this->name
-                . '&token=' . Tools::getValue('token');
-
             $this->smarty->assign(array(
                 'coachs' => $listCoaches,
-                'linkFilter' => $linkFilterCoachs,
                 'filterActif' => (int)$this->context->cookie->cdmoculeca_id_filter_coach,
             ));
-            return $this->display(__FILE__, 'synthesecoachs/synthesecoachsfilter.tpl');
         }
+    }
+
+    private function syntheseCoachsFilterCodeAction()
+    {
+        if (Tools::isSubmit('submitFilterCodeAction')) {
+            $this->context->cookie->cdmoduleca_id_filter_code_action = Tools::getValue('filterCodeAction');
+        }
+        $this->idFilterCodeAction = ($this->context->cookie->cdmoduleca_id_filter_code_action)
+            ?$this->context->cookie->cdmoduleca_id_filter_code_action:'0';
+
+        $listCodesAction = $this->getAllGroupeCodesAction();
+        $listCodesAction[] = array(
+            'id_code_action' => '0',
+            'name' => 'Tous les codes'
+        );
+        $this->context->smarty->assign(array(
+            'codesAction' => $listCodesAction,
+            'filterCodeAction' => $this->idFilterCodeAction
+        ));
     }
 
 }
