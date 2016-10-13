@@ -74,18 +74,68 @@ class CdModuleCA extends ModuleGrid
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->table_charset = 'utf8';
 
-        $this->default_sort_column = 'total';
-        $this->default_sort_direction = 'ASC';
+        $this->default_sort_column = 'id';
+        $this->default_sort_direction = 'DESC';
 
         $this->columns = array(
             array(
-                'id' => 'total',
+                'id' => 'id',
                 'header' => $this->l('id'),
-                'dataIndex' => 'total',
+                'dataIndex' => 'id',
+                'align' => 'center'
+            ),
+            array(
+                'id' => 'hthp',
+                'header' => $this->l('ht-hp'),
+                'dataIndex' => 'hthp',
+                'align' => 'center',
+            ),
+            array(
+                'id' => 'id_employee',
+                'header' => $this->l('id coach'),
+                'dataIndex' => 'id_employee',
+                'align' => 'center'
+            ),
+            array(
+                'id' => 'id_customer',
+                'header' => $this->l('id client'),
+                'dataIndex' => 'id_customer',
+                'align' => 'center'
+            ),
+            array(
+                'id' => 'id_code_action',
+                'header' => $this->l('id code action'),
+                'dataIndex' => 'id_code_action',
+                'align' => 'center'
+            ),
+            array(
+                'id' => 'code_action',
+                'header' => $this->l('code action'),
+                'dataIndex' => 'code_action',
+                'align' => 'center'
+            ),
+            array(
+                'id' => 'new',
+                'header' => $this->l('new'),
+                'dataIndex' => 'new',
+                'align' => 'center'
+            ),
+            array(
+                'id' => 'date_add',
+                'header' => $this->l('date add'),
+                'dataIndex' => 'date_add',
+                'align' => 'center'
+            ),
+            array(
+                'id' => 'date_upd',
+                'header' => $this->l('date upd'),
+                'dataIndex' => 'date_upd',
                 'align' => 'center'
             ),
 
         );
+        $this->setIdFilterCoach();
+        $this->setIdFilterCodeAction();
     }
 
     public function install()
@@ -192,10 +242,12 @@ class CdModuleCA extends ModuleGrid
         } elseif (Tools::isSubmit('submitUpdateCodeAction')) {
             $codes_action = $this->getAllCodesAction();
             foreach ($codes_action as $code) {
-                if (!Db::getInstance()->update('code_action',
+                if (Db::getInstance()->update('code_action',
                     array('groupe' => Tools::getValue($code['id_code_action'])),
                     'id_code_action = ' . $code['id_code_action'])
                 ) {
+                    $this->updateOrdersTableIdCodeAction();
+                } else {
                     $error .= $this->l('Erreur lors de la mise à jour des codes action.');
                 }
             }
@@ -405,15 +457,22 @@ class CdModuleCA extends ModuleGrid
             'PROSP52' => array('Prospection tracer 52', '2'),
             'PROSP53' => array('Prospection tracer 53', '2'),
             'PROSP ENTR' => array('Contact entrant sans fiche client', '2'),
-            'FID' => array('FID', '18'),
-            'FID PROMO' => array('FID suite promo', '18'),
-            'FID PROG F' => array('FID programme fidélité', '18'),
-            'PAR' => array('Parrainage', '21'),
-            'REACT+4M' => array('Reactivation fichier clients +4mois', '22'),
-            'REACT+4MPROMO' => array('Reactivation fichier clients +4mois suite à promo', '22'),
-            'REACT SPONT' => array('Reactivation client spontanée', '22'),
-            'REACT SPONT PROMO' => array('Reactivation client spontanée suite à promo', '22'),
-            'REACT AC FORM' => array('Reactivation client AC formulaire', '22')
+            'PROSP REL' => array('Prospection REL', '2'),
+            'FID' => array('FID', '19'),
+            'FID PROMO' => array('FID suite promo', '19'),
+            'FID PROG F' => array('FID programme fidélité', '19'),
+            'FID WEB PRGF' => array('FID web PRGF', '19'),
+            'FID WEB PROMO' => array('FID web PROMO', '19'),
+            'FID WEB' => array('FID web', '19'),
+            'PAR' => array('Parrainage', '25'),
+            'REACT+4M' => array('Reactivation fichier clients +4mois', '26'),
+            'REACT+4MPROMO' => array('Reactivation fichier clients +4mois suite à promo', '26'),
+            'REACT SPONT' => array('Reactivation client spontanée', '26'),
+            'REACT SPONT PROMO' => array('Reactivation client spontanée suite à promo', '26'),
+            'REACTSPONT' => array('Reactivation client AC formulaire', '26'),
+            'REACT AC FORM' => array('Reactivation client AC formulaire', '26'),
+            'REACTIV' => array('Reactivation REACTIV', '26'),
+            'CONT ENTR' => array('CONT ENTR', '33')
         );
         $data = array();
         $c = 1;
@@ -461,7 +520,7 @@ class CdModuleCA extends ModuleGrid
         $listCodesAction = $this->getAllCodesAction();
 
         foreach ($listCodesAction as $code) {
-            $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET id_code_action = ' . $code['id_code_action'] . '
+            $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET id_code_action = ' . $code['groupe'] . '
             WHERE  code_action = "' . $code['name'] . '"';
             Db::getInstance()->execute($sql);
         }
@@ -477,7 +536,7 @@ class CdModuleCA extends ModuleGrid
 
     private function getCodeAction($id)
     {
-        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE id_code_action = '. (intval($id));
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE id_code_action = ' . (intval($id));
 
         return Db::getInstance()->getRow($sql);
     }
@@ -498,6 +557,7 @@ class CdModuleCA extends ModuleGrid
 
     public function hookAdminStatsModules($params)
     {
+        $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/statscdmoduleca.css');
         $engine_params = array(
             'id' => 'id_order',
             'title' => $this->displayName,
@@ -524,6 +584,31 @@ class CdModuleCA extends ModuleGrid
         $this->html .= $this->display(__FILE__, 'footerstats.tpl');
 
         return $this->html;
+    }
+
+    private function setIdFilterCodeAction()
+    {
+        if (Tools::isSubmit('submitFilterCodeAction')) {
+            $this->context->cookie->cdmoduleca_id_filter_code_action = Tools::getValue('filterCodeAction');
+        }
+        $this->idFilterCodeAction = ($this->context->cookie->cdmoduleca_id_filter_code_action)
+            ? $this->context->cookie->cdmoduleca_id_filter_code_action : '0';
+
+        return $this->idFilterCodeAction;
+    }
+
+    private function setIdFilterCoach()
+    {
+        $this->idFilterCoach = (int)$this->context->employee->id;
+
+        if ($this->viewAllCoachs[$this->context->employee->id_profile]) {
+            if (Tools::isSubmit('submitFilterCoachs')) {
+                $this->context->cookie->cdmoculeca_id_filter_coach = Tools::getValue('filterCoach');
+            }
+            $this->idFilterCoach = $this->context->cookie->cdmoculeca_id_filter_coach;
+        }
+
+        return $this->idFilterCoach;
     }
 
     public function hookActionValidateOrder($params)
@@ -555,11 +640,15 @@ class CdModuleCA extends ModuleGrid
     protected function getData()
     {
         $this->query = '
-          SELECT SQL_CALC_FOUND_ROWS SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) as total 
+          SELECT SQL_CALC_FOUND_ROWS id_order AS id, ROUND(o.total_products - o.total_discounts_tax_excl,2) AS hthp,
+          id_employee, id_code_action, id_customer, date_add, date_upd, code_action,
+          IF((SELECT so.id_order FROM `ps_orders` so WHERE so.id_customer = o.id_customer 
+          AND so.id_order < o.id_order LIMIT 1) > 0, 1, 0) as new
 				FROM ' . _DB_PREFIX_ . 'orders AS o
-				WHERE valid = 1
-				AND id_employee = 30
-				AND date_add BETWEEN ' . $this->getDate();
+				WHERE valid = 1 ';
+        $this->query .= ($this->idFilterCoach != 0) ? ' AND id_employee = ' . $this->idFilterCoach : '';
+        $this->query .= ($this->idFilterCodeAction != 0) ? ' AND id_code_action = ' . $this->idFilterCodeAction : '';
+        $this->query .= ' AND date_add BETWEEN ' . $this->getDate();
 
 
         if (Validate::IsName($this->_sort)) {
@@ -603,11 +692,45 @@ class CdModuleCA extends ModuleGrid
         $html = $this->display(__FILE__, 'synthesecoachs/synthesecoachsheader.tpl');
         $html .= $this->syntheseCoachsFilter();
 
-        $html .= $this->display(__FILE__, 'synthesecoachs/synthesecoachscontent.tpl');
+        $html .= $this->syntheseCoachsContent();
         $html .= $this->display(__FILE__, 'synthesecoachs/synthesecoachsfooter.tpl');
         return $html;
     }
 
+    private function syntheseCoachsContent()
+    {
+        $this->syntheseCoachsContentGetData();
+        return $this->display(__FILE__, 'synthesecoachs/synthesecoachscontent.tpl');
+    }
+
+    private function syntheseCoachsContentGetData()
+    {
+        $this->smarty->assign(array(
+            'caCoachsTotal' => $this->getCaCoachsTotal(0, $this->idFilterCodeAction),
+            'caCoach' => $this->getCaCoachsTotal($this->idFilterCoach, $this->idFilterCodeAction),
+            'coach' => new Employee($this->idFilterCoach),
+            'caFidTotal' => $this->getCaFid(0),
+            'caFidCoach' => $this->getCaFid($this->idFilterCoach),
+        ));
+    }
+
+    private function getCaCoachsTotal($idCoach = 0, $idCodeAction = 0)
+    {
+        $filterCoach = ($idCoach != 0)
+            ? ' AND id_employee = ' . $idCoach : '';
+
+        $filterCodeAction = ($idCodeAction != 0)
+            ? ' AND id_code_action = ' . $idCodeAction : '';
+
+        $sql = 'SELECT SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) as total
+                FROM ' . _DB_PREFIX_ . 'orders AS o
+                WHERE valid = 1 ';
+        $sql .= $filterCoach;
+        $sql .= $filterCodeAction;
+        $sql .= ' AND date_add BETWEEN ' . $this->getDate();
+
+        return Db::getInstance()->getValue($sql);
+    }
 
     private function syntheseCoachsFilter()
     {
@@ -616,6 +739,7 @@ class CdModuleCA extends ModuleGrid
         $this->smarty->assign(array(
             'linkFilter' => $linkFilterCoachs,
         ));
+
         $this->syntheseCoachsFilterCoach();
         $this->syntheseCoachsFilterCodeAction();
         return $this->display(__FILE__, 'synthesecoachs/synthesecoachsfilter.tpl');
@@ -624,7 +748,6 @@ class CdModuleCA extends ModuleGrid
 
     private function syntheseCoachsFilterCoach()
     {
-        $this->idFilterCoach = (int)$this->context->employee->id;
         $idProfil = $this->context->employee->id_profile;
 
         if ($this->viewAllCoachs[$idProfil]) {
@@ -634,26 +757,15 @@ class CdModuleCA extends ModuleGrid
                 'lastname' => 'Tous les coachs',
                 'firstname' => '---');
 
-            if (Tools::isSubmit('submitFilterCoachs')) {
-                $this->context->cookie->cdmoculeca_id_filter_coach = Tools::getValue('filterCoach');
-            }
-            $this->idFilterCoach = $this->context->cookie->cdmoculeca_id_filter_coach;
-
             $this->smarty->assign(array(
                 'coachs' => $listCoaches,
-                'filterActif' => (int)$this->context->cookie->cdmoculeca_id_filter_coach,
+                'filterActif' => (int)$this->idFilterCoach,
             ));
         }
     }
 
     private function syntheseCoachsFilterCodeAction()
     {
-        if (Tools::isSubmit('submitFilterCodeAction')) {
-            $this->context->cookie->cdmoduleca_id_filter_code_action = Tools::getValue('filterCodeAction');
-        }
-        $this->idFilterCodeAction = ($this->context->cookie->cdmoduleca_id_filter_code_action)
-            ?$this->context->cookie->cdmoduleca_id_filter_code_action:'0';
-
         $listCodesAction = $this->getAllGroupeCodesAction();
         $listCodesAction[] = array(
             'id_code_action' => '0',
@@ -665,4 +777,55 @@ class CdModuleCA extends ModuleGrid
         ));
     }
 
+    private function getCaFid($idFilterCoach = 0)
+    {
+        $filterCoach = ($idFilterCoach != 0)
+            ? ' AND id_employee = ' . $idFilterCoach : '';
+
+        $sql = 'SELECT ROUND(o.total_products - o.total_discounts_tax_excl,2) AS total,
+          IF((SELECT so.id_order FROM `ps_orders` so WHERE so.id_customer = o.id_customer 
+          AND so.id_order < o.id_order LIMIT 1) > 0, 1, 0) as notNew
+				FROM ' . _DB_PREFIX_ . 'orders AS o
+				WHERE valid = 1';
+        $sql .= $filterCoach;
+        $sql .= ' AND id_code_Action = ' . $this->getCodeActionbyName('FID');
+        $sql .= ' AND date_add BETWEEN ' . $this->getDate();
+
+        $caFID = Db::getInstance()->executeS($sql);
+
+        $total = '';
+        foreach ($caFID as $ca) {
+            $total += ($ca['notNew']) ? $ca['total'] : 0;
+        }
+
+        return $total;
+    }
+
+    private function getCodeActionbyName($name)
+    {
+        return Db::getInstance()->getValue('SELECT id_code_action FROM `'._DB_PREFIX_.'code_action` WHERE name = "' . $name .'"' );
+    }
+
 }
+
+//   SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS
+//   a.`id_order`,`total_paid_tax_incl`,`payment`,a.date_add as date_add,`code_action`,`coach`
+//   ,
+//   a.id_currency,
+//   a.id_order AS id_pdf,
+//   CONCAT(LEFT(c.`firstname`, 1), '. ', c.`lastname`) AS `customer`,
+//   osl.`name` AS `osname`,
+//   os.`color`,
+//   IF((SELECT so.id_order FROM `ps_orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
+//   country_lang.name as cname,(SELECT GROUP_CONCAT(id_group SEPARATOR ", ") FROM `ps_customer_group` cg  WHERE cg.`id_customer`=a.`id_customer` GROUP by cg.`id_customer`) as id_group,
+//   (SELECT ord.`total_products` - ord.`total_discounts_tax_excl` FROM `ps_orders` ord where ord.`id_order`=a.`id_order`) as total_ht_hp,
+//   IF(a.valid, 1, 0) badge_success
+//   FROM `ps_orders` a
+//   LEFT JOIN `ps_customer` c ON (c.`id_customer` = a.`id_customer`)
+//   INNER JOIN `ps_address` address ON address.id_address = a.id_address_delivery
+//   INNER JOIN `ps_country` country ON address.id_country = country.id_country
+//   INNER JOIN `ps_country_lang` country_lang ON (country.`id_country` = country_lang.`id_country` AND country_lang.`id_lang` = 2)
+//   LEFT JOIN `ps_order_state` os ON (os.`id_order_state` = a.`current_state`)
+//   LEFT JOIN `ps_order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = 2)
+//   WHERE 1
+//   ORDER BY a.`date_add` DESC LIMIT 0,50
