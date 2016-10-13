@@ -28,7 +28,6 @@ if (!defined('_PS_VERSION_')) {
     exit();
 }
 
-require_once(dirname(__FILE__) . '/controllers/admin/cdmoduleca.php');
 
 class CdModuleCA extends ModuleGrid
 {
@@ -40,6 +39,8 @@ class CdModuleCA extends ModuleGrid
     public $default_sort_direction;
     public $empty_message;
     public $paging_message;
+    public $viewAllCoachs;
+    public $idFilterCoach;
     public $config = array(
         'CDMODULECA' => '1'
     );
@@ -57,13 +58,23 @@ class CdModuleCA extends ModuleGrid
 
         $this->displayName = $this->l('Module CA');
         $this->description = $this->l('Synthèse CA pour L et Sens');
+        $this->viewAllCoachs = array(
+            '1' => true,    // SuperAdmin
+            '2' => false,   // Logisticien
+            '3' => false,   // Traducteur
+            '4' => false,   // Commercial
+            '5' => false,   // Diet
+            '6' => false,   // Stagiaire
+            '7' => true,    // Manager
+            '8' => false    // WebMarketing
+        );
         $this->empty_message = $this->l('Pas d\'enregistrement disponible');
         $this->paging_message = sprintf($this->l('Affichage %1$s de %2$s'), '{0} - {1}', '{2}');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->table_charset = 'utf8';
 
-        $this->default_sort_column = 'id_order';
-        $this->default_sort_direction = 'DESC';
+        $this->default_sort_column = 'total';
+        $this->default_sort_direction = 'ASC';
 
         $this->columns = array(
             array(
@@ -465,7 +476,30 @@ class CdModuleCA extends ModuleGrid
 
     public function hookAdminStatsModules($params)
     {
-        $this->html = StatsCdModuleCa::hookAdminStatsModules($this);
+        $engine_params = array(
+            'id' => 'id_order',
+            'title' => $this->displayName,
+            'columns' => $this->columns,
+            'defaultSortColumn' => $this->default_sort_column,
+            'defaultSortDirection' => $this->default_sort_direction,
+            'emptyMessage' => $this->empty_message,
+            'pagingMessage' => $this->paging_message
+        );
+
+        if (Tools::getValue('export')) {
+            $this->csvExport($engine_params);
+        }
+
+        $this->smarty->assign(array(
+            'displayName' => $this->displayName,
+            'CSVExport' => $this->l('CSV Export'),
+            'CSVLink' => Tools::safeOutput($_SERVER['REQUEST_URI'] . '&export=1')
+        ));
+
+        $this->html .= $this->display(__FILE__, 'headerstats.tpl');
+        $this->html .= $this->syntheseCoachs();
+        $this->html .= $this->engine($engine_params);
+        $this->html .= $this->display(__FILE__, 'footerstats.tpl');
 
         return $this->html;
     }
@@ -498,7 +532,26 @@ class CdModuleCA extends ModuleGrid
 
     protected function getData()
     {
-        $this->_values = StatsCdModuleCa::getDataCdModuleCa($this);
+        $this->query = '
+          SELECT SQL_CALC_FOUND_ROWS SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) as total 
+				FROM ' . _DB_PREFIX_ . 'orders AS o
+				WHERE valid = 1
+				AND id_employee = 30
+				AND date_add BETWEEN ' . $this->getDate();
+
+
+        if (Validate::IsName($this->_sort)) {
+            $this->query .= ' ORDER BY `' . bqSQL($this->_sort) . '`';
+            if (isset($this->_direction) && (Tools::strtoupper($this->_direction) == 'ASC' || Tools::strtoupper($this->_direction) == 'DESC'))
+                $this->query .= ' ' . pSQL($this->_direction);
+        }
+
+        if (($this->_start === 0 || Validate::IsUnsignedInt($this->_start)) && Validate::IsUnsignedInt($this->_limit))
+            $this->query .= ' LIMIT ' . (int)$this->_start . ', ' . (int)$this->_limit;
+
+        $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
+
+        $this->_values = $values;
         $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
     }
 
@@ -520,6 +573,47 @@ class CdModuleCA extends ModuleGrid
             ->where('name = ' . $code_action);
 
         return Db::getInstance()->getValue($req);
+    }
+
+
+    private function syntheseCoachs()
+    {
+        $html = $this->display(__FILE__, 'synthesecoachs/synthesecoachsheader.tpl');
+        $html .= $this->syntheseCoachsFilter();
+
+        $html .= $this->display(__FILE__, 'synthesecoachs/synthesecoachscontent.tpl');
+        $html .= $this->display(__FILE__, 'synthesecoachs/synthesecoachsfooter.tpl');
+        return $html;
+    }
+
+
+    private function syntheseCoachsFilter()
+    {
+        $this->idFilterCoach = (int)$this->context->employee->id;
+        $idProfil = $this->context->employee->id_profile;
+
+        if ($this->viewAllCoachs[$idProfil]) {
+            $listCoaches = Employee::getEmployees();
+            $listCoaches[] = array(
+                'id_employee' => '0',
+                'lastname' => 'Tous les coachs',
+                'firstname' => '---');
+
+            if (Tools::isSubmit('submitFilterCoachs')) {
+                $this->context->cookie->cdmoculeca_id_filter_coach = Tools::getValue('filterCoach');
+            }
+            $this->idFilterCoach = $this->context->cookie->cdmoculeca_id_filter_coach;
+
+            $linkFilterCoachs = AdminController::$currentIndex . '&module=' . $this->name
+                . '&token=' . Tools::getValue('token');
+
+            $this->smarty->assign(array(
+                'coachs' => $listCoaches,
+                'linkFilter' => $linkFilterCoachs,
+                'filterActif' => (int)$this->context->cookie->cdmoculeca_id_filter_coach,
+            ));
+            return $this->display(__FILE__, 'synthesecoachs/synthesecoachsfilter.tpl');
+        }
     }
 
 }
