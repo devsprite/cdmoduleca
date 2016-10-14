@@ -42,6 +42,7 @@ class CdModuleCA extends ModuleGrid
     public $viewAllCoachs;
     public $idFilterCoach;
     public $idFilterCodeAction;
+    public $employees_actif;
     public $config = array(
         'CDMODULECA' => '1',
         'CDMODULECA_ORDERS_STATE' => '7'
@@ -77,7 +78,7 @@ class CdModuleCA extends ModuleGrid
 
         $this->default_sort_column = 'id';
         $this->default_sort_direction = 'DESC';
-
+        $this->employees_actif = 1;
         $this->columns = array(
             array(
                 'id' => 'id',
@@ -234,8 +235,8 @@ class CdModuleCA extends ModuleGrid
             $groups = $this->getGroupsParrain();
             foreach ($groups as $group) {
                 if (!Db::getInstance()->update('group_lang',
-                    array('parrain' => str_replace('gp_','',Tools::getValue('gp_'.$group['id_group']))),
-                    'id_group = ' . str_replace('gp_','',$group['id_group']))
+                    array('parrain' => str_replace('gp_', '', Tools::getValue('gp_' . $group['id_group']))),
+                    'id_group = ' . str_replace('gp_', '', $group['id_group']))
                 ) {
                     $error .= $this->l('Erreur lors de la mise à jour des groupes');
                 }
@@ -244,8 +245,8 @@ class CdModuleCA extends ModuleGrid
             $codes_action = $this->getAllCodesAction();
             foreach ($codes_action as $code) {
                 if (Db::getInstance()->update('code_action',
-                    array('groupe' => str_replace('ca_','',Tools::getValue('ca_'.$code['id_code_action']))),
-                    'id_code_action = ' . str_replace('ca_','',$code['id_code_action']))
+                    array('groupe' => str_replace('ca_', '', Tools::getValue('ca_' . $code['id_code_action']))),
+                    'id_code_action = ' . str_replace('ca_', '', $code['id_code_action']))
                 ) {
                     $this->updateOrdersTableIdCodeAction();
                 } else {
@@ -257,11 +258,11 @@ class CdModuleCA extends ModuleGrid
             $listStatuts = OrderState::getOrderStates($lang);
             $statuts = array();
             foreach ($listStatuts as $statut) {
-                if (Tools::getValue('os_'.$statut['id_order_state'])) {
+                if (Tools::getValue('os_' . $statut['id_order_state'])) {
                     $statuts[] = $statut['id_order_state'];
                 }
             }
-            $confStatus = implode(',',$statuts);
+            $confStatus = implode(',', $statuts);
             Configuration::updateValue('CDMODULECA_ORDERS_STATE', $confStatus);
         }
 
@@ -289,7 +290,7 @@ class CdModuleCA extends ModuleGrid
             $inputs[] = array(
                 'type' => 'select',
                 'label' => $value['description'] . ' (' . $value['name'] . ')',
-                'name' => 'ca_'.$value['id_code_action'],
+                'name' => 'ca_' . $value['id_code_action'],
                 'options' => array(
                     'query' => $codesAction,
                     'id' => 'id_code_action',
@@ -336,8 +337,8 @@ class CdModuleCA extends ModuleGrid
         foreach ($listStatuts as $statut => $value) {
             $inputs[] = array(
                 'type' => 'switch',
-                'label' => $value['name'],
-                'name' => 'os_'.$value['id_order_state'],
+                'label' => $value['name'] . '  ( ' . $value['id_order_state'] . ' )',
+                'name' => 'os_' . $value['id_order_state'],
                 'desc' => $this->l('Commandes déduite du CA du coach ?'),
                 'values' => array(
                     array(
@@ -390,7 +391,7 @@ class CdModuleCA extends ModuleGrid
             $inputs[] = array(
                 'type' => 'switch',
                 'label' => $value['name'],
-                'name' => 'gp_'.$value['id_group'],
+                'name' => 'gp_' . $value['id_group'],
                 'desc' => $this->l('Groupe Parrain ?'),
                 'values' => array(
                     array(
@@ -444,11 +445,11 @@ class CdModuleCA extends ModuleGrid
         $conf_statuts = explode(',', Configuration::get('CDMODULECA_ORDERS_STATE'));
 
         foreach ($list_statuts as $statut => $value) {
-            $statuts['os_'.$value['id_order_state']] = 0;
+            $statuts['os_' . $value['id_order_state']] = 0;
         }
 
         foreach ($conf_statuts as $conf) {
-            $statuts['os_'.$conf] = 1;
+            $statuts['os_' . $conf] = 1;
         }
 
         return $statuts;
@@ -459,7 +460,7 @@ class CdModuleCA extends ModuleGrid
         $code_action = array();
         $codes = $this->getAllCodesAction();
         foreach ($codes as $code => $value) {
-            $code_action['ca_'.$value['id_code_action']] = $value['groupe'];
+            $code_action['ca_' . $value['id_code_action']] = $value['groupe'];
         }
 
         return $code_action;
@@ -474,7 +475,7 @@ class CdModuleCA extends ModuleGrid
         $groups_parrain = array();
         $groups = $this->getGroupsParrain();
         foreach ($groups as $group => $value) {
-            $groups_parrain['gp_'.$value['id_group']] = $value['parrain'];
+            $groups_parrain['gp_' . $value['id_group']] = $value['parrain'];
         }
 
         return $groups_parrain;
@@ -686,15 +687,14 @@ class CdModuleCA extends ModuleGrid
     private function setIdFilterCoach()
     {
         $this->idFilterCoach = (int)$this->context->employee->id;
-
         if ($this->viewAllCoachs[$this->context->employee->id_profile]) {
             if (Tools::isSubmit('submitFilterCoachs')) {
                 $this->context->cookie->cdmoculeca_id_filter_coach = Tools::getValue('filterCoach');
+                $this->context->cookie->cdmoculeca_id_filter_coach_actif = Tools::getValue('filterCoachActif');
             }
             $this->idFilterCoach = $this->context->cookie->cdmoculeca_id_filter_coach;
+            $this->employees_actif = $this->context->cookie->cdmoculeca_id_filter_coach_actif;
         }
-
-        return $this->idFilterCoach;
     }
 
     public function hookActionValidateOrder($params)
@@ -779,6 +779,7 @@ class CdModuleCA extends ModuleGrid
         $html .= $this->syntheseCoachsFilter();
 
         $html .= $this->syntheseCoachsContent();
+        $html .= $this->syntheseCoachsTable();
         $html .= $this->display(__FILE__, 'synthesecoachs/synthesecoachsfooter.tpl');
         return $html;
     }
@@ -792,14 +793,17 @@ class CdModuleCA extends ModuleGrid
     private function syntheseCoachsContentGetData()
     {
         $this->smarty->assign(array(
-            'caTotal' => $this->getCaCoachsTotal(0, 0),
-            'caTotalCoach' => $this->getCaCoachsTotal($this->idFilterCoach, 0),
             'caCoachsTotal' => $this->getCaCoachsTotal(0, $this->idFilterCodeAction),
             'caCoach' => $this->getCaCoachsTotal($this->idFilterCoach, $this->idFilterCodeAction),
+            'caFidTotal' => $this->getCaDejaInscrit(0),
+            'caFidCoach' => $this->getCaDejaInscrit($this->idFilterCoach),
+            'caDeduitTotal' => $this->getCaDeduit(),
+            'caDeduitCoach' => $this->getCaDeduit($this->idFilterCoach),
+
+            'caTotal' => $this->getCaCoachsTotal(0, 0),
+            'caTotalCoach' => $this->getCaCoachsTotal($this->idFilterCoach, 0),
             'coach' => new Employee($this->idFilterCoach),
             'filterCodeAction' => $this->getCodeAction($this->idFilterCodeAction),
-            'caFidTotal' => $this->getCaFid(0),
-            'caFidCoach' => $this->getCaFid($this->idFilterCoach),
         ));
     }
 
@@ -840,7 +844,7 @@ class CdModuleCA extends ModuleGrid
         $idProfil = $this->context->employee->id_profile;
 
         if ($this->viewAllCoachs[$idProfil]) {
-            $listCoaches = Employee::getEmployees();
+            $listCoaches = $this->getEmployees($this->employees_actif);
             $listCoaches[] = array(
                 'id_employee' => '0',
                 'lastname' => 'Tous les coachs',
@@ -849,6 +853,7 @@ class CdModuleCA extends ModuleGrid
             $this->smarty->assign(array(
                 'coachs' => $listCoaches,
                 'filterActif' => (int)$this->idFilterCoach,
+                'filterCoachActif' => $this->employees_actif
             ));
         }
     }
@@ -866,20 +871,18 @@ class CdModuleCA extends ModuleGrid
         ));
     }
 
-    private function getCaFid($idFilterCoach = 0)
+    private function getCaDejaInscrit($idFilterCoach = 0)
     {
         $filterCoach = ($idFilterCoach != 0)
             ? ' AND id_employee = ' . $idFilterCoach : '';
 
         $sql = 'SELECT ROUND(o.total_products - o.total_discounts_tax_excl,2) AS total,
-          IF((SELECT so.id_order FROM `ps_orders` so WHERE so.id_customer = o.id_customer 
-          AND so.id_order < o.id_order LIMIT 1) > 0, 1, 0) as notNew
+                IF((SELECT so.id_order FROM `ps_orders` so WHERE so.id_customer = o.id_customer 
+                AND so.id_order < o.id_order LIMIT 1) > 0, 1, 0) as notNew
 				FROM ' . _DB_PREFIX_ . 'orders AS o
 				WHERE valid = 1';
         $sql .= $filterCoach;
-        $sql .= ' AND id_code_Action = ' . $this->getCodeActionbyName('FID');
         $sql .= ' AND date_add BETWEEN ' . $this->getDate();
-
         $caFID = Db::getInstance()->executeS($sql);
 
         $total = '';
@@ -890,10 +893,92 @@ class CdModuleCA extends ModuleGrid
         return $total;
     }
 
+    private function getCaDeduit($idFilterCoach = 0)
+    {
+        $listStatuts = explode(',', Configuration::get('CDMODULECA_ORDERS_STATE'));
+        $sqlStatuts = ' AND ( ';
+        foreach ($listStatuts as $statut) {
+            $sqlStatuts .= ' current_state = ' . $statut . ' OR ';
+        }
+        $sqlStatuts = substr($sqlStatuts, 0, -3) . ')';
+
+        $filterCoach = ($idFilterCoach != 0)
+            ? ' AND id_employee = ' . $idFilterCoach : '';
+
+        $sql = 'SELECT SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) as total
+                FROM ' . _DB_PREFIX_ . 'orders AS o
+                WHERE valid = 1 ';
+        $sql .= $filterCoach;
+        $sql .= ' AND date_add BETWEEN ' . $this->getDate();
+        $sql .= $sqlStatuts;
+
+        return Db::getInstance()->getValue($sql);
+    }
+
     private function getCodeActionbyName($name)
     {
         return Db::getInstance()->getValue('SELECT id_code_action FROM `' . _DB_PREFIX_ . 'code_action` WHERE name = "' . $name . '"');
     }
+
+    private function getEmployees($active = 0)
+    {
+        $sql = 'SELECT `id_employee`, `firstname`, `lastname`
+			FROM `' . _DB_PREFIX_ . 'employee` ';
+        $sql .= ($active == 'on') ? 'WHERE active = 1 ' : '';
+        $sql .= 'ORDER BY `id_employee` ASC';
+        return Db::getInstance()->executeS($sql);
+    }
+
+    private function syntheseCoachsTable()
+    {
+        $employees = $this->getEmployees($this->employees_actif);
+        $datasEmployees = array();
+        foreach ($employees as $employee) {
+            $datasEmployees[$employee['id_employee']]['lastname'] = $employee['lastname'];
+            $datasEmployees[$employee['id_employee']]['firstname'] = $employee['firstname'];
+
+            $datasEmployees[$employee['id_employee']]['caTotal'] =
+                $this->getCaCoachsTotal($employee['id_employee'], 0);
+
+            $datasEmployees[$employee['id_employee']]['caDejaInscrit'] =
+                $this->getCaDejaInscrit($employee['id_employee']);
+
+            $datasEmployees[$employee['id_employee']]['CaProsp'] =
+                $this->caProsp($datasEmployees[$employee['id_employee']]);
+
+            $datasEmployees[$employee['id_employee']]['PourcCaProspect'] =
+                $this->PourcCaProspect($datasEmployees[$employee['id_employee']]);
+
+            $datasEmployees[$employee['id_employee']]['PourcCaFID'] =
+                $this->PourcCaFID($datasEmployees[$employee['id_employee']]);
+
+        }
+
+        $this->smarty->assign(array(
+            'datasEmployees' => $datasEmployees,
+            'dateRequete' => $this->getDate()
+        ));
+
+        return $this->display(__FILE__, 'synthesecoachs/synthesecoachstable.tpl');
+    }
+
+    private function caProsp($data)
+    {
+        return ($data['caTotal']) ? $data['caTotal'] - $data['caDejaInscrit'] : '';
+    }
+
+    private function PourcCaProspect($data)
+    {
+        return (isset($data['caTotal'])) ? number_format(($data['CaProsp'] * 100) / $data['caTotal'], 2) . ' %' : '';
+    }
+
+    private function PourcCaFID($data)
+    {
+        return (isset($data['caTotal'])) ? number_format(($data['caDejaInscrit'] * 100) / $data['caTotal'], 2) . ' %' : '';
+    }
+
+
+
 
     //   SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS
 //   a.`id_order`,`total_paid_tax_incl`,`payment`,a.date_add as date_add,`code_action`,`coach`

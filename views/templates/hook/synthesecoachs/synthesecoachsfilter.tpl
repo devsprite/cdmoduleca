@@ -16,6 +16,12 @@
                             {/foreach}
                         </select>
                         <input type="hidden" name="submitFilterCoachs" value="1"/>
+                        <div class="checkbox">
+                            <label for="filterCoachActif">
+                                <input type="checkbox" name="filterCoachActif" id="filterCoachActif"
+                                       onchange="this.form.submit();" {if $filterCoachActif}checked{/if}>
+                                Actif</label>
+                        </div>
                     </div>
                 </div>
             </form>
