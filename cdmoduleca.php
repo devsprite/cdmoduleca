@@ -920,18 +920,23 @@ class CdModuleCA extends ModuleGrid
         return Db::getInstance()->getValue('SELECT id_code_action FROM `' . _DB_PREFIX_ . 'code_action` WHERE name = "' . $name . '"');
     }
 
-    private function getEmployees($active = 0)
+    private function getEmployees($active = 0, $id = null)
     {
         $sql = 'SELECT `id_employee`, `firstname`, `lastname`
 			FROM `' . _DB_PREFIX_ . 'employee` ';
         $sql .= ($active == 'on') ? 'WHERE active = 1 ' : '';
-        $sql .= 'ORDER BY `id_employee` ASC';
+        $sql .= ($id) ? ' WHERE id_employee = ' . $id : '';
+        $sql .= ' ORDER BY `id_employee` ASC';
         return Db::getInstance()->executeS($sql);
     }
 
     private function syntheseCoachsTable()
     {
-        $employees = $this->getEmployees($this->employees_actif);
+        $employees = $this->getEmployees(1, $this->context->employee->id);
+        if ($this->viewAllCoachs[$this->context->employee->id_profile]) {
+            $employees = $this->getEmployees($this->employees_actif);
+        }
+
         $datasEmployees = array();
         foreach ($employees as $employee) {
             $datasEmployees[$employee['id_employee']]['lastname'] = $employee['lastname'];
