@@ -43,7 +43,8 @@ class CdModuleCA extends ModuleGrid
     public $idFilterCoach;
     public $idFilterCodeAction;
     public $config = array(
-        'CDMODULECA' => '1'
+        'CDMODULECA' => '1',
+        'CDMODULECA_ORDERS_STATE' => '7'
     );
 
 
@@ -103,9 +104,9 @@ class CdModuleCA extends ModuleGrid
                 'align' => 'center'
             ),
             array(
-                'id' => 'id_code_action',
-                'header' => $this->l('id code action'),
-                'dataIndex' => 'id_code_action',
+                'id' => 'current_state',
+                'header' => $this->l('Etat Commande'),
+                'dataIndex' => 'current_state',
                 'align' => 'center'
             ),
             array(
@@ -233,8 +234,8 @@ class CdModuleCA extends ModuleGrid
             $groups = $this->getGroupsParrain();
             foreach ($groups as $group) {
                 if (!Db::getInstance()->update('group_lang',
-                    array('parrain' => Tools::getValue($group['id_group'])),
-                    'id_group = ' . $group['id_group'])
+                    array('parrain' => str_replace('gp_','',Tools::getValue('gp_'.$group['id_group']))),
+                    'id_group = ' . str_replace('gp_','',$group['id_group']))
                 ) {
                     $error .= $this->l('Erreur lors de la mise à jour des groupes');
                 }
@@ -243,14 +244,25 @@ class CdModuleCA extends ModuleGrid
             $codes_action = $this->getAllCodesAction();
             foreach ($codes_action as $code) {
                 if (Db::getInstance()->update('code_action',
-                    array('groupe' => Tools::getValue($code['id_code_action'])),
-                    'id_code_action = ' . $code['id_code_action'])
+                    array('groupe' => str_replace('ca_','',Tools::getValue('ca_'.$code['id_code_action']))),
+                    'id_code_action = ' . str_replace('ca_','',$code['id_code_action']))
                 ) {
                     $this->updateOrdersTableIdCodeAction();
                 } else {
                     $error .= $this->l('Erreur lors de la mise à jour des codes action.');
                 }
             }
+        } elseif (Tools::isSubmit('submitUpdateStatuts')) {
+            $lang = (int)Configuration::get('PS_LANG_DEFAULT');
+            $listStatuts = OrderState::getOrderStates($lang);
+            $statuts = array();
+            foreach ($listStatuts as $statut) {
+                if (Tools::getValue('os_'.$statut['id_order_state'])) {
+                    $statuts[] = $statut['id_order_state'];
+                }
+            }
+            $confStatus = implode(',',$statuts);
+            Configuration::updateValue('CDMODULECA_ORDERS_STATE', $confStatus);
         }
 
         if ($error) {
@@ -264,7 +276,8 @@ class CdModuleCA extends ModuleGrid
     private function displayForm()
     {
         $this->html .= $this->generateFormCodeAction();
-        $this->html .= $this->generateForm();
+        $this->html .= $this->generateFormStatutsCommande();
+        $this->html .= $this->generateFormGroupeParrain();
         $this->html .= $this->display(__FILE__, 'configuration.tpl');
     }
 
@@ -276,7 +289,7 @@ class CdModuleCA extends ModuleGrid
             $inputs[] = array(
                 'type' => 'select',
                 'label' => $value['description'] . ' (' . $value['name'] . ')',
-                'name' => $value['id_code_action'],
+                'name' => 'ca_'.$value['id_code_action'],
                 'options' => array(
                     'query' => $codesAction,
                     'id' => 'id_code_action',
@@ -314,7 +327,62 @@ class CdModuleCA extends ModuleGrid
 
     }
 
-    private function generateForm()
+    private function generateFormStatutsCommande()
+    {
+        $lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        $listStatuts = OrderState::getOrderStates($lang);
+
+        $inputs = array();
+        foreach ($listStatuts as $statut => $value) {
+            $inputs[] = array(
+                'type' => 'switch',
+                'label' => $value['name'],
+                'name' => 'os_'.$value['id_order_state'],
+                'desc' => $this->l('Commandes déduite du CA du coach ?'),
+                'values' => array(
+                    array(
+                        'id' => 'active_on',
+                        'value' => 1,
+                        'label' => $this->l('Enabled')
+                    ),
+                    array(
+                        'id' => 'active_off',
+                        'value' => 0,
+                        'label' => $this->l('Disabled')
+                    )
+                )
+            );
+        }
+        $fields_form = array(
+            'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Les commandes avec le statuts à Oui seront déduite du CA du coach.'),
+                    'icon' => 'icon-cogs'
+                ),
+                'input' => $inputs,
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                    'class' => 'btn btn-default pull-right',
+                    'name' => 'submitUpdateStatuts'
+                )
+            )
+        );
+
+        $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
+        $helper = new HelperForm();
+        $helper->default_form_language = $lang->id;
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name
+            . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfigStatusCommandes(),
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id
+        );
+        return $helper->generateForm(array($fields_form));
+    }
+
+    private function generateFormGroupeParrain()
     {
         $groupsParrain = $this->getGroupsParrain();
         $inputs = array();
@@ -322,7 +390,7 @@ class CdModuleCA extends ModuleGrid
             $inputs[] = array(
                 'type' => 'switch',
                 'label' => $value['name'],
-                'name' => $value['id_group'],
+                'name' => 'gp_'.$value['id_group'],
                 'desc' => $this->l('Groupe Parrain ?'),
                 'values' => array(
                     array(
@@ -331,7 +399,7 @@ class CdModuleCA extends ModuleGrid
                         'label' => $this->l('Enabled')
                     ),
                     array(
-                        'id' => 'active_ff',
+                        'id' => 'active_off',
                         'value' => 0,
                         'label' => $this->l('Disabled')
                     )
@@ -368,12 +436,30 @@ class CdModuleCA extends ModuleGrid
         return $helper->generateForm(array($fields_form));
     }
 
+    private function getConfigStatusCommandes()
+    {
+        $statuts = array();
+        $lang = (int)Configuration::get('PS_LANG_DEFAULT');
+        $list_statuts = OrderState::getOrderStates($lang);
+        $conf_statuts = explode(',', Configuration::get('CDMODULECA_ORDERS_STATE'));
+
+        foreach ($list_statuts as $statut => $value) {
+            $statuts['os_'.$value['id_order_state']] = 0;
+        }
+
+        foreach ($conf_statuts as $conf) {
+            $statuts['os_'.$conf] = 1;
+        }
+
+        return $statuts;
+    }
+
     private function getConfigCodeAction()
     {
         $code_action = array();
         $codes = $this->getAllCodesAction();
         foreach ($codes as $code => $value) {
-            $code_action[$value['id_code_action']] = $value['groupe'];
+            $code_action['ca_'.$value['id_code_action']] = $value['groupe'];
         }
 
         return $code_action;
@@ -388,7 +474,7 @@ class CdModuleCA extends ModuleGrid
         $groups_parrain = array();
         $groups = $this->getGroupsParrain();
         foreach ($groups as $group => $value) {
-            $groups_parrain[$value['id_group']] = $value['parrain'];
+            $groups_parrain['gp_'.$value['id_group']] = $value['parrain'];
         }
 
         return $groups_parrain;
@@ -641,14 +727,14 @@ class CdModuleCA extends ModuleGrid
     {
         $this->query = '
           SELECT SQL_CALC_FOUND_ROWS id_order AS id, ROUND(o.total_products - o.total_discounts_tax_excl,2) AS hthp,
-          id_employee, id_code_action, id_customer, date_add, date_upd, code_action,
+          id_employee, id_code_action, id_customer, date_add, date_upd, code_action, current_state ,
           IF((SELECT so.id_order FROM `ps_orders` so WHERE so.id_customer = o.id_customer 
           AND so.id_order < o.id_order LIMIT 1) > 0, 1, 0) as new
-				FROM ' . _DB_PREFIX_ . 'orders AS o
-				WHERE valid = 1 ';
+				FROM ' . _DB_PREFIX_ . 'orders AS o ';
+        $this->query .= ' WHERE date_add BETWEEN ' . $this->getDate();
         $this->query .= ($this->idFilterCoach != 0) ? ' AND id_employee = ' . $this->idFilterCoach : '';
         $this->query .= ($this->idFilterCodeAction != 0) ? ' AND id_code_action = ' . $this->idFilterCodeAction : '';
-        $this->query .= ' AND date_add BETWEEN ' . $this->getDate();
+        $this->query .= ' AND valid = 1 ';
 
 
         if (Validate::IsName($this->_sort)) {
@@ -706,9 +792,12 @@ class CdModuleCA extends ModuleGrid
     private function syntheseCoachsContentGetData()
     {
         $this->smarty->assign(array(
+            'caTotal' => $this->getCaCoachsTotal(0, 0),
+            'caTotalCoach' => $this->getCaCoachsTotal($this->idFilterCoach, 0),
             'caCoachsTotal' => $this->getCaCoachsTotal(0, $this->idFilterCodeAction),
             'caCoach' => $this->getCaCoachsTotal($this->idFilterCoach, $this->idFilterCodeAction),
             'coach' => new Employee($this->idFilterCoach),
+            'filterCodeAction' => $this->getCodeAction($this->idFilterCodeAction),
             'caFidTotal' => $this->getCaFid(0),
             'caFidCoach' => $this->getCaFid($this->idFilterCoach),
         ));
@@ -803,12 +892,10 @@ class CdModuleCA extends ModuleGrid
 
     private function getCodeActionbyName($name)
     {
-        return Db::getInstance()->getValue('SELECT id_code_action FROM `'._DB_PREFIX_.'code_action` WHERE name = "' . $name .'"' );
+        return Db::getInstance()->getValue('SELECT id_code_action FROM `' . _DB_PREFIX_ . 'code_action` WHERE name = "' . $name . '"');
     }
 
-}
-
-//   SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS
+    //   SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS
 //   a.`id_order`,`total_paid_tax_incl`,`payment`,a.date_add as date_add,`code_action`,`coach`
 //   ,
 //   a.id_currency,
@@ -829,3 +916,4 @@ class CdModuleCA extends ModuleGrid
 //   LEFT JOIN `ps_order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = 2)
 //   WHERE 1
 //   ORDER BY a.`date_add` DESC LIMIT 0,50
+}
