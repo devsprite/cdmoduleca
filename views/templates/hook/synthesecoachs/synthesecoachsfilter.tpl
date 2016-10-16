@@ -3,10 +3,10 @@
         {if isset($coachs)}
             <form action="{$linkFilter}" method="post">
                 <div class="form-group">
-                    <label class="control-label col-lg-1" for="filterCoach">
+                    <div class="col-lg-3 ">
+                    <label class="control-label" for="filterCoach">
                         Coach :
                     </label>
-                    <div class="col-lg-3 ">
                         <select name="filterCoach" class="fixed-width-xl" id="filterCoach"
                                 onchange="this.form.submit();">
                             {foreach item=coach from=$coachs}
@@ -28,10 +28,10 @@
         {/if}
         <form action="{$linkFilter}" method="post">
             <div class="form-group">
-                <label class="control-label col-lg-1" for="filterCodeAction">
+                <div class="col-lg-3">
+                <label class="control-label" for="filterCodeAction">
                     Code Action :
                 </label>
-                <div class="col-lg-2 ">
                     <select name="filterCodeAction" class="fixed-width-xl" id="filterCoach"
                             onchange="this.form.submit();">
                         {foreach item=code from=$codesAction}
@@ -40,6 +40,23 @@
                         {/foreach}
                     </select>
                     <input type="hidden" name="submitFilterCodeAction" value="1"/>
+                </div>
+            </div>
+        </form>
+        <form action="{$linkFilter}" method="post">
+            <div class="form-group">
+                <div class="col-lg-2 ">
+                <label class="control-label" for="filterCommande">
+                    Commande Valide :
+                </label>
+                    <select name="filterCommande" class="fixed-width-xl" id="filterCommande"
+                            onchange="this.form.submit();">
+                        {foreach item=code from=$commandeActive}
+                            <option value="{$code['value']}" {if $filterCommandeActive == $code['value']}
+                                selected="selected"{/if}>{$code['key']}</option>
+                        {/foreach}
+                    </select>
+                    <input type="hidden" name="submitFilterCommande" value="1"/>
                 </div>
             </div>
         </form>
