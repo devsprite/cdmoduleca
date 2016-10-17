@@ -32,6 +32,7 @@ if (!defined('_PS_VERSION_')) {
 class CdModuleCA extends ModuleGrid
 {
     public $errors = array();
+    public $confirmation = '';
     public $html = '';
     public $query;
     public $columns;
@@ -77,7 +78,7 @@ class CdModuleCA extends ModuleGrid
         );
         $this->empty_message = $this->l('Pas d\'enregistrement disponible');
         $this->paging_message = sprintf($this->l('Affichage %1$s de %2$s'), '{0} - {1}', '{2}');
-        $this->limit = 60;
+        $this->limit = 300;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->table_charset = 'utf8';
 
@@ -150,11 +151,13 @@ class CdModuleCA extends ModuleGrid
         $this->setIdFilterCoach();
         $this->setIdFilterCodeAction();
         $this->setFilterCommandeValid();
+        $this->AjoutSomme();
     }
 
     public function install()
     {
         if (!parent::install() ||
+            !$this->createTableAjoutSomme() ||
             !$this->alterGroupLangTable() ||
             !$this->installConfigGroupes() ||
             !$this->alterOrderTable() ||
@@ -173,6 +176,7 @@ class CdModuleCA extends ModuleGrid
     public function uninstall()
     {
         if (
+            !$this->eraseTableAjoutSomme() ||
             !$this->removeCodeActionTable() ||
             !$this->alterGroupLangTable('remove') ||
             !$this->alterOrderTable('remove') ||
@@ -182,6 +186,32 @@ class CdModuleCA extends ModuleGrid
             return false;
         }
 
+        return true;
+    }
+
+    private function createTableAjoutSomme()
+    {
+        $sql = "CREATE TABLE `" . _DB_PREFIX_ . "ajout_somme` (
+        `id_ajout_somme` INT (12) NOT NULL AUTO_INCREMENT,
+        `somme` DECIMAL (8,2) NULL,
+        `commentaire` VARCHAR(255) NULL,
+        `id_employee` INT (12),
+        `date_add` DATETIME NOT NULL,
+        `date_upd` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (`id_ajout_somme`))
+        ENGINE =" . _MYSQL_ENGINE_ . " DEFAULT CHARSET=" . $this->table_charset . ";";
+
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
+        return true;
+    }
+
+    private function eraseTableAjoutSomme()
+    {
+        if (!Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'ajout_somme`')) {
+            return false;
+        }
         return true;
     }
 
@@ -759,6 +789,77 @@ class CdModuleCA extends ModuleGrid
 
     }
 
+    private function AjoutSomme()
+    {
+        if ($this->idFilterCoach != 0) {
+            if (Tools::isSubmit('as_submit')) {
+                $data = array(
+                    'id_employee' => (int)Tools::getValue('as_id_employee'),
+                    'somme' => Tools::getValue('as_somme'),
+                    'commentaire' => pSQL(Tools::getValue('as_commentaire')),
+                    'date_add' => Tools::getValue('as_date')
+                );
+                if (!Validate::isInt($data['id_employee'])) {
+                    $this->errors[] = 'L\'id de l\'employee n\'est pas valide';
+                }
+                if (!Validate::isFloat(str_replace(',', '.', $data['somme']))) {
+                    $this->errors[] = 'La somme n\'est pas valide';
+                }
+                if (!Validate::isString($data['commentaire'])) {
+                    $this->errors[] = 'Erreur du champ commentaire';
+                }
+                if (!Validate::isDate($data['date_add'])) {
+                    $this->errors[] = 'Erreur du champ date';
+                }
+
+                if (!$this->errors) {
+                    if (Tools::getValue('as_id')) {
+                        if (!Db::getInstance()->update('ajout_somme', $data, 'id_ajout_somme = '
+                            . (int)Tools::getValue('id_ajout_somme'))
+                        ) {
+                            $this->errors[] = $this->l('Erreur lors de la mise à jour');
+                        }
+                    } else {
+                        if (!Db::getInstance()->insert('ajout_somme', $data)) {
+                            $this->errors[] = $this->l('Erreur lors de l\'ajout.');
+                        }
+                    }
+                    if (!$this->errors) {
+                        $this->confirmation = $this->l('Enregistrement éffectué.');
+                        unset($_POST['as_id_employee']);
+                        unset($_POST['as_somme']);
+                        unset($_POST['as_commentaire']);
+                        unset($_POST['as_date_add']);
+                    }
+                }
+            }
+        }
+        $ajoutSommes = $this->getAjoutSomme($this->idFilterCoach);
+
+        $this->smarty->assign(array(
+            'ajoutSommes' => $ajoutSommes
+        ));
+        $this->smarty->assign(array(
+            'errors' => $this->errors,
+            'confirmation' => $this->confirmation,
+        ));
+    }
+
+    private function getAjoutSomme($id_employee)
+    {
+        $sql = 'SELECT id_ajout_somme, somme, commentaire, a.id_employee, date_add, lastname
+                FROM `ps_ajout_somme` AS a
+                LEFT JOIN `ps_employee` AS e ON a.id_employee = e.id_employee
+                WHERE date_add BETWEEN ' . $this->getDate();
+
+        if ($id_employee != 0){
+            $sql .= ' AND a.id_employee = ' . (int)$id_employee;
+        }
+
+        return Db::getInstance()->executeS($sql);
+    }
+
+
     public function hookActionValidateOrder($params)
     {
         $employee = (isset($this->context->employee->id)) ? $this->context->employee->id : false;
@@ -895,8 +996,8 @@ class CdModuleCA extends ModuleGrid
             'caDeduitTotal' => $this->getCaDeduit(),
             'caDeduitCoach' => $this->getCaDeduit($this->idFilterCoach),
             'caDeduitJours' => (int)Configuration::get('CDMODULECA_ORDERS_STATE_JOURS'),
-            'caTotalNbrCommandes' => $this->getNumberCommande(0, $this->idFilterCodeAction),
-            'caCoachNbrCommandes' => $this->getNumberCommande($this->idFilterCoach, $this->idFilterCodeAction),
+            'caTotalNbrCommandes' => $this->getNumberCommande(0, $this->idFilterCodeAction, array(460, 443)),
+            'caCoachNbrCommandes' => $this->getNumberCommande($this->idFilterCoach, $this->idFilterCodeAction, array(460, 443)),
 
             'caTotal' => $this->getCaCoachsTotal(0, 0),
             'caTotalCoach' => $this->getCaCoachsTotal($this->idFilterCoach, 0),
@@ -913,7 +1014,9 @@ class CdModuleCA extends ModuleGrid
         $filterCodeAction = ($idCodeAction != 0)
             ? ' AND id_code_action = ' . $idCodeAction : '';
 
-        $sql = 'SELECT SQL_CALC_FOUND_ROWS SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) as total
+        $sql = 'SELECT SQL_CALC_FOUND_ROWS 
+                if(SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) < 
+                0 , 0, SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2))) as total
                 FROM ' . _DB_PREFIX_ . 'orders AS o
                 WHERE valid = 1 ';
         $sql .= $filterCoach;
@@ -923,19 +1026,28 @@ class CdModuleCA extends ModuleGrid
         return Db::getInstance()->getValue($sql);
     }
 
-    private function getNumberCommande($idCoach = 0, $idCodeAction = 0)
+    private function getNumberCommande($idCoach = 0, $idCodeAction = 0, $current_state = null)
     {
         $filterCoach = ($idCoach != 0)
             ? ' AND id_employee = ' . $idCoach : '';
 
         $filterCodeAction = ($idCodeAction != 0)
             ? ' AND id_code_action = ' . $idCodeAction : '';
+        $filter_current_state = '';
+        if ($current_state) {
+            $filter_current_state = ' AND ( ';
+            foreach ($current_state as $value) {
+                $filter_current_state .= " o.current_state != '" . (int)$value . "' AND ";
+            }
+            $filter_current_state = substr($filter_current_state, 0, -4) . ' )';
+        }
 
         $sql = 'SELECT SQL_CALC_FOUND_ROWS id_order
                 FROM ' . _DB_PREFIX_ . 'orders AS o
                 WHERE valid = 1 ';
         $sql .= $filterCoach;
         $sql .= $filterCodeAction;
+        $sql .= $filter_current_state;
         $sql .= ' AND date_add BETWEEN ' . $this->getDate();
 
         Db::getInstance()->executeS($sql);
@@ -1092,7 +1204,7 @@ class CdModuleCA extends ModuleGrid
                     $this->PourcCaFID($datasEmployees[$employee['id_employee']]);
 
                 $datasEmployees[$employee['id_employee']]['NbrCommandes'] =
-                    $this->getNumberCommande($employee['id_employee']);
+                    $this->getNumberCommande($employee['id_employee'], null, array(460, 443));
 
                 $datasEmployees[$employee['id_employee']]['panierMoyen'] =
                     $this->getPanierMoyen($datasEmployees[$employee['id_employee']]);
@@ -1120,6 +1232,9 @@ class CdModuleCA extends ModuleGrid
 
                 $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] =
                     $this->getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), true);
+
+                $datasEmployees[$employee['id_employee']]['nbrVenteGrDesaAbo'] =
+                    $this->getNbrGrVentes($employee['id_employee'], 'ABO', array(440, 453, null, false, 0));
 
                 $datasEmployees[$employee['id_employee']]['nbrVenteGrFid'] =
                     $this->getNbrGrVentes($employee['id_employee'], 'FID');
@@ -1150,13 +1265,8 @@ class CdModuleCA extends ModuleGrid
         return $this->display(__FILE__, 'synthesecoachs/synthesecoachstable.tpl');
     }
 
-    /**
-     * @param int $idFilterCoach
-     * @param null $code_action
-     * @param null $current_state
-     * @return mixed Nombre de vente par groupe de l'employé, filtré par code action et état de la commande
-     */
-    private function getNbrGrVentes($idFilterCoach = 0, $code_action = null, $current_state = null, $totalMoney = false)
+
+    private function getNbrGrVentes($idFilterCoach = 0, $code_action = null, $current_state = null, $totalMoney = false, $valid = false)
     {
         $filterCoach = ($idFilterCoach != 0)
             ? " AND e . id_employee = '" . $idFilterCoach . "'" : '';
@@ -1178,22 +1288,21 @@ class CdModuleCA extends ModuleGrid
 
         $sqlTotal = ($totalMoney)
             ? "SELECT SUM(ROUND(o . total_products - o . total_discounts_tax_excl, 2)) as total "
-            : "SELECT DISTINCT SQL_CALC_FOUND_ROWS o . id_order ";
+            : "SELECT SQL_CALC_FOUND_ROWS o . id_order ";
 
         $sql = $sqlTotal . "
             FROM ps_orders as o
             LEFT JOIN ps_customer as c ON o . id_customer = c . id_customer
             LEFT JOIN ps_customer_group as cg ON c . id_customer = cg . id_customer
-            LEFT JOIN ps_group_lang as gl ON cg . id_group = gl . id_group
+            LEFT JOIN ps_group_lang as gl ON cg . id_group = gl . id_group AND gl.id_lang = '" . $this->lang . "'
             LEFT JOIN ps_employee as e ON gl . id_employee = e . id_employee";
         $sql .= ' WHERE o.date_add BETWEEN ' . $this->getDate();
-        $sql .= ' AND o.valid = 1';
+        $sql .= ($valid) ? ' AND o.valid = 1 ' : '';
         $sql .= $filterCoach;
         $sql .= $sql_code_action;
         $sql .= $filter_current_state;
 
         $nbrGrVentes = Db::getInstance()->getValue($sql);
-
         $nbrRows = $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
 
         return ($totalMoney) ? $nbrGrVentes : $nbrRows;

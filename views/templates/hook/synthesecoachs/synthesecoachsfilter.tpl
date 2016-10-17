@@ -4,9 +4,9 @@
             <form action="{$linkFilter}" method="post">
                 <div class="form-group">
                     <div class="col-lg-3 ">
-                    <label class="control-label" for="filterCoach">
-                        Coach :
-                    </label>
+                        <label class="control-label" for="filterCoach">
+                            Coach :
+                        </label>
                         <select name="filterCoach" class="fixed-width-xl" id="filterCoach"
                                 onchange="this.form.submit();">
                             {foreach item=coach from=$coachs}
@@ -29,9 +29,9 @@
         <form action="{$linkFilter}" method="post">
             <div class="form-group">
                 <div class="col-lg-3">
-                <label class="control-label" for="filterCodeAction">
-                    Code Action :
-                </label>
+                    <label class="control-label" for="filterCodeAction">
+                        Code Action :
+                    </label>
                     <select name="filterCodeAction" class="fixed-width-xl" id="filterCoach"
                             onchange="this.form.submit();">
                         {foreach item=code from=$codesAction}
@@ -46,9 +46,9 @@
         <form action="{$linkFilter}" method="post">
             <div class="form-group">
                 <div class="col-lg-2 ">
-                <label class="control-label" for="filterCommande">
-                    Commande Valide :
-                </label>
+                    <label class="control-label" for="filterCommande">
+                        Commande Valide :
+                    </label>
                     <select name="filterCommande" class="fixed-width-xl" id="filterCommande"
                             onchange="this.form.submit();">
                         {foreach item=code from=$commandeActive}
@@ -61,4 +61,52 @@
             </div>
         </form>
     </div>
+    <hr>
+    {if $filterActif != 0}
+        <div class="col-xs-12">
+            <form id="form_as_date" action="{$linkFilter}" method="post">
+                <div class="form-group">
+                    <div class="col-lg-1">
+                        <label for="as_date">Date</label>
+                        <input type="text" name="as_date" id="as_date" value="{if isset($smarty.post.as_date)
+                        }{$smarty.post.as_date|date_format:'%Y-%m-%d'}{else}{$smarty.now|date_format:'%Y-%m-%d'}{/if}"
+                               class="datepicker  form-control">
+                        <script type="text/javascript">
+                            {literal}
+                            $(document).ready(function () {
+                                if ($("form#form_as_date .datepicker").length > 0)
+                                    $("form#form_as_date .datepicker").datepicker({
+                                        prevText: '',
+                                        nextText: '',
+                                        dateFormat: 'yy-mm-dd'
+                                    });
+                            });
+                            {/literal}
+                        </script>
+                    </div>
+                    <div class="col-lg-1">
+                        <label for="as_somme">Somme</label>
+                        <div class="input input-group">
+                            <input type="text" id="as_somme" name="as_somme" value="{if isset($smarty.post.as_somme)
+                            }{$smarty.post.as_somme}{/if}">
+                            <span class="input-group-addon">€</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <label for="as_commentaire">Commentaire</label>
+                        <input type="text" id="as_commentaire" value="{if isset($smarty.post.as_commentaire)
+                        }{$smarty.post.as_commentaire}{/if}" name="as_commentaire">
+                    </div>
+                    <div class="col-lg-1">
+                        <label for="">Enregistrer</label>
+                        <button class="btn btn-success" type="submit" id="as_submit" name="as_submit">Enregistrer
+                        </button>
+                        <input type="hidden" id="as_id_employee" name="as_id_employee"
+                               value="{if isset($smarty.post.as_id_employee)
+                               }{$smarty.post.as_id_employee}{else}{$filterActif}{/if}">
+                    </div>
+                </div>
+            </form>
+        </div>
+    {/if}
 </div>
