@@ -62,8 +62,10 @@
         </form>
     </div>
     <hr>
-    {if $filterActif != 0}
+    {if isset($coachs) && $filterActif != 0}
         <div class="col-xs-12">
+            <br>
+            <h3>Ajout manuel</h3>
             <form id="form_as_date" action="{$linkFilter}" method="post">
                 <div class="form-group">
                     <div class="col-lg-1">
@@ -104,6 +106,9 @@
                         <input type="hidden" id="as_id_employee" name="as_id_employee"
                                value="{if isset($smarty.post.as_id_employee)
                                }{$smarty.post.as_id_employee}{else}{$filterActif}{/if}">
+                        <input type="hidden" id="as_id" name="as_id"
+                               value="{if isset($smarty.post.as_id)
+                               }{$smarty.post.as_id}{/if}">
                     </div>
                 </div>
             </form>

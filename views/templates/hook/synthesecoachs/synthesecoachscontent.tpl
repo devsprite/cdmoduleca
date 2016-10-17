@@ -1,6 +1,6 @@
 <hr>
 <div class="row synthesecontent">
-    <div class="col-xs-4">
+    <div class="col-xs-3">
         <div class="row group">
             <div class="col-xs-12">CA Code Action {$filterCodeAction['name']}
                 <span class="pull-right">{displayPrice price=$caCoachsTotal}</span></div>
@@ -34,26 +34,36 @@
                 <span class="pull-right">{displayPrice price=($caTotalCoach - $caFidCoach)}</span></div>
         </div>
     </div>
-    <div class="col-xs-push-1 col-xs-6">
+    <div class="col-xs-push-1 col-xs-8">
         <h2>Ajout manuel</h2>
         <table class="table table-hover">
             <thead>
             <tr>
-                <th class="fixed-width-md">Nom</th>
-                <th class="fixed-width-md">Date</th>
-                <th class="fixed-width-md">Somme</th>
-                <th class="fixed-width-md">Commentaire</th>
+                <th>Nom</th>
+                <th>Date</th>
+                <th>Somme</th>
+                <th>Commentaire</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
-            {foreach item=ajoutSomme from=$ajoutSommes}
-                <tr>
-                    <td>{$ajoutSomme['lastname']}</td>
-                    <td>{$ajoutSomme['date_add']|date_format:'%D'}</td>
-                    <td>{displayPrice price=$ajoutSomme['somme']}</td>
-                    <td>{$ajoutSomme['commentaire']}</td>
-                </tr>
-            {/foreach}
+                {foreach item=ajoutSomme from=$ajoutSommes}
+                    <tr>
+                        <td>{$ajoutSomme['lastname']}</td>
+                        <td>{$ajoutSomme['date_add']|date_format:'%d/%m/%Y'}</td>
+                        <td><span class="pull-right">{displayPrice price=$ajoutSomme['somme']}</span></td>
+                        <td>{$ajoutSomme['commentaire']|wordwrap:50:"\n":true}</td>
+                        <td>
+                            <a href="{$linkFilter}&mod&id_as={$ajoutSomme['id_ajout_somme']}">
+                                <i class="icon-edit text-success"></i>
+                            </a>
+                            <a href="{$linkFilter}&del&id_as={$ajoutSomme['id_ajout_somme']}"
+                               onclick="if(confirm('Etes-vous sur de vouloir supprimer ce carnet ?')) {} else return false"">
+                            <i class="icon-cut text-danger"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {/foreach}
             </tbody>
         </table>
     </div>

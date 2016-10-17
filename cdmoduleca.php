@@ -78,13 +78,14 @@ class CdModuleCA extends ModuleGrid
         );
         $this->empty_message = $this->l('Pas d\'enregistrement disponible');
         $this->paging_message = sprintf($this->l('Affichage %1$s de %2$s'), '{0} - {1}', '{2}');
-        $this->limit = 300;
+        $this->limit = 40;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->table_charset = 'utf8';
 
         $this->default_sort_column = 'id';
         $this->default_sort_direction = 'DESC';
         $this->employees_actif = 1;
+        $this->commandeValid = 1;
         $this->columns = array(
             array(
                 'id' => 'id',
@@ -189,6 +190,9 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    /**
+     * @return bool Table permettant l'ajout ou la déduction d'une prime pour un employee
+     */
     private function createTableAjoutSomme()
     {
         $sql = "CREATE TABLE `" . _DB_PREFIX_ . "ajout_somme` (
@@ -215,6 +219,10 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    /**
+     * Ajout d'une colonne id_employee pour faire la liaison entre les employee et les groupes client
+     * @return bool
+     */
     private function alterGroupLangTable($method = 'add')
     {
         if ($method == 'add') {
@@ -229,6 +237,102 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    /**
+     * Table permettant de regrouper les codes actions
+     * @return bool
+     */
+    private function createCodeActionTable()
+    {
+        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'code_action` (
+        `id_code_action` INT(12) NOT NULL AUTO_INCREMENT,
+        `name` VARCHAR(64) NOT NULL,
+        `description` VARCHAR(255) NULL,
+        `groupe` VARCHAR(64) NULL, 
+        PRIMARY KEY (`id_code_action`))
+          ENGINE =' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=' . $this->table_charset . ';';
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
+
+        $data = $this->dataCodeAction();
+        if (!Db::getInstance()->insert('code_action', $data)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function removeCodeActionTable()
+    {
+        if (!Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'code_action`')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Configuration du regroupement des codes actions
+     * @return array
+     */
+    private function dataCodeAction()
+    {
+        $code_action = array(
+            'ABO' => array('Abonnement', '1'),
+            'PROSP' => array('Prospection', '2'),
+            'PROSP1' => array('Prospection tracer 1', '2'),
+            'PROSP11' => array('Prospection tracer 11', '2'),
+            'PROSP12' => array('Prospection tracer 12', '2'),
+            'PROSP13' => array('Prospection tracer 13', '2'),
+            'PROSP2' => array('Prospection tracer 2', '2'),
+            'PROSP21' => array('Prospection tracer 21', '2'),
+            'PROSP22' => array('Prospection tracer 22', '2'),
+            'PROSP23' => array('Prospection tracer 23', '2'),
+            'PROSP24' => array('Prospection tracer 24', '2'),
+            'PROSP3' => array('Prospection tracer 3', '2'),
+            'PROSP5' => array('Prospection tracer 5', '2'),
+            'PROSP51' => array('Prospection tracer 51', '2'),
+            'PROSP52' => array('Prospection tracer 52', '2'),
+            'PROSP53' => array('Prospection tracer 53', '2'),
+            'PROSP ENTR' => array('Contact entrant sans fiche client', '2'),
+            'PROSP REL' => array('Prospection REL', '2'),
+            'PROSPWEB' => array('Prospection Web', '2'),
+            'FID' => array('FID', '20'),
+            'FID PROMO' => array('FID suite promo', '20'),
+            'FID PROG F' => array('FID programme fidélité', '20'),
+            'FID WEB PRGF' => array('FID web PRGF', '20'),
+            'FID WEB PROMO' => array('FID web PROMO', '20'),
+            'FID WEB PROM' => array('FID web PROMO', '20'),
+            'FID WEB' => array('FID web', '20'),
+            'PAR' => array('Parrainage', '27'),
+            'REACT+4M' => array('Reactivation fichier clients +4mois', '28'),
+            'REACT+4MPROMO' => array('Reactivation fichier clients +4mois suite à promo', '28'),
+            'REACT SPONT' => array('Reactivation client spontanée', '28'),
+            'REACT SPONT PROMO' => array('Reactivation client spontanée suite à promo', '28'),
+            'REACTSPONT' => array('Reactivation client AC formulaire', '28'),
+            'REACT AC FORM' => array('Reactivation client AC formulaire', '28'),
+            'REACTIV' => array('Reactivation REACTIV', '28'),
+            'CONT ENTR' => array('CONT ENTR', '35')
+        );
+        $data = array();
+        $c = 1;
+        foreach ($code_action as $key => $value) {
+            $data[] = array(
+                'id_code_action' => $c,
+                'name' => $key,
+                'description' => $value[0],
+                'groupe' => $value[1]
+            );
+            $c++;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Installation d'une configuration de base des groupes client lié au employés
+     * @return bool
+     */
     private function installConfigGroupes()
     {
         // Configuration des groupes et employées id_groupe => id_employee
@@ -241,7 +345,7 @@ class CdModuleCA extends ModuleGrid
             '26' => '33', // Lina
             '27' => '60', // Amandine
             '29' => '15', // Mélissa
-            '30' => '9', // Eva
+            '30' => '9',  // Eva
             '31' => '47', // Jean-Batiste
             '33' => '57', // Ludovic
             '34' => '30', // Gaëlle
@@ -259,11 +363,17 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    /**
+     * permet de lié une commande avec un code action et un employee
+     * @param string $method
+     * @return bool
+     */
     private function alterOrderTable($method = 'add')
     {
         if ($method == 'add') {
-            $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'orders` ADD `id_code_action` INT (12) NULL,
-             ADD `id_employee` INT (12) NULL';
+            $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'orders` 
+            ADD `id_code_action` INT (12) NULL,
+            ADD `id_employee` INT (12) NULL';
         } else {
             $sql = 'ALTER TABLE `' . _DB_PREFIX_ . 'orders` DROP COLUMN `id_code_action`, 
              DROP COLUMN `id_employee`';
@@ -304,7 +414,7 @@ class CdModuleCA extends ModuleGrid
     private function postProcess()
     {
         $error = '';
-
+        // Mise à jour de la configuration des groupes lié au employés
         if (Tools::isSubmit('submitUpdateGroups')) {
             $groups = $this->getGroupsParrain();
             foreach ($groups as $group) {
@@ -315,6 +425,7 @@ class CdModuleCA extends ModuleGrid
                     $error .= $this->l('Erreur lors de la mise à jour des groupes');
                 }
             }
+            // Mise à jour de la configuration des code action, permet de regrouper les codes actions entre eux
         } elseif (Tools::isSubmit('submitUpdateCodeAction')) {
             $codes_action = $this->getAllCodesAction();
             foreach ($codes_action as $code) {
@@ -327,6 +438,8 @@ class CdModuleCA extends ModuleGrid
                     $error .= $this->l('Erreur lors de la mise à jour des codes action.');
                 }
             }
+            // Détermine quel sont les status de commande à deduire d'un employee si la commande est valide,
+            // avec le nombre de jour de retard à prendre en compte
         } elseif (Tools::isSubmit('submitUpdateStatuts')) {
             $listStatuts = OrderState::getOrderStates($this->lang);
             $statuts = array();
@@ -507,6 +620,10 @@ class CdModuleCA extends ModuleGrid
         return $helper->generateForm(array($fields_form));
     }
 
+    /**
+     * retourne la configuration des status lié au commandes
+     * @return array
+     */
     private function getConfigStatusCommandes()
     {
         $statuts = array();
@@ -526,6 +643,10 @@ class CdModuleCA extends ModuleGrid
         return $statuts;
     }
 
+    /**
+     * Retourne la configuration des codes actions
+     * @return array
+     */
     private function getConfigCodeAction()
     {
         $code_action = array();
@@ -538,7 +659,7 @@ class CdModuleCA extends ModuleGrid
     }
 
     /**
-     * Retourne la configuration parrain de chaque group
+     * Retourne la configuration des employés de chaque group
      * @return array (id_group => value_parrain)
      */
     private function getConfigGroupsParrain()
@@ -565,90 +686,10 @@ class CdModuleCA extends ModuleGrid
         return $groups;
     }
 
-    private function createCodeActionTable()
-    {
-        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'code_action` (
-        `id_code_action` INT(12) NOT NULL AUTO_INCREMENT,
-        `name` VARCHAR(64) NOT NULL,
-        `description` VARCHAR(255) NULL,
-        `groupe` VARCHAR(64) NULL, 
-        PRIMARY KEY (`id_code_action`))
-          ENGINE =' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=' . $this->table_charset . ';';
-        if (!Db::getInstance()->execute($sql)) {
-            return false;
-        }
-
-        $data = $this->dataCodeAction();
-        if (!Db::getInstance()->insert('code_action', $data)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function removeCodeActionTable()
-    {
-        if (!Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'code_action`')) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function dataCodeAction()
-    {
-        $code_action = array(
-            'ABO' => array('Abonnement', '1'),
-            'PROSP' => array('Prospection', '2'),
-            'PROSP1' => array('Prospection tracer 1', '2'),
-            'PROSP11' => array('Prospection tracer 11', '2'),
-            'PROSP12' => array('Prospection tracer 12', '2'),
-            'PROSP13' => array('Prospection tracer 13', '2'),
-            'PROSP2' => array('Prospection tracer 2', '2'),
-            'PROSP21' => array('Prospection tracer 21', '2'),
-            'PROSP22' => array('Prospection tracer 22', '2'),
-            'PROSP23' => array('Prospection tracer 23', '2'),
-            'PROSP24' => array('Prospection tracer 24', '2'),
-            'PROSP3' => array('Prospection tracer 3', '2'),
-            'PROSP5' => array('Prospection tracer 5', '2'),
-            'PROSP51' => array('Prospection tracer 51', '2'),
-            'PROSP52' => array('Prospection tracer 52', '2'),
-            'PROSP53' => array('Prospection tracer 53', '2'),
-            'PROSP ENTR' => array('Contact entrant sans fiche client', '2'),
-            'PROSP REL' => array('Prospection REL', '2'),
-            'PROSPWEB' => array('Prospection Web', '2'),
-            'FID' => array('FID', '20'),
-            'FID PROMO' => array('FID suite promo', '20'),
-            'FID PROG F' => array('FID programme fidélité', '20'),
-            'FID WEB PRGF' => array('FID web PRGF', '20'),
-            'FID WEB PROMO' => array('FID web PROMO', '20'),
-            'FID WEB PROM' => array('FID web PROMO', '20'),
-            'FID WEB' => array('FID web', '20'),
-            'PAR' => array('Parrainage', '27'),
-            'REACT+4M' => array('Reactivation fichier clients +4mois', '28'),
-            'REACT+4MPROMO' => array('Reactivation fichier clients +4mois suite à promo', '28'),
-            'REACT SPONT' => array('Reactivation client spontanée', '28'),
-            'REACT SPONT PROMO' => array('Reactivation client spontanée suite à promo', '28'),
-            'REACTSPONT' => array('Reactivation client AC formulaire', '28'),
-            'REACT AC FORM' => array('Reactivation client AC formulaire', '28'),
-            'REACTIV' => array('Reactivation REACTIV', '28'),
-            'CONT ENTR' => array('CONT ENTR', '35')
-        );
-        $data = array();
-        $c = 1;
-        foreach ($code_action as $key => $value) {
-            $data[] = array(
-                'id_code_action' => $c,
-                'name' => $key,
-                'description' => $value[0],
-                'groupe' => $value[1]
-            );
-            $c++;
-        }
-
-        return $data;
-    }
-
+    /**
+     * Mise à jour de la table ps_orders avec les codes action et les id_employee correspondant aux commandes
+     * @return bool
+     */
     private function updateOrdersTable()
     {
         $this->updateOrdersTableIdEmployee();
@@ -657,6 +698,9 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    /**
+     * Mise à jour de la table orders avec les d_employee
+     */
     private function updateOrdersTableIdEmployee()
     {
         $reqCoachs = new DbQuery();
@@ -675,6 +719,9 @@ class CdModuleCA extends ModuleGrid
         }
     }
 
+    /**
+     * Mise à jour de la table orders avec les id_code_action des groupe code action
+     */
     private function updateOrdersTableIdCodeAction()
     {
         $listCodesAction = $this->getAllCodesAction();
@@ -722,6 +769,8 @@ class CdModuleCA extends ModuleGrid
         return $listGroupes;
     }
 
+    // ***************** Fin de la partie installation et configuration du module
+
     public function hookAdminStatsModules($params)
     {
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/statscdmoduleca.css');
@@ -754,6 +803,10 @@ class CdModuleCA extends ModuleGrid
         return $this->html;
     }
 
+    /**
+     * Enregistrement de la configuration du filtre code action dans un cookie
+     * @return string
+     */
     private function setIdFilterCodeAction()
     {
         if (Tools::isSubmit('submitFilterCodeAction')) {
@@ -765,6 +818,9 @@ class CdModuleCA extends ModuleGrid
         return $this->idFilterCodeAction;
     }
 
+    /**
+     * Enregistrement de la configuration du filtre coach dans un cookie
+     */
     private function setIdFilterCoach()
     {
         $this->idFilterCoach = (int)$this->context->employee->id;
@@ -779,6 +835,9 @@ class CdModuleCA extends ModuleGrid
         }
     }
 
+    /**
+     * Enregistrement de la configuration du filtre commande valide dans un cookie
+     */
     private function setFilterCommandeValid()
     {
         $this->commandeValid = 1;
@@ -789,9 +848,12 @@ class CdModuleCA extends ModuleGrid
 
     }
 
+    /**
+     * Enregistre, modifie, oou efface une ligne de la table ajout_somme
+     */
     private function AjoutSomme()
     {
-        if ($this->idFilterCoach != 0) {
+        if ($this->viewAllCoachs[$this->context->employee->id_profile]) {
             if (Tools::isSubmit('as_submit')) {
                 $data = array(
                     'id_employee' => (int)Tools::getValue('as_id_employee'),
@@ -813,13 +875,16 @@ class CdModuleCA extends ModuleGrid
                 }
 
                 if (!$this->errors) {
+                    // Modifie
                     if (Tools::getValue('as_id')) {
+                        $data['id_ajout_somme'] = (int)Tools::getValue('as_id');
                         if (!Db::getInstance()->update('ajout_somme', $data, 'id_ajout_somme = '
-                            . (int)Tools::getValue('id_ajout_somme'))
+                            . (int)Tools::getValue('as_id'))
                         ) {
                             $this->errors[] = $this->l('Erreur lors de la mise à jour');
                         }
                     } else {
+                        // Insert
                         if (!Db::getInstance()->insert('ajout_somme', $data)) {
                             $this->errors[] = $this->l('Erreur lors de l\'ajout.');
                         }
@@ -832,10 +897,25 @@ class CdModuleCA extends ModuleGrid
                         unset($_POST['as_date_add']);
                     }
                 }
+                // Efface
+            } elseif (Tools::isSubmit('del')) {
+                $id = (int)Tools::getValue('id_as');
+                if (!Db::getInstance()->delete('ajout_somme', 'id_ajout_somme = ' . $id)) {
+                    $this->errors[] = $this->l('Erreur lors de la suppression');
+                } else {
+                    $this->confirmation = $this->l('Ajout manuel supprimé.');
+                }
+            } elseif (Tools::isSubmit('mod')) {
+                $as = $this->getAjoutSommeById((int)Tools::getValue('id_as'));
+                $_POST['as_id_employee'] = $as['id_employee'];
+                $_POST['as_somme'] = $as['somme'];
+                $_POST['as_commentaire'] = $as['commentaire'];
+                $_POST['as_date_add'] = $as['date_add'];
+                $_POST['as_id'] = $as['id_ajout_somme'];
             }
         }
-        $ajoutSommes = $this->getAjoutSomme($this->idFilterCoach);
 
+        $ajoutSommes = $this->getAjoutSomme($this->idFilterCoach);
         $this->smarty->assign(array(
             'ajoutSommes' => $ajoutSommes
         ));
@@ -845,6 +925,14 @@ class CdModuleCA extends ModuleGrid
         ));
     }
 
+    private function getAjoutSommeById($id)
+    {
+        $sql = 'SELECT * FROM ps_ajout_somme WHERE id_ajout_somme = ' . $id;
+
+        return Db::getInstance()->getRow($sql);
+    }
+
+
     private function getAjoutSomme($id_employee)
     {
         $sql = 'SELECT id_ajout_somme, somme, commentaire, a.id_employee, date_add, lastname
@@ -852,14 +940,17 @@ class CdModuleCA extends ModuleGrid
                 LEFT JOIN `ps_employee` AS e ON a.id_employee = e.id_employee
                 WHERE date_add BETWEEN ' . $this->getDate();
 
-        if ($id_employee != 0){
+        if ($id_employee != 0) {
             $sql .= ' AND a.id_employee = ' . (int)$id_employee;
         }
 
         return Db::getInstance()->executeS($sql);
     }
 
-
+    /**
+     * Intercepte la validation d'une commande pour ajouter l'id_code_action et l'id_employee lié à la commande
+     * @param $params
+     */
     public function hookActionValidateOrder($params)
     {
         $employee = (isset($this->context->employee->id)) ? $this->context->employee->id : false;
@@ -884,8 +975,13 @@ class CdModuleCA extends ModuleGrid
                 }
             }
         }
+
+        return true;
     }
 
+    /**
+     * Affiche le tableau de stat principal
+     */
     protected function getData()
     {
         $filterGroupe = ' LEFT JOIN ps_customer_group AS cg ON o.id_customer = cg.id_customer 
@@ -942,10 +1038,10 @@ class CdModuleCA extends ModuleGrid
         if (($this->_start === 0 || Validate::IsUnsignedInt($this->_start)) && Validate::IsUnsignedInt($this->_limit))
             $this->query .= ' LIMIT ' . (int)$this->_start . ', ' . (int)$this->_limit;
 
-        $values = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query);
+        $values = Db::getInstance()->executeS($this->query);
 
         $this->_values = $values;
-        $this->_totalCount = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
+        $this->_totalCount = Db::getInstance()->getValue('SELECT FOUND_ROWS()');
     }
 
     private function getIdCoach($coach)
@@ -968,12 +1064,14 @@ class CdModuleCA extends ModuleGrid
         return Db::getInstance()->getValue($req);
     }
 
-
+    /**
+     * Appel des différrentes partie de la page stats
+     * @return string
+     */
     private function syntheseCoachs()
     {
         $html = $this->display(__FILE__, 'synthesecoachs/synthesecoachsheader.tpl');
         $html .= $this->syntheseCoachsFilter();
-
         $html .= $this->syntheseCoachsContent();
         $html .= $this->syntheseCoachsTable();
         $html .= $this->display(__FILE__, 'synthesecoachs/synthesecoachsfooter.tpl');
@@ -1088,12 +1186,14 @@ class CdModuleCA extends ModuleGrid
 
             $this->smarty->assign(array(
                 'coachs' => $listCoaches,
-                'filterActif' => (int)$this->idFilterCoach,
                 'filterCoachActif' => $this->employees_actif,
-                'filterCommandeActive' => $this->commandeValid,
-                'commandeActive' => $commandeActive,
             ));
         }
+        $this->smarty->assign(array(
+            'filterActif' => (int)$this->idFilterCoach,
+            'filterCommandeActive' => $this->commandeValid,
+            'commandeActive' => $commandeActive,
+        ));
     }
 
     private function syntheseCoachsFilterCodeAction()
@@ -1360,29 +1460,4 @@ class CdModuleCA extends ModuleGrid
         $sql = 'SELECT id_group FROM ps_group_lang WHERE id_lang = "' . $this->lang . '" AND id_employee = ' . (int)$idFilterCoach;
         return Db::getInstance()->getValue($sql);
     }
-
-
-
-
-    //   SELECT SQL_NO_CACHE SQL_CALC_FOUND_ROWS
-//   a.`id_order`,`total_paid_tax_incl`,`payment`,a.date_add as date_add,`code_action`,`coach`
-//   ,
-//   a.id_currency,
-//   a.id_order AS id_pdf,
-//   CONCAT(LEFT(c.`firstname`, 1), '. ', c.`lastname`) AS `customer`,
-//   osl.`name` AS `osname`,
-//   os.`color`,
-//   IF((SELECT so.id_order FROM `ps_orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
-//   country_lang.name as cname,(SELECT GROUP_CONCAT(id_group SEPARATOR ", ") FROM `ps_customer_group` cg  WHERE cg.`id_customer`=a.`id_customer` GROUP by cg.`id_customer`) as id_group,
-//   (SELECT ord.`total_products` - ord.`total_discounts_tax_excl` FROM `ps_orders` ord where ord.`id_order`=a.`id_order`) as total_ht_hp,
-//   IF(a.valid, 1, 0) badge_success
-//   FROM `ps_orders` a
-//   LEFT JOIN `ps_customer` c ON (c.`id_customer` = a.`id_customer`)
-//   INNER JOIN `ps_address` address ON address.id_address = a.id_address_delivery
-//   INNER JOIN `ps_country` country ON address.id_country = country.id_country
-//   INNER JOIN `ps_country_lang` country_lang ON (country.`id_country` = country_lang.`id_country` AND country_lang.`id_lang` = 2)
-//   LEFT JOIN `ps_order_state` os ON (os.`id_order_state` = a.`current_state`)
-//   LEFT JOIN `ps_order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = 2)
-//   WHERE 1
-//   ORDER BY a.`date_add` DESC LIMIT 0,50
 }
