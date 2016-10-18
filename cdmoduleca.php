@@ -1161,7 +1161,8 @@ class CdModuleCA extends ModuleGrid
         $idGroupEmployee = $this->getGroupeEmployee($this->idFilterCoach);
 
         $filterCoach = ($this->idFilterCoach != 0)
-            ? ' AND (gl.id_group = "' . $idGroupEmployee . '" AND gl.id_lang = "' . $this->lang . '")'
+            ? ' AND ((gl.id_group = "' . $idGroupEmployee . '" AND gl.id_lang = "' . $this->lang . '")
+                OR o.id_employee = ' . $this->idFilterCoach . ')'
             : '';
 
         $filterCodeAction = '';
