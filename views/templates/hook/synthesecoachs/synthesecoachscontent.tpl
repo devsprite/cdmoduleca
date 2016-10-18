@@ -41,7 +41,7 @@
             <tr>
                 <th>Nom</th>
                 <th>Date</th>
-                <th>Somme</th>
+                <th><span class="pull-right">Somme</span></th>
                 <th>Commentaire</th>
                 <th></th>
             </tr>
@@ -54,16 +54,53 @@
                         <td><span class="pull-right">{displayPrice price=$ajoutSomme['somme']}</span></td>
                         <td>{$ajoutSomme['commentaire']|wordwrap:50:"\n":true}</td>
                         <td>
-                            <a href="{$linkFilter}&mod&id_as={$ajoutSomme['id_ajout_somme']}">
+                            <a href="{$linkFilter}&mod_as&id_as={$ajoutSomme['id_ajout_somme']}">
                                 <i class="icon-edit text-success"></i>
                             </a>
-                            <a href="{$linkFilter}&del&id_as={$ajoutSomme['id_ajout_somme']}"
-                               onclick="if(confirm('Etes-vous sur de vouloir supprimer ce carnet ?')) {} else return false"">
+                            <a href="{$linkFilter}&del_as&id_as={$ajoutSomme['id_ajout_somme']}"
+                               onclick="if(confirm('Etes-vous sur de vouloir supprimer ce cet ajout ?')) {} else return false"">
                             <i class="icon-cut text-danger"></i>
                             </a>
                         </td>
                     </tr>
                 {/foreach}
+            </tbody>
+        </table>
+        <h2>Objectif Coach</h2>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Date début</th>
+                <th>Date fin</th>
+                <th><span class="pull-right">Objectif</span></th>
+                <th><span class="pull-right">CA</span></th>
+                <th><span class="pull-right">% Objectif</span></th>
+                <th>Commentaire</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {foreach item=objectif from=$objectifCoachs}
+                <tr class="{$objectif['class']}">
+                    <td>{$objectif['lastname']}</td>
+                    <td>{$objectif['date_start']|date_format:'%d/%m/%Y'}</td>
+                    <td>{$objectif['date_end']|date_format:'%d/%m/%Y'}</td>
+                    <td><span class="pull-right">{displayPrice price=$objectif['somme']}</span></td>
+                    <td><span class="pull-right">{displayPrice price=$objectif['caCoach']}</span></td>
+                    <td><span class="pull-right">{$objectif['pourcentDeObjectif']} %</span></td>
+                    <td>{$objectif['commentaire']|wordwrap:50:"\n":true}</td>
+                    <td>
+                        <a href="{$linkFilter}&mod_oc&id_oc={$objectif['id_objectif_coach']}">
+                            <i class="icon-edit text-success"></i>
+                        </a>
+                        <a href="{$linkFilter}&del_oc&id_oc={$objectif['id_objectif_coach']}"
+                           onclick="if(confirm('Etes-vous sur de vouloir supprimer cet objectif ?')) {} else return false"">
+                        <i class="icon-cut text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+            {/foreach}
             </tbody>
         </table>
     </div>

@@ -149,15 +149,20 @@ class CdModuleCA extends ModuleGrid
             ),
 
         );
-        $this->setIdFilterCoach();
-        $this->setIdFilterCodeAction();
-        $this->setFilterCommandeValid();
-        $this->AjoutSomme();
+
+        if ($this->isEnabledForShopContext()) {
+            $this->setIdFilterCoach();
+            $this->setIdFilterCodeAction();
+            $this->setFilterCommandeValid();
+            $this->AjoutSomme();
+            $this->AjoutObjectif();
+        }
     }
 
     public function install()
     {
         if (!parent::install() ||
+            !$this->createTableObjectifCoach() ||
             !$this->createTableAjoutSomme() ||
             !$this->alterGroupLangTable() ||
             !$this->installConfigGroupes() ||
@@ -177,6 +182,7 @@ class CdModuleCA extends ModuleGrid
     public function uninstall()
     {
         if (
+            !$this->eraseTableObjectifCoach() ||
             !$this->eraseTableAjoutSomme() ||
             !$this->removeCodeActionTable() ||
             !$this->alterGroupLangTable('remove') ||
@@ -187,6 +193,35 @@ class CdModuleCA extends ModuleGrid
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * @return bool Table permettant l'ajout d'un objectif pour un employee
+     */
+    private function createTableObjectifCoach()
+    {
+        $sql = "CREATE TABLE `" . _DB_PREFIX_ . "objectif_coach` (
+        `id_objectif_coach` INT (12) NOT NULL AUTO_INCREMENT,
+        `somme` DECIMAL (8,2) NULL,
+        `commentaire` VARCHAR(255) NULL,
+        `id_employee` INT (12),
+        `date_start` DATETIME NOT NULL,
+        `date_end` DATETIME NOT NULL,
+        PRIMARY KEY (`id_objectif_coach`))
+        ENGINE =" . _MYSQL_ENGINE_ . " DEFAULT CHARSET=" . $this->table_charset . ";";
+
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
+        return true;
+    }
+
+    private function eraseTableObjectifCoach()
+    {
+        if (!Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'objectif_coach`')) {
+            return false;
+        }
         return true;
     }
 
@@ -769,7 +804,8 @@ class CdModuleCA extends ModuleGrid
         return $listGroupes;
     }
 
-    // ***************** Fin de la partie installation et configuration du module
+    // ***************** Fin de la partie installation et configuration du module ********/
+    // ***************** Début de la page stat *******************************************/
 
     public function hookAdminStatsModules($params)
     {
@@ -895,17 +931,18 @@ class CdModuleCA extends ModuleGrid
                         unset($_POST['as_somme']);
                         unset($_POST['as_commentaire']);
                         unset($_POST['as_date_add']);
+                        unset($_POST['as_id']);
                     }
                 }
                 // Efface
-            } elseif (Tools::isSubmit('del')) {
+            } elseif (Tools::isSubmit('del_as')) {
                 $id = (int)Tools::getValue('id_as');
                 if (!Db::getInstance()->delete('ajout_somme', 'id_ajout_somme = ' . $id)) {
                     $this->errors[] = $this->l('Erreur lors de la suppression');
                 } else {
                     $this->confirmation = $this->l('Ajout manuel supprimé.');
                 }
-            } elseif (Tools::isSubmit('mod')) {
+            } elseif (Tools::isSubmit('mod_as')) {
                 $as = $this->getAjoutSommeById((int)Tools::getValue('id_as'));
                 $_POST['as_id_employee'] = $as['id_employee'];
                 $_POST['as_somme'] = $as['somme'];
@@ -925,13 +962,98 @@ class CdModuleCA extends ModuleGrid
         ));
     }
 
+    /**
+     * Enregistre, modifie, oou efface une ligne de la table objectif_coach
+     */
+    private function AjoutObjectif()
+    {
+        if ($this->viewAllCoachs[$this->context->employee->id_profile]) {
+            if (Tools::isSubmit('oc_submit')) {
+                $data = array(
+                    'id_employee' => (int)Tools::getValue('oc_id_employee'),
+                    'somme' => Tools::getValue('oc_somme'),
+                    'commentaire' => pSQL(Tools::getValue('oc_commentaire')),
+                    'date_start' => Tools::getValue('oc_date_start'),
+                    'date_end' => date('Y-m-d 23:59:59', strtotime(Tools::getValue('oc_date_end')))
+                );
+                if (!Validate::isInt($data['id_employee'])) {
+                    $this->errors[] = 'L\'id de l\'employee n\'est pas valide';
+                }
+                if (!Validate::isFloat(str_replace(',', '.', $data['somme']))) {
+                    $this->errors[] = 'La somme n\'est pas valide';
+                }
+                if (!Validate::isString($data['commentaire'])) {
+                    $this->errors[] = 'Erreur du champ commentaire';
+                }
+                if (!Validate::isDate($data['date_start'])) {
+                    $this->errors[] = 'Erreur du champ date début';
+                }
+                if (!Validate::isDate($data['date_end'])) {
+                    $this->errors[] = 'Erreur du champ date fin';
+                }
+
+
+                if (!$this->errors) {
+                    // Modifie
+                    if (Tools::getValue('oc_id')) {
+                        $data['id_objectif_coach'] = (int)Tools::getValue('oc_id');
+                        if (!Db::getInstance()->update('objectif_coach', $data, 'id_objectif_coach = '
+                            . (int)Tools::getValue('oc_id'))
+                        ) {
+                            $this->errors[] = $this->l('Erreur lors de la mise à jour');
+                        }
+                    } else {
+                        // Insert
+                        if (!Db::getInstance()->insert('objectif_coach', $data)) {
+                            $this->errors[] = $this->l('Erreur lors de l\'ajout.');
+                        }
+                    }
+                    if (!$this->errors) {
+                        $this->confirmation = $this->l('Enregistrement éffectué.');
+                        unset($_POST['oc_id_employee']);
+                        unset($_POST['oc_somme']);
+                        unset($_POST['oc_commentaire']);
+                        unset($_POST['oc_date_start']);
+                        unset($_POST['oc_date_end']);
+                        unset($_POST['oc_id']);
+                    }
+                }
+                // Efface
+            } elseif (Tools::isSubmit('del_oc')) {
+                $id = (int)Tools::getValue('id_oc');
+                if (!Db::getInstance()->delete('objectif_coach', 'id_objectif_coach = ' . $id)) {
+                    $this->errors[] = $this->l('Erreur lors de la suppression');
+                } else {
+                    $this->confirmation = $this->l('Objectif supprimé.');
+                }
+            } elseif (Tools::isSubmit('mod_oc')) {
+                $oc = $this->getObjectifById((int)Tools::getValue('id_oc'));
+                $_POST['oc_id_employee'] = $oc['id_employee'];
+                $_POST['oc_somme'] = $oc['somme'];
+                $_POST['oc_commentaire'] = $oc['commentaire'];
+                $_POST['oc_date_start'] = $oc['date_start'];
+                $_POST['oc_date_end'] = $oc['date_end'];
+                $_POST['oc_id'] = $oc['id_objectif_coach'];
+            }
+        }
+
+        $objectifCoachs = $this->getObjectifCoachs($this->idFilterCoach);
+        $objectifs = $this->isObjectifAteint($objectifCoachs);
+        $this->smarty->assign(array(
+            'objectifCoachs' => $objectifs
+        ));
+        $this->smarty->assign(array(
+            'errors' => $this->errors,
+            'confirmation' => $this->confirmation,
+        ));
+    }
+
     private function getAjoutSommeById($id)
     {
         $sql = 'SELECT * FROM ps_ajout_somme WHERE id_ajout_somme = ' . $id;
 
         return Db::getInstance()->getRow($sql);
     }
-
 
     private function getAjoutSomme($id_employee)
     {
@@ -945,6 +1067,55 @@ class CdModuleCA extends ModuleGrid
         }
 
         return Db::getInstance()->executeS($sql);
+    }
+
+    private function getObjectifById($id)
+    {
+        $sql = 'SELECT * FROM ps_objectif_coach WHERE id_objectif_coach = ' . $id;
+
+        return Db::getInstance()->getRow($sql);
+    }
+
+    private function getObjectifCoachs($id_employee)
+    {
+        $sql = 'SELECT id_objectif_coach, somme, commentaire, a.id_employee, date_start, date_end, lastname
+                FROM `ps_objectif_coach` AS a
+                LEFT JOIN `ps_employee` AS e ON a.id_employee = e.id_employee
+                WHERE date_start BETWEEN ' . $this->getDate();
+
+        if ($id_employee != 0) {
+            $sql .= ' AND a.id_employee = ' . (int)$id_employee;
+        }
+
+        $sql .= ' ORDER BY id_employee ASC, date_start ASC';
+
+        return Db::getInstance()->executeS($sql);
+    }
+
+    private function isObjectifAteint($objectifCoachs)
+    {
+        if ($objectifCoachs) {
+
+            foreach ($objectifCoachs as $objectifCoach => $objectif) {
+                $dateBetween = '"' . $objectif['date_start'] . '" AND "' . $objectif['date_end'] . '"';
+
+                $caCoach = $this->getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
+                $p = round(((100 * $caCoach) / $objectif['somme']), 2);
+                $objectifCoachs[$objectifCoach]['pourcentDeObjectif'] = $p;
+                $objectifCoachs[$objectifCoach]['caCoach'] = $caCoach;
+                $class = '';
+                if ($p < 50) {
+                    $class = 'danger';
+                } elseif ($p >= 50 && $p < 100) {
+                    $class = 'warning';
+                } elseif ($p >= 100) {
+                    $class = 'success';
+                }
+                $objectifCoachs[$objectifCoach]['class'] = $class;
+            }
+        }
+
+        return $objectifCoachs;
     }
 
     /**
@@ -1104,7 +1275,7 @@ class CdModuleCA extends ModuleGrid
         ));
     }
 
-    private function getCaCoachsTotal($idCoach = 0, $idCodeAction = 0)
+    private function getCaCoachsTotal($idCoach = 0, $idCodeAction = 0, $dateBetween = false)
     {
         $filterCoach = ($idCoach != 0)
             ? ' AND id_employee = ' . $idCoach : '';
@@ -1119,7 +1290,8 @@ class CdModuleCA extends ModuleGrid
                 WHERE valid = 1 ';
         $sql .= $filterCoach;
         $sql .= $filterCodeAction;
-        $sql .= ' AND date_add BETWEEN ' . $this->getDate();
+        $sql .= ' AND date_add BETWEEN ';
+        $sql .= ($dateBetween) ? $dateBetween : $this->getDate();
 
         return Db::getInstance()->getValue($sql);
     }
