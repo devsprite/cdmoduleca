@@ -1164,17 +1164,18 @@ class CdModuleCA extends ModuleGrid
             ? ' AND (gl.id_group = "' . $idGroupEmployee . '" AND gl.id_lang = "' . $this->lang . '")'
             : '';
 
-        $filterCodeAction = ($this->idFilterCodeAction != 0)
-            ? ' AND o.id_code_action = ' . $this->idFilterCodeAction
-            : '';
+        $filterCodeAction = '';
+        if ($this->idFilterCodeAction == 99) {
+            $filterCodeAction = ' AND o.id_code_action != ' . $this->getCodeActionByName('ABO');
+        } elseif ($this->idFilterCodeAction != 0) {
+            $filterCodeAction = ' AND o.id_code_action = ' . $this->idFilterCodeAction;
+        }
 
         $filterValid = '';
         if ($this->commandeValid == 0) {
             $filterValid = ' AND o.valid = "0" ';
         } elseif ($this->commandeValid == 1) {
             $filterValid = ' AND o.valid = "1" ';
-        } else {
-            $filterValid = '';
         }
 
         $this->query = '
@@ -1280,18 +1281,21 @@ class CdModuleCA extends ModuleGrid
         $filterCoach = ($idCoach != 0)
             ? ' AND id_employee = ' . $idCoach : '';
 
-        $filterCodeAction = ($idCodeAction != 0)
-            ? ' AND id_code_action = ' . $idCodeAction : '';
+        $filterCodeAction = '';
+        if ($this->idFilterCodeAction == 99) {
+            $filterCodeAction = ' AND o.id_code_action != ' . $this->getCodeActionByName('ABO');
+        } elseif ($this->idFilterCodeAction != 0) {
+            $filterCodeAction = ' AND o.id_code_action = ' . $this->idFilterCodeAction;
+        }
 
         $sql = 'SELECT SQL_CALC_FOUND_ROWS 
                 if(SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) < 
                 0 , 0, SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2))) as total
-                FROM ' . _DB_PREFIX_ . 'orders AS o
-                WHERE valid = 1 ';
+                FROM ' . _DB_PREFIX_ . 'orders AS o';
+        $sql .= ' WHERE date_add BETWEEN ';
+        $sql .= ($dateBetween) ? $dateBetween : $this->getDate();
         $sql .= $filterCoach;
         $sql .= $filterCodeAction;
-        $sql .= ' AND date_add BETWEEN ';
-        $sql .= ($dateBetween) ? $dateBetween : $this->getDate();
 
         return Db::getInstance()->getValue($sql);
     }
@@ -1375,6 +1379,11 @@ class CdModuleCA extends ModuleGrid
             'id_code_action' => '0',
             'name' => 'Tous les codes'
         );
+
+        $listCodesAction[] = array(
+            'id_code_action' => '99',
+            'name' => 'Tous les codes sauf ABO'
+        );
         $this->context->smarty->assign(array(
             'codesAction' => $listCodesAction,
             'filterCodeAction' => $this->idFilterCodeAction
@@ -1416,10 +1425,9 @@ class CdModuleCA extends ModuleGrid
             ? ' AND id_employee = ' . $idFilterCoach : '';
 
         $sql = 'SELECT SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) as total
-                FROM ' . _DB_PREFIX_ . 'orders AS o
-                WHERE valid = 1 ';
+                FROM ' . _DB_PREFIX_ . 'orders AS o';
+        $sql .= ' WHERE date_add BETWEEN ' . $this->getDateCaDeduit();
         $sql .= $filterCoach;
-        $sql .= ' AND date_add BETWEEN ' . $this->getDateCaDeduit();
         $sql .= $sqlStatuts;
 
         return Db::getInstance()->getValue($sql);
@@ -1429,8 +1437,8 @@ class CdModuleCA extends ModuleGrid
     {
         $d = $this->getDate();
         $days = Configuration::get('CDMODULECA_ORDERS_STATE_JOURS');
-        $d_start = "'" . date('Y - m - d H:i:s', strtotime(substr($d, 2, 19) . ' - ' . $days . ' days')) . "'";
-        $d_end = "'" . date('Y - m - d H:i:s', strtotime(substr($d, 28, 19) . ' - ' . $days . ' days')) . "'";
+        $d_start = "'" . date('Y-m-d H:i:s', strtotime(substr($d, 2, 19) . ' - ' . $days . ' days')) . "'";
+        $d_end = "'" . date('Y-m-d H:i:s', strtotime(substr($d, 28, 19) . ' - ' . $days . ' days')) . "'";
 
         return $d_start . ' AND ' . $d_end;
     }
@@ -1609,7 +1617,10 @@ class CdModuleCA extends ModuleGrid
 
     private function getPanierMoyen($data)
     {
-        return ($data['caTotal']) ? $data['caTotal'] / $data['NbrCommandes'] : '';
+        if ($data['NbrCommandes'] != 0) {
+            return $data['caTotal'] / $data['NbrCommandes'];
+        }
+        return '';
     }
 
     private function caProsp($data)
@@ -1619,12 +1630,18 @@ class CdModuleCA extends ModuleGrid
 
     private function PourcCaProspect($data)
     {
-        return (isset($data['caTotal'])) ? number_format(($data['CaProsp'] * 100) / $data['caTotal'], 2) . ' %' : '';
+        if ($data['caTotal'] != 0) {
+            return number_format(($data['CaProsp'] * 100) / $data['caTotal'], 2) . ' %';
+        }
+        return '';
     }
 
     private function PourcCaFID($data)
     {
-        return (isset($data['caTotal'])) ? number_format(($data['caDejaInscrit'] * 100) / $data['caTotal'], 2) . ' %' : '';
+        if ($data['caTotal'] != 0) {
+            return number_format(($data['caDejaInscrit'] * 100) / $data['caTotal'], 2) . ' %';
+        }
+        return '';
     }
 
     private function getGroupeEmployee($idFilterCoach)

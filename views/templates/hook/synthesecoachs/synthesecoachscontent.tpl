@@ -47,23 +47,25 @@
             </tr>
             </thead>
             <tbody>
-                {foreach item=ajoutSomme from=$ajoutSommes}
-                    <tr>
-                        <td>{$ajoutSomme['lastname']}</td>
-                        <td>{$ajoutSomme['date_add']|date_format:'%d/%m/%Y'}</td>
-                        <td><span class="pull-right">{displayPrice price=$ajoutSomme['somme']}</span></td>
-                        <td>{$ajoutSomme['commentaire']|wordwrap:50:"\n":true}</td>
-                        <td>
+            {foreach item=ajoutSomme from=$ajoutSommes}
+                <tr>
+                    <td>{$ajoutSomme['lastname']}</td>
+                    <td>{$ajoutSomme['date_add']|date_format:'%d/%m/%Y'}</td>
+                    <td><span class="pull-right">{displayPrice price=$ajoutSomme['somme']}</span></td>
+                    <td>{$ajoutSomme['commentaire']|wordwrap:50:"\n":true}</td>
+                    <td>
+                        {if isset($coachs)}
                             <a href="{$linkFilter}&mod_as&id_as={$ajoutSomme['id_ajout_somme']}">
                                 <i class="icon-edit text-success"></i>
                             </a>
                             <a href="{$linkFilter}&del_as&id_as={$ajoutSomme['id_ajout_somme']}"
-                               onclick="if(confirm('Etes-vous sur de vouloir supprimer ce cet ajout ?')) {} else return false"">
-                            <i class="icon-cut text-danger"></i>
+                               onclick="if(confirm('Etes-vous sur de vouloir supprimer ce cet ajout ?')) {} else return false">
+                                <i class="icon-cut text-danger"></i>
                             </a>
-                        </td>
-                    </tr>
-                {/foreach}
+                        {/if}
+                    </td>
+                </tr>
+            {/foreach}
             </tbody>
         </table>
         <h2>Objectif Coach</h2>
@@ -91,13 +93,15 @@
                     <td><span class="pull-right">{$objectif['pourcentDeObjectif']} %</span></td>
                     <td>{$objectif['commentaire']|wordwrap:50:"\n":true}</td>
                     <td>
-                        <a href="{$linkFilter}&mod_oc&id_oc={$objectif['id_objectif_coach']}">
-                            <i class="icon-edit text-success"></i>
-                        </a>
-                        <a href="{$linkFilter}&del_oc&id_oc={$objectif['id_objectif_coach']}"
-                           onclick="if(confirm('Etes-vous sur de vouloir supprimer cet objectif ?')) {} else return false"">
-                        <i class="icon-cut text-danger"></i>
-                        </a>
+                        {if isset($coachs)}
+                            <a href="{$linkFilter}&mod_oc&id_oc={$objectif['id_objectif_coach']}">
+                                <i class="icon-edit text-success"></i>
+                            </a>
+                            <a href="{$linkFilter}&del_oc&id_oc={$objectif['id_objectif_coach']}"
+                               onclick="if(confirm('Etes-vous sur de vouloir supprimer cet objectif ?')) {} else return false">
+                                <i class="icon-cut text-danger"></i>
+                            </a>
+                        {/if}
                     </td>
                 </tr>
             {/foreach}
