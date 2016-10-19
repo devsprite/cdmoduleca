@@ -162,6 +162,9 @@ class CdModuleCA extends ModuleGrid
     public function install()
     {
         if (!parent::install() ||
+            !$this->createTabs() ||
+            !$this->createTableProspectAttribue() ||
+            !$this->createTableProspect() ||
             !$this->createTableObjectifCoach() ||
             !$this->createTableAjoutSomme() ||
             !$this->alterGroupLangTable() ||
@@ -182,6 +185,9 @@ class CdModuleCA extends ModuleGrid
     public function uninstall()
     {
         if (
+            !$this->eraseTabs() ||
+            !$this->eraseTableProspectAttribue() ||
+            !$this->eraseTableProspect() ||
             !$this->eraseTableObjectifCoach() ||
             !$this->eraseTableAjoutSomme() ||
             !$this->removeCodeActionTable() ||
@@ -194,6 +200,92 @@ class CdModuleCA extends ModuleGrid
         }
 
         return true;
+    }
+
+    private function createTabs()
+    {
+        $tab = new Tab();
+        $tab->active = 1;
+        $languages = Language::getLanguages(false);
+        if(is_array($languages))
+        {
+            foreach ($languages as $language)
+            {
+                $tab->name[2] = 'Prospects'; //TODO Changé ici
+            }
+        }
+        $tab->class_name = 'AdminProspects';
+        $tab->module = $this->name;
+        $tab->id_parent = 11;
+
+        return (bool)$tab->add();
+    }
+
+    private function eraseTabs()
+    {
+        $id_tab = (int)Tab::getIdFromClassName('AdminProspects');
+        if($id_tab)
+        {
+            $tab = new Tab($id_tab);
+            $tab->delete();
+        }
+        return true;
+    }
+
+    /**
+     * Table pour ajouter une ligne d'attribution de prospects à un employee
+     * @return bool
+     */
+    private function createTableProspectAttribue()
+    {
+        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'prospect_attribue` (
+        `id_prospect_attribue` INT(12) NOT NULL AUTO_INCREMENT,
+        `id_employee` INT(12) NOT NULL,
+        `nbr_prospect_attribue` INT(12) NULL,
+        `date_debut` DATETIME NOT NULL,
+        `date_fin` DATETIME NOT NULL,
+        PRIMARY KEY (`id_prospect_attribue`))
+        ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=' . $this->table_charset . ';';
+
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function eraseTableProspectAttribue()
+    {
+        return Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'prospect_attribue`');
+    }
+
+    /**
+     * Table pour le suivi des prospect attribué au employes
+     * @return bool
+     */
+    private function createTableProspect()
+    {
+        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'prospect` (
+        `id_prospect` INT(12) NOT NULL AUTO_INCREMENT,
+        `id_customer` INT(12) NOT NULL,
+        `id_prospect_attribue` INT(12) NOT NULL,
+        `traite` VARCHAR(64) NULL,
+        `injoignable` VARCHAR(64) NULL,
+        `contacte` VARCHAR(64) NULL,
+        `date_add` DATETIME NOT NULL,
+        PRIMARY KEY (`id_prospect`))
+        ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=' . $this->table_charset . ';';
+
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function eraseTableProspect()
+    {
+        return Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'prospect`');
     }
 
     /**
