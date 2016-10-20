@@ -1,3 +1,4 @@
+{if isset($prosGr1)}
 <div class="row panel">
     <div class="panel-heading">
         Prospects
@@ -29,3 +30,4 @@
         </tbody>
     </table>
 </div>
+{/if}

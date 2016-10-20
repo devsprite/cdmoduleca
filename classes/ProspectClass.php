@@ -4,7 +4,7 @@ class ProspectClass extends ObjectModel
 {
     public $id_prospect;
     public $id_customer;
-    public $id_prospect_attibue;
+    public $id_prospect_attribue;
     public $traite;
     public $injoignable;
     public $contacte;
@@ -15,7 +15,7 @@ class ProspectClass extends ObjectModel
         'primary' => 'id_prospect',
         'fields' => array(
             'id_customer' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId', 'required' => true),
-            'id_prospect_attibue' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId', 'required' => true),
+            'id_prospect_attribue' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId', 'required' => true),
             'traite' => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false, 'size' => 64),
             'injoignable' => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false, 'size' => 64),
             'contacte' => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false, 'size' => 64),

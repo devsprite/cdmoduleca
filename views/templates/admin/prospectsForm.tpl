@@ -70,7 +70,7 @@
             {foreach item=employe from=$employes}
                 <div class="col-md-2 col-xs-3">
                     <label for="{$employe['lastname']}{$employe['firstname']}">{$employe['lastname']}
-                        ({$employe['firstname']})
+                        ({$employe['firstname']}){if !empty({$employe['total_prospect']})} - {$employe['total_prospect']} Prospects{/if}
                         <input type="text" name="em_{$employe['id_employee']}"
                                id="{$employe['lastname']}{$employe['firstname']}" value="">
                     </label>
