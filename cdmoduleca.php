@@ -206,17 +206,14 @@ class CdModuleCA extends ModuleGrid
     {
         $tab = new Tab();
         $tab->active = 1;
-        $languages = Language::getLanguages(false);
-        if(is_array($languages))
+        $names = array(1=>'Prospects', 'Prospects');
+        foreach (Language::getLanguages() as $language)
         {
-            foreach ($languages as $language)
-            {
-                $tab->name[2] = 'Prospects'; //TODO Changé ici
-            }
+            $tab->name[$language['id_lang']] = isset($names[$language['id_lang']]) ? $names[$language['id_lang']] : $names[1];
         }
         $tab->class_name = 'AdminProspects';
         $tab->module = $this->name;
-        $tab->id_parent = 11;
+        $tab->id_parent = Tab::getIdFromClassName('AdminCustomers');
 
         return (bool)$tab->add();
     }
@@ -1536,7 +1533,7 @@ class CdModuleCA extends ModuleGrid
         return $d_start . ' AND ' . $d_end;
     }
 
-    private function getEmployees($active = 0, $id = null)
+    public function getEmployees($active = 0, $id = null)
     {
         $sql = 'SELECT `id_employee`, `firstname`, `lastname`
 			FROM `' . _DB_PREFIX_ . 'employee` ';
@@ -1737,7 +1734,7 @@ class CdModuleCA extends ModuleGrid
         return '';
     }
 
-    private function getGroupeEmployee($idFilterCoach)
+    public function getGroupeEmployee($idFilterCoach)
     {
         $sql = 'SELECT id_group FROM ps_group_lang WHERE id_lang = "' . $this->lang . '" AND id_employee = ' . (int)$idFilterCoach;
         return Db::getInstance()->getValue($sql);
