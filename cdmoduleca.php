@@ -162,7 +162,8 @@ class CdModuleCA extends ModuleGrid
     public function install()
     {
         if (!parent::install() ||
-            !$this->createTabs() ||
+            !$this->createTabsStatsCA() ||
+            !$this->createTabsProspects() ||
             !$this->createTableProspectAttribue() ||
             !$this->createTableProspect() ||
             !$this->createTableObjectifCoach() ||
@@ -185,7 +186,8 @@ class CdModuleCA extends ModuleGrid
     public function uninstall()
     {
         if (
-            !$this->eraseTabs() ||
+            !$this->eraseTabsStatsCA() ||
+            !$this->eraseTabsProspects() ||
             !$this->eraseTableProspectAttribue() ||
             !$this->eraseTableProspect() ||
             !$this->eraseTableObjectifCoach() ||
@@ -202,7 +204,7 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
-    private function createTabs()
+    private function createTabsProspects()
     {
         $tab = new Tab();
         $tab->active = 1;
@@ -218,9 +220,36 @@ class CdModuleCA extends ModuleGrid
         return (bool)$tab->add();
     }
 
-    private function eraseTabs()
+    private function eraseTabsProspects()
     {
         $id_tab = (int)Tab::getIdFromClassName('AdminProspects');
+        if($id_tab)
+        {
+            $tab = new Tab($id_tab);
+            $tab->delete();
+        }
+        return true;
+    }
+
+    private function createTabsStatsCA()
+    {
+        $tab = new Tab();
+        $tab->active = 1;
+        $names = array(1=>'CA L&Sens', 'CA L&Sens');
+        foreach (Language::getLanguages() as $language)
+        {
+            $tab->name[$language['id_lang']] = isset($names[$language['id_lang']]) ? $names[$language['id_lang']] : $names[1];
+        }
+        $tab->class_name = 'AdminCaLetSens';
+        $tab->module = $this->name;
+        $tab->id_parent = Tab::getIdFromClassName('AdminParentStats');
+
+        return (bool)$tab->add();
+    }
+
+    private function eraseTabsStatsCA()
+    {
+        $id_tab = (int)Tab::getIdFromClassName('AdminCaLetSens');
         if($id_tab)
         {
             $tab = new Tab($id_tab);
@@ -1552,8 +1581,8 @@ class CdModuleCA extends ModuleGrid
 
         $datasEmployees = array();
         foreach ($employees as $employee) {
-
-            if (!empty($this->getCaCoachsTotal($employee['id_employee'], 0))) {
+            $id_e = $this->getCaCoachsTotal($employee['id_employee'], 0);
+            if (!empty($id_e)) {
 
                 $datasEmployees[$employee['id_employee']]['lastname'] = $employee['lastname'];
                 $datasEmployees[$employee['id_employee']]['firstname'] = $employee['firstname'];

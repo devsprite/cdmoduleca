@@ -5,3 +5,11 @@
 .synthesecontent .group{
     margin-top: 12px;
 }
+
+.sidebar {
+    display: none;
+}
+
+#statsContainer {
+    width: 100%;
+}

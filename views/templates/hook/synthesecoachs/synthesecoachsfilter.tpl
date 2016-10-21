@@ -56,6 +56,7 @@
                                 selected="selected"{/if}>{$code['key']}</option>
                         {/foreach}
                     </select>
+                    <input type="hidden" name="submitFilterCommande" value="1"/>
                 </div>
             </div>
         </form>
