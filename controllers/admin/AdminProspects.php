@@ -69,7 +69,9 @@ class AdminProspectsController extends ModuleAdminController
         if ($isOk) {
             foreach ($_POST as $key => $nbrProspect) {
                 if (substr($key, 0, 3) == 'em_' && !empty($nbrProspect) && $isOk) {
-                    if (!Validate::isInt(str_replace('em_', '', $key)) || !Validate::isInt($nbrProspect)) {
+                    if (!Validate::isInt(str_replace('em_', '', $key)) ||
+                        !Validate::isInt($nbrProspect) ||
+                        $nbrProspect <= 0) {
                         $isOk = false;
                     } else {
                         $id_employe = str_replace('em_', '', $key);

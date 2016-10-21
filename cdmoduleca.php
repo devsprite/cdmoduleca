@@ -1600,8 +1600,9 @@ class CdModuleCA extends ModuleGrid
                 $datasEmployees[$employee['id_employee']]['nbrVenteGrAbo'] =
                     $this->getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462));
 
-                $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] =
-                    $this->getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), true);
+                $n = $this->getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), true);
+                $totalVenteGrAbo = ($n)?($n/100)*10:''; // Calcul de la prime 10 % sur la vente des abos
+                $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] = $totalVenteGrAbo;
 
                 $datasEmployees[$employee['id_employee']]['nbrVenteGrDesaAbo'] =
                     $this->getNbrGrVentes($employee['id_employee'], 'ABO', array(440, 453, null, false, 0));
