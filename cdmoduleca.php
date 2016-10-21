@@ -901,7 +901,7 @@ class CdModuleCA extends ModuleGrid
         return Db::getInstance()->getRow($sql);
     }
 
-    private function getCodeActionByName($name)
+    public function getCodeActionByName($name)
     {
         $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE name = "' . pSQL($name) . '"';
 
