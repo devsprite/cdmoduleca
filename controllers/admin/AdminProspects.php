@@ -18,7 +18,7 @@ class AdminProspectsController extends ModuleAdminController
         $this->lang = false;
         $this->context = Context::getContext();
         $this->smarty = $this->context->smarty;
-        $this->path_tpl = _PS_MODULE_DIR_ . 'cdmoduleca/views/templates/admin/';
+        $this->path_tpl = _PS_MODULE_DIR_ . 'cdmoduleca/views/templates/admin/prospects/';
         parent::__construct();
     }
 

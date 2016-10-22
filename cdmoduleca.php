@@ -558,6 +558,7 @@ class CdModuleCA extends ModuleGrid
 
     public function getContent()
     {
+        $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/bootstrap.min.css');
         $this->postProcess();
         $this->displayForm();
 
@@ -949,10 +950,8 @@ class CdModuleCA extends ModuleGrid
             'CSVLink' => Tools::safeOutput($_SERVER['REQUEST_URI'] . '&export=1')
         ));
 
-        $this->html .= $this->display(__FILE__, 'headerstats.tpl');
         $this->html .= $this->syntheseCoachs();
         $this->html .= $this->engine($engine_params);
-        $this->html .= $this->display(__FILE__, 'footerstats.tpl');
 
         return $this->html;
     }
