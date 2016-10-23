@@ -150,13 +150,13 @@ class CdModuleCA extends ModuleGrid
 
         );
 
-        if ($this->isEnabledForShopContext()) {
-            $this->setIdFilterCoach();
-            $this->setIdFilterCodeAction();
-            $this->setFilterCommandeValid();
-            $this->AjoutSomme();
-            $this->AjoutObjectif();
-        }
+//        if ($this->isEnabledForShopContext()) {
+//            $this->setIdFilterCoach();
+//            $this->setIdFilterCodeAction();
+//            $this->setFilterCommandeValid();
+//            $this->AjoutSomme();
+//            $this->AjoutObjectif();
+//        }
     }
 
     public function install()
