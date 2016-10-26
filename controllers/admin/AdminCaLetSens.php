@@ -30,7 +30,6 @@ class AdminCaLetSensController extends ModuleAdminController
     }
 
 
-
     public function initContent()
     {
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/statscdmoduleca.css');
@@ -66,7 +65,10 @@ class AdminCaLetSensController extends ModuleAdminController
             $g->csvExport($engine_params);
         }
 
-        $this->html .= '';
+        $this->html = '
+			<a class="btn btn-default export-csv" href="' . Tools::safeOutput($_SERVER['REQUEST_URI'] . '&export=1') . '">
+				<i class="icon-cloud-upload"></i> ' . $this->l('CSV Export') . '
+			</a>';
 
         $this->html .= $this->displayCalendar();
         $this->html .= $this->syntheseCoachs();
@@ -174,7 +176,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
                 $n = CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), true, false,
                     $this->getDateBetween(), $this->module->lang);
-                $totalVenteGrAbo = ($n)?($n/100)*10:''; // Calcul de la prime 10 % sur la vente des abos
+                $totalVenteGrAbo = ($n) ? ($n / 100) * 10 : ''; // Calcul de la prime 10 % sur la vente des abos
                 $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] = $totalVenteGrAbo;
 
                 $datasEmployees[$employee['id_employee']]['nbrVenteGrDesaAbo'] =
@@ -513,13 +515,13 @@ class AdminCaLetSensController extends ModuleAdminController
     public function displayCalendar()
     {
         return AdminCaLetSensController::displayCalendarForm(array(
-            'Calendar' => $this->l('Calendar', 'AdminCaLetSens'),
-            'Day' => $this->l('Day', 'AdminCaLetSens'),
-            'Month' => $this->l('Month', 'AdminCaLetSens'),
-            'Year' => $this->l('Year', 'AdminCaLetSens'),
-            'From' => $this->l('From:', 'AdminCaLetSens'),
-            'To' => $this->l('To:', 'AdminCaLetSens'),
-            'Save' => $this->l('Save', 'AdminCaLetSens')
+            'Calendar' => $this->l('Calendrier', 'AdminCaLetSens'),
+            'Day' => $this->l('Jour', 'AdminCaLetSens'),
+            'Month' => $this->l('Mois', 'AdminCaLetSens'),
+            'Year' => $this->l('Année', 'AdminCaLetSens'),
+            'From' => $this->l('Du', 'AdminCaLetSens'),
+            'To' => $this->l('Au', 'AdminCaLetSens'),
+            'Save' => $this->l('Enregistrer', 'AdminCaLetSens')
         ), $this->token);
     }
 
@@ -529,18 +531,17 @@ class AdminCaLetSensController extends ModuleAdminController
         $context = $this->context;
 
         $context->controller->addJqueryUI('ui.datepicker');
-        if ($identifier === null && Tools::getValue('module'))
-        {
+        if ($identifier === null && Tools::getValue('module')) {
             $identifier = 'module';
             $id = Tools::getValue('module');
         }
 
         $action = Context::getContext()->link->getAdminLink('AdminCaLetSens');
-        $action .= ($action && $table ? '&'.Tools::safeOutput($action) : '');
-        $action .= ($identifier && $id ? '&'.Tools::safeOutput($identifier).'='.(int)$id : '');
+        $action .= ($action && $table ? '&' . Tools::safeOutput($action) : '');
+        $action .= ($identifier && $id ? '&' . Tools::safeOutput($identifier) . '=' . (int)$id : '');
         $module = Tools::getValue('module');
-        $action .= ($module ? '&module='.Tools::safeOutput($module) : '');
-        $action .= (($id_product = Tools::getValue('id_product')) ? '&id_product='.Tools::safeOutput($id_product) : '');
+        $action .= ($module ? '&module=' . Tools::safeOutput($module) : '');
+        $action .= (($id_product = Tools::getValue('id_product')) ? '&id_product=' . Tools::safeOutput($id_product) : '');
         $this->smarty->assign(array(
             'current' => self::$currentIndex,
             'token' => $token,
@@ -559,46 +560,38 @@ class AdminCaLetSensController extends ModuleAdminController
 
     public function processDateRange()
     {
-        if (Tools::isSubmit('submitDatePicker'))
-        {
+        if (Tools::isSubmit('submitDatePicker')) {
             if ((!Validate::isDate($from = Tools::getValue('datepickerFrom')) || !Validate::isDate($to = Tools::getValue('datepickerTo'))) || (strtotime($from) > strtotime($to)))
                 $this->errors[] = Tools::displayError('The specified date is invalid.');
         }
-        if (Tools::isSubmit('submitDateDay'))
-        {
+        if (Tools::isSubmit('submitDateDay')) {
             $from = date('Y-m-d');
             $to = date('Y-m-d');
         }
-        if (Tools::isSubmit('submitDateDayPrev'))
-        {
+        if (Tools::isSubmit('submitDateDayPrev')) {
             $yesterday = time() - 60 * 60 * 24;
             $from = date('Y-m-d', $yesterday);
             $to = date('Y-m-d', $yesterday);
         }
-        if (Tools::isSubmit('submitDateMonth'))
-        {
+        if (Tools::isSubmit('submitDateMonth')) {
             $from = date('Y-m-01');
             $to = date('Y-m-t');
         }
-        if (Tools::isSubmit('submitDateMonthPrev'))
-        {
+        if (Tools::isSubmit('submitDateMonthPrev')) {
             $m = (date('m') == 1 ? 12 : date('m') - 1);
             $y = ($m == 12 ? date('Y') - 1 : date('Y'));
-            $from = $y.'-'.$m.'-01';
-            $to = $y.'-'.$m.date('-t', mktime(12, 0, 0, $m, 15, $y));
+            $from = $y . '-' . $m . '-01';
+            $to = $y . '-' . $m . date('-t', mktime(12, 0, 0, $m, 15, $y));
         }
-        if (Tools::isSubmit('submitDateYear'))
-        {
+        if (Tools::isSubmit('submitDateYear')) {
             $from = date('Y-01-01');
             $to = date('Y-12-31');
         }
-        if (Tools::isSubmit('submitDateYearPrev'))
-        {
-            $from = (date('Y') - 1).date('-01-01');
-            $to = (date('Y') - 1).date('-12-31');
+        if (Tools::isSubmit('submitDateYearPrev')) {
+            $from = (date('Y') - 1) . date('-01-01');
+            $to = (date('Y') - 1) . date('-12-31');
         }
-        if (isset($from) && isset($to) && !count($this->errors))
-        {
+        if (isset($from) && isset($to) && !count($this->errors)) {
             $this->context->employee->stats_date_from = $from;
             $this->context->employee->stats_date_to = $to;
             $this->context->employee->update();
