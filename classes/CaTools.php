@@ -2,7 +2,7 @@
 
 class CaTools
 {
-    public static function getEmployees($active = 0, $id = null)
+    public static function getEmployees($active = null, $id = null)
     {
         $sql = 'SELECT `id_employee`, `firstname`, `lastname`
 			FROM `' . _DB_PREFIX_ . 'employee` ';
