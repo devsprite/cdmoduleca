@@ -63,9 +63,10 @@ class AdminProspectsController extends ModuleAdminController
                 $this->setEmployesAttribue();
             } elseif (Tools::isSubmit('mod_pa')) {
                 $this->displayUpdateProspectsAttribue();
+            } elseif (Tools::isSubmit('del_pa')) {
+                $this->deleteProspectsAttribue();
             }
         }
-
 
         return parent::postProcess();
     }
@@ -93,7 +94,7 @@ class AdminProspectsController extends ModuleAdminController
                     $pa = new ProspectAttribueClass($id_pa);
                     $pa->date_debut = $date_debut;
                     $pa->date_fin = $date_fin;
-                    $this->changeGroupProspects($pa, $id_em);
+                    $this->changeGroupProspects($pa, $this->module->getGroupeEmployee($id_em));
                     $pa->id_employee = $id_em;
                     $pa->update();
                 };
@@ -124,23 +125,6 @@ class AdminProspectsController extends ModuleAdminController
         } else {
             $this->errors = $this->module->l('Erreur lors de l\'enregistrement');
         }
-    }
-
-    private function updateProspectsAttribue()
-    {
-        $data['id_prospect_attribue'] = (Validate::isInt((int)Tools::getValue('pa_id_pa'))) ? (int)Tools::getValue('id_pa') : false;
-        $data['id_employee'] = (Validate::isInt((int)Tools::getValue('pa_id_em'))) ? (int)Tools::getValue('pa_id_em') : false;
-        $data['date_debut'] = (Validate::isDateFormat(Tools::getValue('date_debut'))) ? Tools::getValue('date_debut') : false;
-        $data['date_fin'] = (Validate::isDateFormat(Tools::getValue('date_fin'))) ? Tools::getValue('date_fin') : false;
-
-        if ($this->module->viewAllCoachs[$this->context->employee->id_profile] &&
-            $data['id_prospect_attribue'] && $data['id_employee'] && $data['date_debut'] && $data['date_fin'] &&
-            ProspectAttribueClass::isExist($data['id_prospect_attribue'])
-        ) {
-            $pa = new ProspectAttribueClass($data);
-            ddd($pa);
-        }
-
     }
 
     private function displayUpdateProspectsAttribue()
@@ -357,10 +341,9 @@ class AdminProspectsController extends ModuleAdminController
         return ModuleGraph::getDateBetween($this->context->employee);
     }
 
-    private function changeGroupProspects(ProspectAttribueClass $pa, $id_employee)
+    private function changeGroupProspects(ProspectAttribueClass $pa, $groupNewCoach)
     {
         $groupOldCoach = $this->module->getGroupeEmployee($pa->id_employee);
-        $groupNewCoach = $this->module->getGroupeEmployee($id_employee);
         $prospects = ProspectClass::getProspectsByIdPa($pa->id_prospect_attribue);
         foreach ($prospects as $prospect) {
             $c = new Customer($prospect['id_customer']);
@@ -370,6 +353,17 @@ class AdminProspectsController extends ModuleAdminController
             $c->updateGroup($g);
             unset($c);
             unset($g);
+        }
+    }
+
+    private function deleteProspectsAttribue()
+    {
+        $id_pa = (int)Tools::getValue('id_pa');
+        if (ProspectAttribueClass::isExist($id_pa)) {
+            $pa = new ProspectAttribueClass($id_pa);
+            $this->changeGroupProspects($pa, '1');
+            $pa->delete();
+            $this->confirmations = $this->module->l('Enregistrement éffacé.');
         }
     }
 
