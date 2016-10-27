@@ -65,6 +65,8 @@ class AdminProspectsController extends ModuleAdminController
                 $this->displayUpdateProspectsAttribue();
             } elseif (Tools::isSubmit('del_pa')) {
                 $this->deleteProspectsAttribue();
+            } elseif (Tools::isSubmit('view_pa')) {
+                $this->viewProspectsAttribue();
             }
         }
 
@@ -418,6 +420,13 @@ class AdminProspectsController extends ModuleAdminController
         $req = Db::getInstance()->execute($sql);
 
         return $req;
+    }
+
+    private function viewProspectsAttribue()
+    {
+        $id_pa = (int)Tools::getValue('id_pa');
+        $this->smarty->assign( array(
+            'listProspects' => ProspectClass::getProspectsByIdPa($id_pa)));
     }
 
 

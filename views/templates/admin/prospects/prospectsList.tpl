@@ -1,4 +1,4 @@
-{if isset($prosGr1)}
+{if isset($listProspects)}
 <div class="row panel">
     <div class="panel-heading">
         Prospects
@@ -8,23 +8,23 @@
         <tr>
             <th>Id</th>
             <th>Nom</th>
-            <th>Groupe</th>
+            <th>Coach</th>
             <th>Contacté</th>
             <th>Traité</th>
             <th>Injoignable</th>
-            <th>Date Inscription</th>
+            <th>Date Prospection</th>
         </tr>
         </thead>
         <tbody>
-        {foreach item=prosp from=$prosGr1}
+        {foreach item=prosp from=$listProspects}
             <tr>
                 <td>{$prosp['id_customer']}</td>
-                <td>{$prosp['nom']}</td>
-                <td>{$prosp['id_group']}</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>{$prosp['date_add']}</td>
+                <td>{$prosp['lastname']|upper} {$prosp['firstname']|lower|capitalize}</td>
+                <td>{$prosp['coach']}</td>
+                <td>{$prosp['traite']}</td>
+                <td>{$prosp['injoignable']}</td>
+                <td>{$prosp['contacte']}</td>
+                <td>{$prosp['date_debut']|date_format:'%d/%m/%Y'}</td>
             </tr>
         {/foreach}
         </tbody>

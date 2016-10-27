@@ -45,7 +45,11 @@ class ProspectClass extends ObjectModel
 
     public static function getProspectsByIdPa($id_prospect_attribue)
     {
-        $sql = 'SELECT * FROM `ps_prospect` WHERE `id_prospect_attribue` = ' . $id_prospect_attribue;
+        $sql = 'SELECT p.* , pa.*, cu.firstname, cu.lastname, e.lastname as coach FROM `ps_prospect` AS p 
+                LEFT JOIN `ps_prospect_attribue` AS pa ON p.`id_prospect_attribue` = pa.`id_prospect_attribue`
+                LEFT JOIN `ps_customer` AS cu ON p.`id_customer` = cu.`id_customer`
+                LEFT JOIN `ps_employee` AS e ON pa.`id_employee` = e.`id_employee`
+                WHERE p.`id_prospect_attribue` = ' . $id_prospect_attribue;
         $req = Db::getInstance()->executeS($sql);
 
         return $req;

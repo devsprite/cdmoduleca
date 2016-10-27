@@ -1,39 +1,15 @@
 {if $confirmation}{$confirmation}{/if}
 <div class="row panel">
     <div class="panel-heading">
-        Configuration
-    </div>
-    <form action="{$linkForm}" method="post">
-        <div class="col-xs-2">
-            <label for="nbrProspects">Nombre de prospects à distribuer
-                <input type="text" name="nbr_prospect_distribuer" id="nbrProspects">
-            </label>
-        </div>
-        <div class="col-xs-1">
-            <div>
-                <label for="employeActif">Employés actif</label>
-            </div>
-            <div>
-                <input type="checkbox" name="employeActif" id="employeActif" onchange="this.form.submit();"
-                        {if $employeActif}{$employeActif}{/if}>
-                <input type="hidden" name="submitEmployeActif" value="1"/>
-            </div>
-        </div>
-        <div class="col-xs-2">
-            {if $nbr_prospects <= 0}
-            {else}
-                <p>Il y a {$nbr_prospects} nouveaux prospect(s)</p>
-            {/if}
-        </div>
-    </form>
-</div>
-<div class="row panel">
-    <div class="panel-heading">
-        Employés
+        Attribution des prospects
+        {if $nbr_prospects <= 0}
+        {else}
+            <p>Il y a {$nbr_prospects} nouveaux prospect(s)</p>
+        {/if}
     </div>
     <form action="{$linkForm}" method="post" name="employes">
         <div class="row panel">
-            <div class="col-xs-2">
+            <div class="col-xs-6 col-md-2 col-xs-12">
                 <label class="control-label" for="p_date_start">Date début
                     <input type="text" name="p_date_start" id="p_date_start"
                            value="{if isset($smarty.post.p_date_start)
@@ -41,7 +17,7 @@
                            isset($pa)}{$pa->date_debut|date_format:'%Y-%m-%d'}{else}{$smarty.now|date_format:'%Y-%m-%d'}{/if}"
                            class="datepicker form-control"></label>
             </div>
-            <div class="col-xs-2">
+            <div class="col-xs-6 col-md-2 col-xs-12">
                 <label class="control-label" for="p_date_end">Date fin
                     <input type="text" name="p_date_end" id="p_date_end"
                            value="{if isset($smarty.post.p_date_end)
@@ -50,10 +26,10 @@
                            class="datepicker form-control"></label>
             </div>
             {if isset($coachs)}
-                <div class="col-lg-2 ">
+                <div class="col-lg-3 col-md-3 col-xs-12">
                     <label class="control-label">
                         Coach :
-                        <select name="pa_id_employee" class="fixed-width-xl" id="pa_id_employee">
+                        <select name="pa_id_employee" class="" id="pa_id_employee">
                             {foreach item=coach from=$coachs}
                                 {if !empty($coach['id_group'])}
                                     <option value="{$coach['id_employee']}" {if $pa->id_employee == $coach['id_employee']}
@@ -64,7 +40,7 @@
                         </select>
                     </label>
                 </div>
-                <div class="col-xs-2">
+                <div class="col-lg-3 col-md-3 col-xs-12">
                     <label class="control-label" for="">Nbre Prosprects Attribués
                         <input type="text" name="" id=""
                                value="{$pa->nbr_prospect_attribue}"
@@ -72,6 +48,16 @@
                 </div>
                 <input type="hidden" name="pa_id_pa" value="{$pa->id_prospect_attribue}">
             {/if}
+            <div class="col-xs-1">
+                <div>
+                    <label for="employeActif">Employés actif</label>
+                </div>
+                <div>
+                    <input type="checkbox" name="employeActif" id="employeActif" onchange="this.form.submit();"
+                            {if $employeActif}{$employeActif}{/if}>
+                    <input type="hidden" name="submitEmployeActif" value="1"/>
+                </div>
+            </div>
             <script type="text/javascript">
                 {literal}
                 $(document).ready(function () {
@@ -90,24 +76,30 @@
                 });
                 {/literal}
             </script>
+
             <div class="col-xs-12">
-                <button type="submit" name="submitEmployes" class="btn btn-success">Valider</button>
-            </div>
-        </div>
-        <div class="col-xs-12">
-            {foreach item=employe from=$employes}
-                {if !empty($employe['id_group'])}
-                    <div class="col-md-2 col-xs-3">
-                        <label class="control-label"
-                               for="{$employe['lastname']}{$employe['firstname']}">{$employe['lastname']}
-                            ({$employe['firstname']}
-                            ){if !empty({$employe['total_prospect']})} - {$employe['total_prospect']} Prospects{/if}
-                            <input type="text" name="em_{$employe['id_employee']}"
-                                   id="{$employe['lastname']}{$employe['firstname']}" value="">
-                        </label>
-                    </div>
+                {if isset($coachs)}{else}
+                    <hr>
+                    {foreach item=employe from=$employes}
+                        {if !empty($employe['id_group'])}
+                            <div class="col-lg-4 col-md-6 col-xs-12">
+                                <label class="control-label"
+                                       for="{$employe['lastname']}{$employe['firstname']}"><strong>{$employe['lastname']}</strong>
+                                    {if !empty({$employe['total_prospect']})} - {$employe['total_prospect']} Prospects{/if}<p>({$employe['firstname']} - {$employe['id_group']}
+                                    )</p></label>
+                                    <input type="text" name="em_{$employe['id_employee']}"
+                                           id="{$employe['lastname']}{$employe['firstname']}" value="">
+
+                            </div>
+                        {/if}
+                    {/foreach}
                 {/if}
-            {/foreach}
+                <div class="col-xs-12">
+                    <hr>
+                    <button type="submit" name="submitEmployes" class="btn btn-success fixed-width-lg">Ajouter
+                    </button>
+                </div>
+            </div>
     </form>
 </div>
 </div>
