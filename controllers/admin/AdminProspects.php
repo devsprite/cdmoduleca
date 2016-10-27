@@ -194,10 +194,10 @@ class AdminProspectsController extends ModuleAdminController
     {
         $actif = (empty($this->employesActif)) ? '' : ' WHERE e.`active` = 1';
         $sql = '
-            SELECT e.`id_employee`, e.`lastname`, e.`firstname`, pa.`nbr_prospect_attribue`,pa.`date_debut`,
+            SELECT gl.`id_group`, e.`id_employee`, e.`lastname`, e.`firstname`, pa.`nbr_prospect_attribue`,pa.`date_debut`,
              pa.`date_fin`,
              (  SELECT COUNT(ppr.`id_prospect_attribue`)
-                FROM `ps_prospect` as ppr 
+                FROM `ps_prospect` as ppr
                 LEFT JOIN `ps_prospect_attribue` AS ppa ON ppr.`id_prospect_attribue` = ppa.`id_prospect_attribue`
                 WHERE e.`id_employee` = ppa.`id_employee`
                 AND ppr.`traite` !=1
@@ -206,6 +206,7 @@ class AdminProspectsController extends ModuleAdminController
             FROM `ps_employee` AS e 
             LEFT JOIN `ps_prospect_attribue` AS pa ON e.`id_employee` = pa.`id_employee`
             LEFT JOIN `ps_prospect` AS p ON pa.`id_prospect_attribue` = p.`id_prospect_attribue`
+            LEFT JOIN `ps_group_lang` as gl ON gl.`id_employee` = e.`id_employee`
             ';
         $sql .= $actif;
         $sql .= ' GROUP BY e.`id_employee`';

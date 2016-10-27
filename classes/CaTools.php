@@ -4,11 +4,12 @@ class CaTools
 {
     public static function getEmployees($active = null, $id = null)
     {
-        $sql = 'SELECT `id_employee`, `firstname`, `lastname`
-			FROM `' . _DB_PREFIX_ . 'employee` ';
-        $sql .= ($active == 'on') ? 'WHERE active = 1 ' : '';
-        $sql .= ($id) ? ' WHERE id_employee = ' . $id : '';
-        $sql .= ' ORDER BY `lastname` ASC';
+        $sql = 'SELECT gl.`id_group`,e.`id_employee`, e.`firstname`, e.`lastname`
+			FROM `' . _DB_PREFIX_ . 'employee` AS e ';
+        $sql .= 'LEFT JOIN `ps_group_lang` AS gl ON e.`id_employee` = gl.`id_employee` ';
+        $sql .= ($active == 'on') ? 'WHERE e.`active` = 1 ' : '';
+        $sql .= ($id) ? ' WHERE e.`id_employee` = ' . $id : '';
+        $sql .= ' ORDER BY e.`lastname` ASC';
 
         return Db::getInstance()->executeS($sql);
     }

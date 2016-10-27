@@ -39,7 +39,7 @@
     <form action="{$linkForm}" method="post" name="employes">
         <div class="row panel">
             <div class="col-xs-2">
-                <label  class="control-label" for="p_date_start">Date début
+                <label class="control-label" for="p_date_start">Date début
                     <input type="text" name="p_date_start" id="p_date_start"
                            value="{if isset($smarty.post.p_date_start)
                            }{$smarty.post.p_date_start|date_format:'%Y-%m-%d'}{elseif
@@ -47,7 +47,7 @@
                            class="datepicker form-control"></label>
             </div>
             <div class="col-xs-2">
-                <label  class="control-label" for="p_date_end">Date fin
+                <label class="control-label" for="p_date_end">Date fin
                     <input type="text" name="p_date_end" id="p_date_end"
                            value="{if isset($smarty.post.p_date_end)
                            }{$smarty.post.p_date_end|date_format:'%Y-%m-%d'}{elseif
@@ -60,15 +60,17 @@
                         Coach :
                         <select name="pa_id_employee" class="fixed-width-xl" id="pa_id_employee">
                             {foreach item=coach from=$coachs}
-                                <option value="{$coach['id_employee']}" {if $pa->id_employee == $coach['id_employee']}
-                                    selected="selected"{/if}>{$coach['lastname']} - ({$coach['firstname']})
-                                </option>
+                                {if !empty($coach['id_group'])}
+                                    <option value="{$coach['id_employee']}" {if $pa->id_employee == $coach['id_employee']}
+                                        selected="selected"{/if}>{$coach['lastname']} - ({$coach['firstname']})
+                                    </option>
+                                {/if}
                             {/foreach}
                         </select>
                     </label>
                 </div>
                 <div class="col-xs-2">
-                    <label  class="control-label" for="">Nbre Prosprects Attribués
+                    <label class="control-label" for="">Nbre Prosprects Attribués
                         <input type="text" name="" id=""
                                value="{$pa->nbr_prospect_attribue}"
                                class="form-control" disabled></label>
@@ -99,14 +101,17 @@
         </div>
         <div class="col-xs-12">
             {foreach item=employe from=$employes}
-                <div class="col-md-2 col-xs-3">
-                    <label  class="control-label" for="{$employe['lastname']}{$employe['firstname']}">{$employe['lastname']}
-                        ({$employe['firstname']}
-                        ){if !empty({$employe['total_prospect']})} - {$employe['total_prospect']} Prospects{/if}
-                        <input type="text" name="em_{$employe['id_employee']}"
-                               id="{$employe['lastname']}{$employe['firstname']}" value="">
-                    </label>
-                </div>
+                {if !empty($employe['id_group'])}
+                    <div class="col-md-2 col-xs-3">
+                        <label class="control-label"
+                               for="{$employe['lastname']}{$employe['firstname']}">{$employe['lastname']}
+                            ({$employe['firstname']}
+                            ){if !empty({$employe['total_prospect']})} - {$employe['total_prospect']} Prospects{/if}
+                            <input type="text" name="em_{$employe['id_employee']}"
+                                   id="{$employe['lastname']}{$employe['firstname']}" value="">
+                        </label>
+                    </div>
+                {/if}
             {/foreach}
     </form>
 </div>
