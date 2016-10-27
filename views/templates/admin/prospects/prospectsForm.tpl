@@ -58,7 +58,7 @@
                 <div class="col-lg-2 ">
                     <label class="control-label">
                         Coach :
-                        <select name="filterCoach" class="fixed-width-xl" id="filterCoach">
+                        <select name="pa_id_employee" class="fixed-width-xl" id="pa_id_employee">
                             {foreach item=coach from=$coachs}
                                 <option value="{$coach['id_employee']}" {if $pa->id_employee == $coach['id_employee']}
                                     selected="selected"{/if}>{$coach['lastname']} - ({$coach['firstname']})
@@ -73,6 +73,7 @@
                                value="{$pa->nbr_prospect_attribue}"
                                class="form-control" disabled></label>
                 </div>
+                <input type="hidden" name="pa_id_pa" value="{$pa->id_prospect_attribue}">
             {/if}
             <script type="text/javascript">
                 {literal}

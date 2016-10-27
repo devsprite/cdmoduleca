@@ -35,6 +35,7 @@ class ProspectAttribueClass extends ObjectModel
                 WHERE `id_prospect_attribue` = ' . pSQL($id);
         $req = Db::getInstance()->getRow($sql);
 
-        return $req;
+        return ($req) ? true : false;
     }
+
 }

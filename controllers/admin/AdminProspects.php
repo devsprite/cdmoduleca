@@ -2,6 +2,7 @@
 
 require_once(dirname(__FILE__) . '/../../classes/ProspectClass.php');
 require_once(dirname(__FILE__) . '/../../classes/ProspectAttribueClass.php');
+require_once(dirname(__FILE__) . '/../../classes/CaTools.php');
 
 class AdminProspectsController extends ModuleAdminController
 {
@@ -84,7 +85,20 @@ class AdminProspectsController extends ModuleAdminController
             $isOk = false;
         }
 
-        if ($isOk) {
+        if ($isOk && Tools::isSubmit('pa_id_pa')) {
+            $id_pa = (Validate::isInt((int)Tools::getValue('pa_id_pa'))) ? (int)Tools::getValue('pa_id_pa') : false;
+            $id_em = (Validate::isInt((int)Tools::getValue('pa_id_employee'))) ? (int)Tools::getValue('pa_id_employee') : false;
+            if ($id_pa && $id_em) {
+                if (ProspectAttribueClass::isExist($id_pa)) {
+                    $pa = new ProspectAttribueClass($id_pa);
+                    $pa->date_debut = $date_debut;
+                    $pa->date_fin = $date_fin;
+                    $this->changeGroupProspects($pa, $id_em);
+                    $pa->id_employee = $id_em;
+                    $pa->update();
+                };
+            }
+        } elseif ($isOk) {
             foreach ($_POST as $key => $nbrProspect) {
                 if (substr($key, 0, 3) == 'em_' && !empty($nbrProspect) && $isOk) {
                     if (!Validate::isInt(str_replace('em_', '', $key)) ||
@@ -341,4 +355,22 @@ class AdminProspectsController extends ModuleAdminController
     {
         return ModuleGraph::getDateBetween($this->context->employee);
     }
+
+    private function changeGroupProspects(ProspectAttribueClass $pa, $id_employee)
+    {
+        $groupOldCoach = $this->module->getGroupeEmployee($pa->id_employee);
+        $groupNewCoach = $this->module->getGroupeEmployee($id_employee);
+        $prospects = ProspectClass::getProspectsByIdPa($pa->id_prospect_attribue);
+        foreach ($prospects as $prospect) {
+            $c = new Customer($prospect['id_customer']);
+            $g = $c->getGroups();
+            unset($g[array_search($groupOldCoach, $g)]);
+            $g[] = (int)$groupNewCoach;
+            $c->updateGroup($g);
+            unset($c);
+            unset($g);
+        }
+    }
+
+
 }

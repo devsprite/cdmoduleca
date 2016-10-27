@@ -48,5 +48,13 @@ class ProspectClass extends ObjectModel
         return $req;
     }
 
+    public static function getProspectsByIdPa($id_prospect_attribue)
+    {
+        $sql = 'SELECT * FROM `ps_prospect` WHERE `id_prospect_attribue` = ' . $id_prospect_attribue;
+        $req = Db::getInstance()->executeS($sql);
+
+        return $req;
+    }
+
 
 }
