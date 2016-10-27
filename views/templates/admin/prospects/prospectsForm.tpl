@@ -1,7 +1,4 @@
 {if $confirmation}{$confirmation}{/if}
-{if $errors}{$errors}{/if}
-
-
 <div class="row panel">
     <div class="panel-heading">
         Configuration
@@ -24,8 +21,6 @@
         </div>
         <div class="col-xs-2">
             {if $nbr_prospects <= 0}
-                <p>Pas de nouveau prospect disponible.</p>
-                <p>L'attribution se ferra sur des prospects plus ancien.</p>
             {else}
                 <p>Il y a {$nbr_prospects} nouveaux prospect(s)</p>
             {/if}

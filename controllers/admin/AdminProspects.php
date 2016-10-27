@@ -32,7 +32,7 @@ class AdminProspectsController extends ModuleAdminController
             . '&token=' . Tools::getValue('token');
 
         $this->displayForm();
-//        $this->displayProspects();
+        $this->displayProspects();
 
         $this->smarty->assign(array(
             'nbr_prospects' => $this->nbrNouveauProspects(),
@@ -41,7 +41,7 @@ class AdminProspectsController extends ModuleAdminController
             'linkFilter' => $linkFilterCoachs,
             'employeActif' => $this->employesActif,
             'confirmation' => $this->confirmations,
-            'errors' => $this->errors
+            'errors' => implode('<br>', $this->errors)
         ));
 
         $this->html .= $this->displayCalendar();
@@ -86,6 +86,7 @@ class AdminProspectsController extends ModuleAdminController
             $isOk = false;
         }
 
+        // Modification d'un enregistrement prospects attribué
         if ($isOk && Tools::isSubmit('pa_id_pa')) {
             $id_pa = (Validate::isInt((int)Tools::getValue('pa_id_pa'))) ? (int)Tools::getValue('pa_id_pa') : false;
             $id_em = (Validate::isInt((int)Tools::getValue('pa_id_employee'))) ? (int)Tools::getValue('pa_id_employee') : false;
@@ -99,6 +100,7 @@ class AdminProspectsController extends ModuleAdminController
                     $pa->update();
                 };
             }
+            // Enregistrement d'une nouvelle ligne
         } elseif ($isOk) {
             foreach ($_POST as $key => $nbrProspect) {
                 if (substr($key, 0, 3) == 'em_' && !empty($nbrProspect) && $isOk) {
@@ -114,8 +116,7 @@ class AdminProspectsController extends ModuleAdminController
                         $attriProspect->date_fin = $date_fin;
                         $attriProspect->id_employee = $id_employe;
                         $attriProspect->nbr_prospect_attribue = $nbrProspect;
-                        $isOk = $attriProspect->add();
-                        $this->attribuProspects($attriProspect, $this->module->getGroupeEmployee($id_employe));
+                        $isOk = $this->attribuProspects($attriProspect, $this->module->getGroupeEmployee($id_employe));
                     }
                 }
             }
@@ -123,7 +124,7 @@ class AdminProspectsController extends ModuleAdminController
         if ($isOk) {
             $this->confirmations = $this->module->l('Enregistrement éffectué');
         } else {
-            $this->errors = $this->module->l('Erreur lors de l\'enregistrement');
+            $this->errors[] = $this->module->l('Erreur lors de l\'enregistrement');
         }
     }
 
@@ -204,7 +205,26 @@ class AdminProspectsController extends ModuleAdminController
 
     private function attribuProspects(ProspectAttribueClass $ap, $id_group)
     {
-        $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, 12, true);
+        $index_id = ProspectClass::getLastCustomer();
+        $nbr_prospects_disponible = $this->nbrProspectsDisponible($index_id);
+        $ap->add();
+        if ($nbr_prospects_disponible >= $ap->nbr_prospect_attribue) {
+            $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $index_id);
+            $this->addProspects($prospects, $id_group, $ap);
+        }elseif ($nbr_prospects_disponible == 0) {
+            $index_id = 0;
+            $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $index_id);
+            $this->addProspects($prospects, $id_group, $ap);
+        } else {
+            $this->errors[] = $this->module->l('Il n\'y a pas assez de prospects disponible');
+            $ap->delete();
+            return false;
+        }
+        return true;
+    }
+
+    private function addProspects($prospects, $id_group, ProspectAttribueClass $ap)
+    {
         foreach ($prospects as $prospect) {
             $c = new Customer($prospect['id_customer']);
             $g = $c->getGroups();
@@ -221,8 +241,8 @@ class AdminProspectsController extends ModuleAdminController
     private function nbrNouveauProspects()
     {
         $nbr_nouveaux_prospects = 0;
-        $index_prospects = Configuration::get('CDMODULECA_INDEX_PROSPECTS', 0);
-        if ($index_prospects != 0) {
+        $index_prospects = ProspectClass::getLastCustomer();
+        if ($index_prospects != null) {
             $nbr_nouveaux_prospects = $this->getNbrNouveauProspects($index_prospects);
         }
 
@@ -362,9 +382,42 @@ class AdminProspectsController extends ModuleAdminController
         if (ProspectAttribueClass::isExist($id_pa)) {
             $pa = new ProspectAttribueClass($id_pa);
             $this->changeGroupProspects($pa, '1');
+            $this->deleteProspectsNonTraite($pa->id_prospect_attribue);
             $pa->delete();
             $this->confirmations = $this->module->l('Enregistrement éffacé.');
         }
+    }
+
+    private function getLastIdGroupDefaut()
+    {
+        $sql = 'SELECT MAX(`id_customer`) FROM `ps_customer_group`
+                WHERE `id_group` = 1 ';
+
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
+    }
+
+    private function nbrProspectsDisponible($index_id)
+    {
+        $sql = 'SELECT COUNT(`id_customer`) FROM `ps_customer_group` 
+                WHERE `id_customer` > ' . $index_id . '
+                AND `id_group` = 1 ';
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
+    }
+
+    private function deleteProspectsNonTraite($id_prospect_attribue)
+    {
+        $sql = 'DELETE FROM `ps_prospect`
+                WHERE `id_prospect_attribue` = ' .(int)$id_prospect_attribue . '
+                AND `traite` = ""
+                AND `injoignable` = ""
+                AND `contacte` = "" ';
+        $req = Db::getInstance()->execute($sql);
+
+        return $req;
     }
 
 
