@@ -178,6 +178,7 @@ class CdModuleCA extends ModuleGrid
     public function uninstall()
     {
         if (
+            !parent::uninstall() ||
             !$this->eraseTabsStatsCA() ||
             !$this->eraseTabsProspects() ||
             !$this->eraseTableProspectAttribue() ||
@@ -187,8 +188,7 @@ class CdModuleCA extends ModuleGrid
             !$this->removeCodeActionTable() ||
             !$this->alterGroupLangTable('remove') ||
             !$this->alterOrderTable('remove') ||
-            !$this->eraseConfig() ||
-            !parent::uninstall()
+            !$this->eraseConfig()
         ) {
             return false;
         }
