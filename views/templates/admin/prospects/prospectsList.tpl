@@ -9,7 +9,6 @@
             <th>Id</th>
             <th>Nom</th>
             <th>Coach</th>
-            <th>Contacté</th>
             <th>Traité</th>
             <th>Injoignable</th>
             <th>Date Prospection</th>
@@ -23,7 +22,6 @@
                 <td>{$prosp['coach']}</td>
                 <td>{$prosp['traite']}</td>
                 <td>{$prosp['injoignable']}</td>
-                <td>{$prosp['contacte']}</td>
                 <td>{$prosp['date_debut']|date_format:'%d/%m/%Y'}</td>
             </tr>
         {/foreach}

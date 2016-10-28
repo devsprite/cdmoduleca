@@ -25,7 +25,7 @@
                            isset($pa)}{$pa->date_fin|date_format:'%Y-%m-%d'}{else}{$smarty.now|date_format:'%Y-%m-%d'}{/if}"
                            class="datepicker form-control"></label>
             </div>
-            {if isset($coachs)}
+            {if isset($pa)}
                 <div class="col-lg-3 col-md-3 col-xs-12">
                     <label class="control-label">
                         Coach :
@@ -47,6 +47,27 @@
                                class="form-control" disabled></label>
                 </div>
                 <input type="hidden" name="pa_id_pa" value="{$pa->id_prospect_attribue}">
+            {elseif !empty($nbrProspectsIsoles)}
+                <div class="col-lg-3 col-md-3 col-xs-12">
+                    <label class="control-label">
+                        Coach :
+                        <select name="pi_id_employee" class="" id="pi_id_employee">
+                            {foreach item=coach from=$coachs}
+                                {if !empty($coach['id_group'])}
+                                    <option value="{$coach['id_employee']}">{$coach['lastname']} -
+                                        ({$coach['firstname']})
+                                    </option>
+                                {/if}
+                            {/foreach}
+                        </select>
+                    </label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-xs-12">
+                    <label class="control-label" for="">{$nbrProspectsIsoles} Prospect(s) Isolé(s)
+                        <input type="text" name="pi_nbr_pr" id="pi_nbr_pr"
+                               value="{$nbrProspectsIsoles}"
+                               class="form-control"></label>
+                </div>
             {/if}
             <div class="col-xs-1">
                 <div>
@@ -78,17 +99,19 @@
             </script>
 
             <div class="col-xs-12">
-                {if isset($coachs)}{else}
+
+                {if isset($pa) || !empty($nbrProspectsIsoles)}{else}
                     <hr>
                     {foreach item=employe from=$employes}
                         {if !empty($employe['id_group'])}
                             <div class="col-lg-4 col-md-6 col-xs-12">
                                 <label class="control-label"
                                        for="{$employe['lastname']}{$employe['firstname']}"><strong>{$employe['lastname']}</strong>
-                                    {if !empty({$employe['total_prospect']})} - {$employe['total_prospect']} Prospects{/if}<p>({$employe['firstname']} - {$employe['id_group']}
-                                    )</p></label>
-                                    <input type="text" name="em_{$employe['id_employee']}"
-                                           id="{$employe['lastname']}{$employe['firstname']}" value="">
+                                    {if !empty({$employe['total_prospect']})} - {$employe['total_prospect']} Prospects{/if}
+                                    <p>({$employe['firstname']} - {$employe['id_group']}
+                                        )</p></label>
+                                <input type="text" name="em_{$employe['id_employee']}"
+                                       id="{$employe['lastname']}{$employe['firstname']}" value="">
 
                             </div>
                         {/if}

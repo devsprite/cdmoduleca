@@ -9,6 +9,13 @@ class ProspectClass extends ObjectModel
     public $injoignable;
     public $contacte;
     public $date_add;
+    public $message = array(
+        'matin' => array(),
+        'midi'=> array(),
+        'apres_midi' => array(),
+        'soir' => array(),
+        'repondeur' => array()
+    );
 
     public static $definition = array(
         'table' => 'prospect',
@@ -105,7 +112,6 @@ class ProspectClass extends ObjectModel
     public static function setContact()
     {
         $id = (int)Tools::getValue('id_customer');
-
         if (!ProspectClass::isProspectExistByIdCustomer($id)) {
             return false;
         }
@@ -135,6 +141,7 @@ class ProspectClass extends ObjectModel
         }
 
         $prospect->contacte = Tools::jsonEncode($contacte);
+        $prospect->traite = 'Non';
         $prospect->update();
     }
 
@@ -168,4 +175,16 @@ class ProspectClass extends ObjectModel
         return $req;
     }
 
+    public static function getProspectsIsole()
+    {
+        $sql = 'SELECT * FROM `ps_prospect` 
+                WHERE `id_prospect_attribue`
+                NOT IN 
+                (SELECT `id_prospect_attribue` FROM `ps_prospect_attribue` )
+                AND `traite` != "Oui"
+                AND `injoignable` = "Non"';
+        $req = Db::getInstance()->executeS($sql);
+
+        return $req;
+    }
 }

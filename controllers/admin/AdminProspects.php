@@ -30,13 +30,17 @@ class AdminProspectsController extends ModuleAdminController
         $isAllow = $this->module->viewAllCoachs[$this->context->employee->id_profile];
         $linkFilterCoachs = AdminController::$currentIndex . '&module=' . $this->module->name
             . '&token=' . Tools::getValue('token');
-
-        $this->displayForm();
-        $this->displayProspects();
+        $actif = (empty($this->employesActif)) ? null : 'on';
+        $listCoaches = CaTools::getEmployees($actif);
+        $prospectsIsoles = $this->getProspectsIsole();
+        $this->generateForm();
 
         $this->smarty->assign(array(
             'nbr_prospects' => $this->nbrNouveauProspects(),
             'prospects_by_coach' => $this->listProspectsByCoach(),
+            'nbrProspectsIsoles' => count($prospectsIsoles),
+            'prospectsIsoles' => $prospectsIsoles,
+            'coachs' => $listCoaches,
             'isAllow' => $isAllow,
             'linkFilter' => $linkFilterCoachs,
             'employeActif' => $this->employesActif,
@@ -55,7 +59,6 @@ class AdminProspectsController extends ModuleAdminController
 
     public function postProcess()
     {
-
         if ($this->module->viewAllCoachs[$this->context->employee->id_profile]) {
             $this->processDateRange();
             if (Tools::isSubmit('submitEmployeActif')) {
@@ -103,6 +106,22 @@ class AdminProspectsController extends ModuleAdminController
                     $pa->update();
                 };
             }
+        } elseif(Tools::isSubmit('pi_id_employee')) {
+            $id_employe = (int)Tools::getValue('pi_id_employee');
+            $nb_pros = (int)Tools::getValue('pi_nbr_pr');
+            $nbrProspect = count($this->getProspectsIsole());
+
+            if ($nb_pros >= $nbrProspect) {
+                $nb_pros = $nbrProspect;
+            }
+            $attriProspect = new ProspectAttribueClass();
+            $attriProspect->date_debut = $date_debut;
+            $attriProspect->date_fin = $date_fin;
+            $attriProspect->id_employee = $id_employe;
+            $attriProspect->nbr_prospect_attribue = $nb_pros;
+            $attriProspect->save();
+            $this->attribuProspectsIsoles($attriProspect, $this->module->getGroupeEmployee($id_employe));
+
             // Enregistrement d'une nouvelle ligne
         } elseif ($isOk) {
             foreach ($_POST as $key => $nbrProspect) {
@@ -136,12 +155,8 @@ class AdminProspectsController extends ModuleAdminController
         $id = (Validate::isInt((int)Tools::getValue('pa_id_pa'))) ? (int)Tools::getValue('id_pa') : false;
         if (ProspectAttribueClass::isExist($id)) {
             $pa = new ProspectAttribueClass($id);
-            $actif = (empty($this->employesActif)) ? null : 'on';
-            $listCoaches = CaTools::getEmployees($actif);
-
             $this->smarty->assign(array(
-                'pa' => $pa,
-                'coachs' => $listCoaches
+                'pa' => $pa
             ));
         }
     }
@@ -156,11 +171,6 @@ class AdminProspectsController extends ModuleAdminController
         $this->context->cookie->cdmoduleca_admin_prospect_employe_actif = $this->employesActif;
     }
 
-    private function displayForm()
-    {
-        $this->generateForm();
-    }
-
     private function generateForm()
     {
         $linkForm = AdminController::$currentIndex . '&token=' . Tools::getValue('token');
@@ -169,13 +179,6 @@ class AdminProspectsController extends ModuleAdminController
             'employes' => $employes,
             'linkForm' => $linkForm
         ));
-    }
-
-    private function displayProspects()
-    {
-        $prospectsGroupe_1 = ProspectClass::getAllProspectsGroup(1);
-        $this->smarty->assign(array('prosGr1' => $prospectsGroupe_1));
-
     }
 
     private function getEmployeesCoach()
@@ -214,7 +217,7 @@ class AdminProspectsController extends ModuleAdminController
         if ($nbr_prospects_disponible >= $ap->nbr_prospect_attribue) {
             $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $index_id);
             $this->addProspects($prospects, $id_group, $ap);
-        }elseif ($nbr_prospects_disponible == 0) {
+        } elseif ($nbr_prospects_disponible == 0) {
             $index_id = 0;
             $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $index_id);
             $this->addProspects($prospects, $id_group, $ap);
@@ -386,7 +389,9 @@ class AdminProspectsController extends ModuleAdminController
         $id_pa = (int)Tools::getValue('id_pa');
         if (ProspectAttribueClass::isExist($id_pa)) {
             $pa = new ProspectAttribueClass($id_pa);
+
             $this->changeGroupProspects($pa, '1');
+
             $this->deleteProspectsNonTraite($pa->id_prospect_attribue);
             $pa->delete();
             $this->confirmations = $this->module->l('Enregistrement éffacé.');
@@ -416,7 +421,7 @@ class AdminProspectsController extends ModuleAdminController
     private function deleteProspectsNonTraite($id_prospect_attribue)
     {
         $sql = 'DELETE FROM `ps_prospect`
-                WHERE `id_prospect_attribue` = ' .(int)$id_prospect_attribue . '
+                WHERE `id_prospect_attribue` = ' . (int)$id_prospect_attribue . '
                 AND `traite` = "Prospect"
                 AND `injoignable` = "Non"
                 AND `contacte` = "" ';
@@ -428,8 +433,32 @@ class AdminProspectsController extends ModuleAdminController
     private function viewProspectsAttribue()
     {
         $id_pa = (int)Tools::getValue('id_pa');
-        $this->smarty->assign( array(
+        $this->smarty->assign(array(
             'listProspects' => ProspectClass::getProspectsByIdPa($id_pa)));
+    }
+
+    private function getProspectsIsole()
+    {
+        $prospects = ProspectClass::getProspectsIsole();
+        return $prospects;
+    }
+
+    private function attribuProspectsIsoles(ProspectAttribueClass $attriProspect, $getGroupeEmployee)
+    {
+        $prospectsIsoles = ProspectClass::getProspectsIsole();
+
+        for ($i = 0 ; $i < $attriProspect->nbr_prospect_attribue ; $i++) {
+            $prospect = new ProspectClass($prospectsIsoles[$i]['id_prospect']);
+            $prospect->id_prospect_attribue = $attriProspect->id;
+
+            $c = new Customer($prospect->id_customer);
+            $g = $c->getGroups();
+            unset($g[array_search('1', $g)]);
+            $g[] = $getGroupeEmployee;
+            $c->updateGroup($g);
+            $prospect->update();
+        }
+
     }
 
 
