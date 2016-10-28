@@ -285,7 +285,7 @@ class CdModuleCA extends ModuleGrid
     {
         $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'prospect` (
         `id_prospect` INT(12) NOT NULL AUTO_INCREMENT,
-        `id_customer` INT(12) NOT NULL,
+        `id_customer` INT(12) NOT NULL UNIQUE,
         `id_prospect_attribue` INT(12) NOT NULL,
         `traite` VARCHAR(64) NULL,
         `injoignable` VARCHAR(64) NULL,

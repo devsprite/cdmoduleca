@@ -55,11 +55,13 @@ class AdminProspectsController extends ModuleAdminController
 
     public function postProcess()
     {
+
         if ($this->module->viewAllCoachs[$this->context->employee->id_profile]) {
             $this->processDateRange();
             if (Tools::isSubmit('submitEmployeActif')) {
                 $this->setEmployeActif(Tools::getValue('employeActif'));
-            } elseif (Tools::isSubmit('submitEmployes')) {
+            }
+            if (Tools::isSubmit('submitEmployes')) {
                 $this->setEmployesAttribue();
             } elseif (Tools::isSubmit('mod_pa')) {
                 $this->displayUpdateProspectsAttribue();
@@ -87,7 +89,6 @@ class AdminProspectsController extends ModuleAdminController
         if ($date_debut > $date_fin) {
             $isOk = false;
         }
-
         // Modification d'un enregistrement prospects attribué
         if ($isOk && Tools::isSubmit('pa_id_pa')) {
             $id_pa = (Validate::isInt((int)Tools::getValue('pa_id_pa'))) ? (int)Tools::getValue('pa_id_pa') : false;
@@ -236,6 +237,8 @@ class AdminProspectsController extends ModuleAdminController
             $p = new ProspectClass();
             $p->id_customer = $c->id;
             $p->id_prospect_attribue = $ap->id;
+            $p->traite = 'Prospect';
+            $p->injoignable = 'Non';
             $p->add();
         }
     }
@@ -414,8 +417,8 @@ class AdminProspectsController extends ModuleAdminController
     {
         $sql = 'DELETE FROM `ps_prospect`
                 WHERE `id_prospect_attribue` = ' .(int)$id_prospect_attribue . '
-                AND `traite` = ""
-                AND `injoignable` = ""
+                AND `traite` = "Prospect"
+                AND `injoignable` = "Non"
                 AND `contacte` = "" ';
         $req = Db::getInstance()->execute($sql);
 
