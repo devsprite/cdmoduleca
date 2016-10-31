@@ -36,11 +36,11 @@
     <tr>
         <td>{$coach['lastname']} ({$coach['firstname']})</td>
         <td class="text-right">{displayPrice price=$coach['caTotal']}</td>
-        <td class="text-center">{$coach['NbrCommandes']}</td>
-        <td></td>
+        <td class="text-center">{$coach['NbreVentesTotal']}</td>
+        <td class="text-center">{$coach['NbreDeProspects']}</td>
         <td class="text-right">{displayPrice price=$coach['panierMoyen']}</td>
-        <td></td>
-        <td></td>
+        <td class="text-center">{$coach['CaContact']}</td>
+        <td class="text-right">{$coach['tauxTransfo']}</td>
         <td class="text-right">{displayPrice price=$coach['CaProsp']}</td>
         <td class="text-right">{$coach['PourcCaProspect']}</td>
         <td class="text-right">{displayPrice price=$coach['caDejaInscrit']}</td>
@@ -75,7 +75,7 @@
         <th class="fixed-width-md text-right">Prime Abo = 10%</th>
         <th class="text-center">Nbre d'abos</th>
         <th class="text-center">Nbre de désabo</th>
-        <th>% de désabo</th>
+        <th class="text-right">% de désabo</th>
         <th class="text-right">CA Parrainage</th>
         <th>% CA Parrainage</th>
         {*<th class="text-right fixed-width-md">CA</th>*}
@@ -98,7 +98,7 @@
             <td class="text-right">{displayPrice price=$coach['totalVenteGrAbo']}</td>
             <td class="text-center">{$coach['nbrVenteGrAbo']}</td>
             <td class="text-center">{$coach['nbrVenteGrDesaAbo']}</td>
-            <td></td>
+            <td class="text-right">{$coach['pourcenDesabo']}</td>
             <td class="text-right">{displayPrice price=$coach['totalVenteGrPar']}</td>
             <td></td>
             {*<td class="text-right">{displayPrice price=$coach['caTotal']}</td>*}

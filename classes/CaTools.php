@@ -38,6 +38,7 @@ class CaTools
                 FROM ' . _DB_PREFIX_ . 'orders AS o';
         $sql .= ' WHERE date_add BETWEEN ';
         $sql .= $dateBetween;
+        $sql .= ' AND valid = 1 ';
         $sql .= $filterCoach;
         $sql .= $filterCodeAction;
 
@@ -239,8 +240,8 @@ class CaTools
 
     public static function getPanierMoyen($data)
     {
-        if ($data['NbrCommandes'] != 0) {
-            return $data['caTotal'] / $data['NbrCommandes'];
+        if ($data['NbreVentesTotal'] != 0) {
+            return $data['caTotal'] / $data['NbreVentesTotal'];
         }
         return '';
     }
@@ -272,7 +273,7 @@ class CaTools
     }
 
     public static function getNbrGrVentes($idFilterCoach = 0, $code_action = null, $current_state = null, $totalMoney = false,
-                                    $valid = false, $dateBetween, $lang)
+                                          $valid = false, $dateBetween, $lang)
     {
         $filterCoach = ($idFilterCoach != 0)
             ? " AND e . id_employee = '" . $idFilterCoach . "'" : '';
@@ -311,7 +312,7 @@ class CaTools
         $nbrGrVentes = Db::getInstance()->getValue($sql);
         $nbrRows = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
 
-        return ($totalMoney) ? $nbrGrVentes : $nbrRows;
+        return ($totalMoney) ? ($nbrGrVentes) ? $nbrGrVentes : '' : ($nbrRows) ? $nbrRows : '';
     }
 
     public static function getGroupeCoach($id_employee)

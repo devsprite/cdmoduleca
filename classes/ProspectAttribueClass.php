@@ -23,7 +23,8 @@ class ProspectAttribueClass extends ObjectModel
     {
         $sql = 'SELECT pa.*, e.lastname, e.firstname FROM `ps_prospect_attribue` AS pa
                 LEFT JOIN `ps_employee` AS e ON pa.id_employee = e.id_employee
-                WHERE `date_debut` BETWEEN ' . $getDateBetween;
+                WHERE `date_debut` BETWEEN ' . $getDateBetween . '
+                ORDER BY `date_debut`';
         $req = Db::getInstance()->executeS($sql);
 
         return $req;
@@ -36,6 +37,17 @@ class ProspectAttribueClass extends ObjectModel
         $req = Db::getInstance()->getRow($sql);
 
         return ($req) ? true : false;
+    }
+
+    public static function getNbrProspectsAttriByCoach($id_employee, $getDateBetween)
+    {
+        $sql = 'SELECT SUM(`nbr_prospect_attribue`) FROM `ps_prospect_attribue`
+                WHERE `id_employee` = ' . (int)$id_employee .' 
+                AND `date_debut` BETWEEN ' . $getDateBetween . '
+                AND `date_fin` BETWEEN ' .$getDateBetween ;
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
     }
 
 }

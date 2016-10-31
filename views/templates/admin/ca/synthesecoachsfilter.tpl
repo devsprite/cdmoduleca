@@ -63,7 +63,7 @@
     </div>
     <hr>
     {if isset($coachs) && $filterActif != 0}
-        <div class="col-xs-12">
+        <div class="col-xs-12 hidden-print">
             <br>
             <h3>Ajout manuel</h3>
             <form id="form_as_date" action="{$linkFilter}" method="post">
@@ -113,7 +113,7 @@
                 </div>
             </form>
         </div>
-        <div class="col-xs-12">
+        <div class="col-xs-12 hidden-print">
             <br>
             <h3>Objectif coach</h3>
             <form id="form_oc_objectif" action="{$linkFilter}" method="post">
