@@ -5,7 +5,7 @@
                 <tr style="line-height: 2pt;">
                     <td style="width: 30%"><span style="font-size: 24pt;color: #448B01;">L&Sens </span></td>
                     <td style="width: 70%; text-align: right"><span
-                                style="font-size: 12pt;">{$smarty.now|date_format:'%A %e %B %Y à %H:%M'}</span></td>
+                                style="font-size: 12pt;">{$smarty.now|date_format:'%A %e %B %Y à %H:%M'|capitalize}</span></td>
                 </tr>
             </table>
         </td>

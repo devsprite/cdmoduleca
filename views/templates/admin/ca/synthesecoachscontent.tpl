@@ -35,7 +35,7 @@
         </div>
     </div>
     <div class="col-xs-push-1 col-xs-8">
-        <h2>Ajout manuel</h2>
+        <h2>Ajustements</h2>
         <table class="table table-hover">
             <thead>
             <tr>

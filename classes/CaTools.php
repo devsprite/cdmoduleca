@@ -322,4 +322,20 @@ class CaTools
 
         return $req;
     }
+
+    public static function getAjustement($id_employee = 0, $getDateBetween)
+    {
+        $filter = '';
+        if ($id_employee != 0) {
+            $filter = ' AND `id_employee` = ' . (int)$id_employee;
+        }
+
+        $sql = 'SELECT SUM(`somme`) FROM `ps_ajout_somme` 
+                WHERE `date_add` BETWEEN ' . $getDateBetween;
+        $sql .= $filter;
+
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
+    }
 }
