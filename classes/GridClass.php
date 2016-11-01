@@ -1,4 +1,5 @@
 <?php
+
 /*
 * 2007-2015 PrestaShop
 *
@@ -31,7 +32,7 @@ class GridClass extends Module
     /** @var array of strings graph data */
     public $_values = array();
 
-    /** @var integer total number of values **/
+    /** @var integer total number of values * */
     protected $_totalCount = 0;
 
     /**@var string graph titles */
@@ -68,7 +69,7 @@ class GridClass extends Module
     {
         if (!Validate::isModuleName($render))
             die(Tools::displayError());
-        if (!Tools::file_exists_cache($file = _PS_ROOT_DIR_.'/modules/'.$render.'/'.$render.'.php'))
+        if (!Tools::file_exists_cache($file = _PS_ROOT_DIR_ . '/modules/' . $render . '/' . $render . '.php'))
             die(Tools::displayError());
         require_once($file);
         $this->_render = new $render($type);
@@ -99,14 +100,14 @@ class GridClass extends Module
             return Tools::displayError('No grid engine selected');
         if (!Validate::isModuleName($render))
             die(Tools::displayError());
-        if (!file_exists(_PS_ROOT_DIR_.'/modules/'.$render.'/'.$render.'.php'))
+        if (!file_exists(_PS_ROOT_DIR_ . '/modules/' . $render . '/' . $render . '.php'))
             return Tools::displayError('Grid engine selected is unavailable.');
 
-        $grider = 'grider.php?render='.$render.'&module=cdmoduleca';
+        $grider = 'grider.php?render=' . $render . '&module=cdmoduleca';
 
         $context = Context::getContext();
-        $grider .= '&id_employee='.(int)$context->employee->id;
-        $grider .= '&id_lang='.(int)$context->language->id;
+        $grider .= '&id_employee=' . (int)$context->employee->id;
+        $grider .= '&id_lang=' . (int)$context->language->id;
 
 
         if (!isset($params['width']) || !Validate::IsUnsignedInt($params['width']))
@@ -118,58 +119,56 @@ class GridClass extends Module
         if (!isset($params['limit']) || !Validate::IsUnsignedInt($params['limit']))
             $params['limit'] = 40;
 
-        $grider .= '&width='.$params['width'];
-        $grider .= '&height='.$params['height'];
+        $grider .= '&width=' . $params['width'];
+        $grider .= '&height=' . $params['height'];
         if (isset($params['start']) && Validate::IsUnsignedInt($params['start']))
-            $grider .= '&start='.$params['start'];
+            $grider .= '&start=' . $params['start'];
         if (isset($params['limit']) && Validate::IsUnsignedInt($params['limit']))
-            $grider .= '&limit='.$params['limit'];
+            $grider .= '&limit=' . $params['limit'];
         if (isset($params['type']) && Validate::IsName($params['type']))
-            $grider .= '&type='.$params['type'];
+            $grider .= '&type=' . $params['type'];
         if (isset($params['option']) && Validate::IsGenericName($params['option']))
-            $grider .= '&option='.$params['option'];
+            $grider .= '&option=' . $params['option'];
         if (isset($params['sort']) && Validate::IsName($params['sort']))
-            $grider .= '&sort='.$params['sort'];
+            $grider .= '&sort=' . $params['sort'];
         if (isset($params['dir']) && Validate::isSortDirection($params['dir']))
-            $grider .= '&dir='.$params['dir'];
+            $grider .= '&dir=' . $params['dir'];
 
-        require_once(_PS_ROOT_DIR_.'/modules/'.$render.'/'.$render.'.php');
+        require_once(_PS_ROOT_DIR_ . '/modules/' . $render . '/' . $render . '.php');
         return call_user_func(array($render, 'hookGridEngine'), $params, $grider);
     }
 
-    public function csvExport($datas)
+    public function csvExport($datas, $nameFile)
     {
         $this->_sort = $datas['defaultSortColumn'];
         $this->setLang(Context::getContext()->language->id);
         $this->getData($this->data);
 
-        $layers = isset($datas['layers']) ?  $datas['layers'] : 1;
+        $layers = isset($datas['layers']) ? $datas['layers'] : 1;
 
         if (isset($datas['option']))
             $this->setOption($datas['option'], $layers);
 
-        if (count($datas['columns']))
-        {
+        if (count($datas['columns'])) {
             foreach ($datas['columns'] as $column)
-                $this->_csv .= $column['header'].';';
-            $this->_csv = rtrim($this->_csv, ';')."\n";
+                $this->_csv .= $column['header'] . ';';
+            $this->_csv = rtrim($this->_csv, ';') . "\n";
 
-            foreach ($this->_values as $value)
-            {
+            foreach ($this->_values as $value) {
                 foreach ($datas['columns'] as $column)
-                    $this->_csv .= $value[$column['dataIndex']].';';
-                $this->_csv = rtrim($this->_csv, ';')."\n";
+                    $this->_csv .= $value[$column['dataIndex']] . ';';
+                $this->_csv = rtrim($this->_csv, ';') . "\n";
             }
         }
-        $this->_displayCsv();
+        $this->_displayCsv($nameFile);
     }
 
-    protected function _displayCsv()
+    protected function _displayCsv($nameFile)
     {
         if (ob_get_level() && ob_get_length() > 0)
             ob_end_clean();
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="'.$this->displayName.' - '.time().'.csv"');
+        header('Content-Disposition: attachment; filename="' . $nameFile . '.csv"');
         echo $this->_csv;
         exit;
     }
@@ -214,7 +213,7 @@ class GridClass extends Module
           SELECT SQL_CALC_FOUND_ROWS 
           DISTINCT o.id_order AS id,
           gl.name AS groupe,
-          CONCAT ( ROUND(o.total_products - o.total_discounts_tax_excl,2), " €") AS hthp,
+          ROUND(o.total_products - o.total_discounts_tax_excl,2) AS hthp,
           (SELECT e.lastname FROM ps_employee AS e WHERE o.id_employee = e.id_employee) AS id_employee,
           (SELECT UCASE(c.lastname) FROM ps_customer AS c WHERE o.id_customer = c.id_customer) AS id_customer,
           date_add,

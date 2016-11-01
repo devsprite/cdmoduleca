@@ -272,8 +272,8 @@ class CaTools
         return ($nbrRows) ? $nbrRows : ''; // ($nbrVenteFID) ? $nbrVenteFID : '';
     }
 
-    public static function getNbrGrVentes($idFilterCoach = 0, $code_action = null, $current_state = null, $totalMoney = false,
-                                          $valid = false, $dateBetween, $lang)
+    public static function getNbrGrVentes($idFilterCoach = 0, $code_action = null, $current_state = null,
+                                          $totalMoney = false, $valid = false, $dateBetween, $lang)
     {
         $filterCoach = ($idFilterCoach != 0)
             ? " AND e . id_employee = '" . $idFilterCoach . "'" : '';
@@ -312,7 +312,7 @@ class CaTools
         $nbrGrVentes = Db::getInstance()->getValue($sql);
         $nbrRows = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
 
-        return ($totalMoney) ? ($nbrGrVentes) ? $nbrGrVentes : '' : ($nbrRows) ? $nbrRows : '';
+        return ($totalMoney) ? (($nbrGrVentes) ? $nbrGrVentes : '') : (($nbrRows) ? $nbrRows : '');
     }
 
     public static function getGroupeCoach($id_employee)

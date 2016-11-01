@@ -58,27 +58,22 @@ class AdminCaLetSensController extends ModuleAdminController
         );
 
         $this->context->smarty->assign(array(
-            'CSVLink' => Tools::safeOutput($_SERVER['REQUEST_URI'] . '&export=1'),
+            'LinkFile' => Tools::safeOutput($_SERVER['REQUEST_URI']),
             'errors' => $this->errors,
             'confirmation' => $this->confirmation,
         ));
-
-//        if (Tools::getValue('export')) {
-//            $g->csvExport($engine_params);
-//        }
-
-
-        $this->html = '
-			<a class="btn btn-default export-csv" href="' . Tools::safeOutput($_SERVER['REQUEST_URI'] . '&export=1') . '">
-				<i class="icon-cloud-upload"></i> ' . $this->l('CSV Export') . '
-			</a>';
 
         $this->html .= $this->displayCalendar();
         $this->html .= $this->syntheseCoachs();
         $this->html .= $g->engine($engine_params);
 
-        if (Tools::getValue('export')) {
-            $this->generatePDF();
+
+        $nameFile = $this->nameFile();
+        if (Tools::getValue('export_csv')) {
+            $g->csvExport($engine_params, $nameFile);
+        }
+        if (Tools::getValue('export_pdf')) {
+            $this->generatePDF($nameFile);
         }
 
         $this->content = $this->html;
@@ -146,8 +141,8 @@ class AdminCaLetSensController extends ModuleAdminController
                 CaTools::getAjustement($employee['id_employee'], $this->getDateBetween());
 
             $datasEmployees[$employee['id_employee']]['caAjuste'] = ($datasEmployees[$employee['id_employee']]['ajustement'])
-            ?($datasEmployees[$employee['id_employee']]['caTotal']
-            - $datasEmployees[$employee['id_employee']]['ajustement']):'';
+                ? ($datasEmployees[$employee['id_employee']]['caTotal']
+                    - $datasEmployees[$employee['id_employee']]['ajustement']) : '';
 
             $datasEmployees[$employee['id_employee']]['caDejaInscrit'] =
                 CaTools::getCaDejaInscrit($employee['id_employee'], $this->getDateBetween());
@@ -205,11 +200,13 @@ class AdminCaLetSensController extends ModuleAdminController
                 CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), false, false,
                     $this->getDateBetween(), $this->module->lang);
 
-            $n = CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), true, false,
+            $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] = CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), true, true,
                 $this->getDateBetween(), $this->module->lang);
 
-            $totalVenteGrAbo = ($n) ? ($n / 100) * 10 : ''; // Calcul de la prime 10 % sur la vente des abos
-            $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] = $totalVenteGrAbo;
+            $n = $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'];
+
+            $primeVenteGrAbo = ($n) ? ($n / 100) * 10 : ''; // Calcul de la prime 10 % sur la vente des abos
+            $datasEmployees[$employee['id_employee']]['primeVenteGrAbo'] = $primeVenteGrAbo;
 
             $datasEmployees[$employee['id_employee']]['nbrVenteGrDesaAbo'] =
                 CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(440, 453), false, false,
@@ -637,7 +634,7 @@ class AdminCaLetSensController extends ModuleAdminController
         }
     }
 
-    private function generatePDF()
+    private function generatePDF($nameFile)
     {
         $pdf = new MYPDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
@@ -693,7 +690,7 @@ class AdminCaLetSensController extends ModuleAdminController
         // ---------------------------------------------------------
 
         //Close and output PDF document
-        $pdf->Output('example_002.pdf', 'I');
+        $pdf->Output($nameFile . '.pdf', 'D');
     }
 
     private function getCodeActionByID()
@@ -710,17 +707,36 @@ class AdminCaLetSensController extends ModuleAdminController
         return $ca;
     }
 
+    private function nameFile()
+    {
+        $name = substr($this->getDateBetween(), 2, 10) . '_' . substr($this->getDateBetween(), 28, 10) . '_';
+        if ($this->idFilterCoach == 0) {
+            $name .= 'tous_les_coachs';
+        } else {
+            $e = new Employee($this->idFilterCoach);
+            $name .= $e->lastname . '_' . $e->firstname;
+        }
+
+        setlocale(LC_ALL, "en_US.utf8");
+        $name = iconv('UTF-8', 'ASCII//TRANSLIT', $name);
+        setlocale(LC_ALL, "fr_FR.utf8");
+
+        return utf8_decode($name);
+    }
+
 }
 
-class MYPDF extends TCPDF {
+class MYPDF extends TCPDF
+{
 
     // Page footer
-    public function Footer() {
+    public function Footer()
+    {
         // Position at 15 mm from bottom
         $this->SetY(-15);
         // Set font
         $this->SetFont('helvetica', 'I', 8);
         // Page number
-        $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+        $this->Cell(0, 10, 'Page ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 }

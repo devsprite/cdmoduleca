@@ -965,8 +965,8 @@ class CdModuleCA extends ModuleGrid
           CONCAT ( ROUND(o.total_products - o.total_discounts_tax_excl,2), " €") AS hthp,
           (SELECT e.lastname FROM ps_employee AS e WHERE o.id_employee = e.id_employee) AS id_employee,
           (SELECT UCASE(c.lastname) FROM ps_customer AS c WHERE o.id_customer = c.id_customer) AS id_customer,
-          date_add,
-          date_upd,
+          o.date_add,
+          o.date_upd,
           IF((o.valid) > 0, "", "Non") AS valid,
           (SELECT ca.name FROM ps_code_action AS ca WHERE o.id_code_action = ca.id_code_action) as CodeAction,
           (SELECT osl.name FROM ps_order_state_lang AS osl WHERE id_lang = "' . $this->lang . '" AND osl.id_order_state = o.current_state ) as current_state ,
@@ -974,7 +974,7 @@ class CdModuleCA extends ModuleGrid
           AND so.id_order < o.id_order LIMIT 1) > 0, "", "Oui") as new
 				FROM ' . _DB_PREFIX_ . 'orders AS o ';
         $this->query .= $filterGroupe;
-        $this->query .= ' WHERE date_add BETWEEN ' . $this->getDate();
+        $this->query .= ' WHERE o.date_add BETWEEN ' . $this->getDate();
         $this->query .= $filterCoach;
         $this->query .= $filterCodeAction;
         $this->query .= $filterValid;
@@ -990,8 +990,7 @@ class CdModuleCA extends ModuleGrid
         if (($this->_start === 0 || Validate::IsUnsignedInt($this->_start)) && Validate::IsUnsignedInt($this->_limit))
             $this->query .= ' LIMIT ' . (int)$this->_start . ', ' . (int)$this->_limit;
 
-
-
+//        ddd($this->query);
         $values = Db::getInstance()->executeS($this->query);
 
         $this->_values = $values;

@@ -67,7 +67,7 @@
     {foreach item=coach from=$datasEmployees}
         <tr>
             <td>{$coach['lastname']} ({$coach['firstname']})</td>
-            <td class="text-right">{displayPrice price=$coach['totalVenteGrAbo']}</td>
+            <td class="text-right">{displayPrice price=$coach['primeVenteGrAbo']}</td>
             <td class="text-center">{$coach['nbrVenteGrAbo']}</td>
             <td class="text-center">{$coach['nbrVenteGrDesaAbo']}</td>
             <td class="text-right">{$coach['pourcenDesabo']}</td>
