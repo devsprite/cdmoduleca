@@ -26,7 +26,7 @@ class AdminCaLetSensController extends ModuleAdminController
         $this->smarty = $this->context->smarty;
         $this->path_tpl = _PS_MODULE_DIR_ . 'cdmoduleca/views/templates/admin/ca/';
         $this->employees_actif = 1;
-        $this->commandeValid = 1;
+        $this->commandeValid = 2;
 
         parent::__construct();
     }
@@ -331,7 +331,7 @@ class AdminCaLetSensController extends ModuleAdminController
      */
     private function setFilterCommandeValid()
     {
-        $this->commandeValid = 1;
+        $this->commandeValid = 2;
         if (Tools::isSubmit('submitFilterCommande')) {
             $this->context->cookie->cdmoculeca_filter_commande = Tools::getValue('filterCommande');
         }
