@@ -26,7 +26,6 @@ class AdminProspectsController extends ModuleAdminController
 
     public function initContent()
     {
-        $this->employesActif = $this->context->cookie->cdmoduleca_admin_prospect_employe_actif;
         $isAllow = $this->module->viewAllCoachs[$this->context->employee->id_profile];
         $linkFilterCoachs = AdminController::$currentIndex . '&module=' . $this->module->name
             . '&token=' . Tools::getValue('token');
@@ -37,7 +36,7 @@ class AdminProspectsController extends ModuleAdminController
 
         $this->smarty->assign(array(
             'nbr_prospects' => $this->nbrNouveauProspects(),
-            'prospects_by_coach' => $this->listProspectsByCoach(),
+            'prospects_by_coach' => $this->listProspectsByCoach($isAllow, $this->context->employee->id),
             'nbrProspectsIsoles' => count($prospectsIsoles),
             'prospectsIsoles' => $prospectsIsoles,
             'coachs' => $listCoaches,
@@ -59,8 +58,8 @@ class AdminProspectsController extends ModuleAdminController
 
     public function postProcess()
     {
+        $this->processDateRange();
         if ($this->module->viewAllCoachs[$this->context->employee->id_profile]) {
-            $this->processDateRange();
             if (Tools::isSubmit('submitEmployeActif')) {
                 $this->setEmployeActif(Tools::getValue('employeActif'));
             }
@@ -70,9 +69,10 @@ class AdminProspectsController extends ModuleAdminController
                 $this->displayUpdateProspectsAttribue();
             } elseif (Tools::isSubmit('del_pa')) {
                 $this->deleteProspectsAttribue();
-            } elseif (Tools::isSubmit('view_pa')) {
-                $this->viewProspectsAttribue();
             }
+        }
+        if (Tools::isSubmit('view_pa')) {
+            $this->viewProspectsAttribue();
         }
 
         return parent::postProcess();
@@ -106,7 +106,7 @@ class AdminProspectsController extends ModuleAdminController
                     $pa->update();
                 };
             }
-        } elseif(Tools::isSubmit('pi_id_employee')) {
+        } elseif (Tools::isSubmit('pi_id_employee')) {
             $id_employe = (int)Tools::getValue('pi_id_employee');
             $nb_pros = (int)Tools::getValue('pi_nbr_pr');
             $nbrProspect = count($this->getProspectsIsole());
@@ -359,9 +359,9 @@ class AdminProspectsController extends ModuleAdminController
         return $req;
     }
 
-    private function listProspectsByCoach()
+    private function listProspectsByCoach($isAllow, $id_employee)
     {
-        return ProspectAttribueClass::getListProspects($this->getDateBetween());
+        return ProspectAttribueClass::getListProspects($this->getDateBetween(), $isAllow, $id_employee);
     }
 
     private function getDateBetween()
@@ -447,7 +447,7 @@ class AdminProspectsController extends ModuleAdminController
     {
         $prospectsIsoles = ProspectClass::getProspectsIsole();
 
-        for ($i = 0 ; $i < $attriProspect->nbr_prospect_attribue ; $i++) {
+        for ($i = 0; $i < $attriProspect->nbr_prospect_attribue; $i++) {
             $prospect = new ProspectClass($prospectsIsoles[$i]['id_prospect']);
             $prospect->id_prospect_attribue = $attriProspect->id;
 

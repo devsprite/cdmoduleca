@@ -19,12 +19,18 @@ class ProspectAttribueClass extends ObjectModel
         )
     );
 
-    public static function getListProspects($getDateBetween)
+    public static function getListProspects($getDateBetween, $isAllow, $id_employee)
     {
+        $filter = '';
+        if (!$isAllow) {
+            $filter = ' AND pa.`id_employee` = ' . (int)$id_employee;
+        }
+
         $sql = 'SELECT pa.*, e.lastname, e.firstname FROM `ps_prospect_attribue` AS pa
                 LEFT JOIN `ps_employee` AS e ON pa.id_employee = e.id_employee
-                WHERE `date_debut` BETWEEN ' . $getDateBetween . '
-                ORDER BY `date_debut`';
+                WHERE `date_debut` BETWEEN ' . $getDateBetween;
+        $sql .= $filter;
+        $sql .= ' ORDER BY `date_debut`';
         $req = Db::getInstance()->executeS($sql);
 
         return $req;
