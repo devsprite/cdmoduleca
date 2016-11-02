@@ -167,7 +167,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
                 'list' => $traite,
                 'order_key' => 'traite',
                 'class' => 'fixed-width-xs',
-                'callBack' => 'doublons',
+                'callback' => 'doublons',
             ),
             'injoignable' => array(
                 'title' => $this->l('Injoignable'),
