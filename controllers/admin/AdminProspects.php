@@ -237,6 +237,8 @@ class AdminProspectsController extends ModuleAdminController
             unset($g[array_search('1', $g)]);
             $g[] = $id_group;
             $c->updateGroup($g);
+            $c->id_default_group = (int)$id_group;
+            $c->update();
             $p = new ProspectClass();
             $p->id_customer = $c->id;
             $p->id_prospect_attribue = $ap->id;
@@ -379,6 +381,8 @@ class AdminProspectsController extends ModuleAdminController
             unset($g[array_search($groupOldCoach, $g)]);
             $g[] = (int)$groupNewCoach;
             $c->updateGroup($g);
+            $c->id_default_group = (int)$groupNewCoach;
+            $c->update();
             unset($c);
             unset($g);
         }
@@ -456,6 +460,8 @@ class AdminProspectsController extends ModuleAdminController
             unset($g[array_search('1', $g)]);
             $g[] = $getGroupeEmployee;
             $c->updateGroup($g);
+            $c->id_default_group = (int)$getGroupeEmployee;
+            $c->update();
             $prospect->update();
         }
 

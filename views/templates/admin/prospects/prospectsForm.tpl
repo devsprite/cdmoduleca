@@ -3,11 +3,14 @@
     <div class="row panel">
         <div class="panel-heading">
             Attribution des prospects
+        </div>
             {if $nbr_prospects <= 0}
             {else}
-                <p>Il y a {$nbr_prospects} nouveaux prospect(s)</p>
+                <div class="row panel">
+                    <p>Il y a {$nbr_prospects} nouveaux prospect(s)</p>
+                </div>
             {/if}
-        </div>
+
         <form action="{$linkForm}" method="post" name="employes">
             <div class="row panel">
                 <div class="col-xs-6 col-md-2 col-xs-12">
