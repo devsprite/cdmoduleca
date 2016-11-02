@@ -8,7 +8,7 @@ class CaTools
 			FROM `' . _DB_PREFIX_ . 'employee` AS e ';
         $sql .= 'LEFT JOIN `ps_group_lang` AS gl ON e.`id_employee` = gl.`id_employee` ';
         $sql .= ($active == 'on') ? 'WHERE e.`active` = 1 ' : '';
-        $sql .= ($id) ? ' WHERE e.`id_employee` = ' . $id : '';
+        $sql .= ($id) ? ' WHERE e.`id_employee` = ' . (int)$id : '';
         $sql .= ' ORDER BY e.`lastname` ASC';
 
         return Db::getInstance()->executeS($sql);
@@ -23,13 +23,13 @@ class CaTools
     public static function getCaCoachsTotal($idCoach = 0, $idFilterCodeAction, $dateBetween)
     {
         $filterCoach = ($idCoach != 0)
-            ? ' AND id_employee = ' . $idCoach : '';
+            ? ' AND id_employee = ' . (int)$idCoach : '';
 
         $filterCodeAction = '';
         if ($idFilterCodeAction == 99) {
-            $filterCodeAction = ' AND o.id_code_action != ' . CaTools::getCodeActionByName('ABO');
+            $filterCodeAction = ' AND o.id_code_action != ' . pSQL(CaTools::getCodeActionByName('ABO'));
         } elseif ($idFilterCodeAction != 0) {
-            $filterCodeAction = ' AND o.id_code_action = ' . $idFilterCodeAction;
+            $filterCodeAction = ' AND o.id_code_action = ' . (int)$idFilterCodeAction;
         }
 
         $sql = 'SELECT SQL_CALC_FOUND_ROWS 
@@ -55,7 +55,7 @@ class CaTools
     public static function getCaDejaInscrit($idFilterCoach = 0, $dateBetween)
     {
         $filterCoach = ($idFilterCoach != 0)
-            ? ' AND id_employee = ' . $idFilterCoach : '';
+            ? ' AND id_employee = ' . (int)$idFilterCoach : '';
 
         $sql = 'SELECT ROUND(o.total_products - o.total_discounts_tax_excl,2) AS total,
                 IF((SELECT so.id_order FROM `ps_orders` so WHERE so.id_customer = o.id_customer 
@@ -79,12 +79,12 @@ class CaTools
         $listStatuts = explode(',', Configuration::get('CDMODULECA_ORDERS_STATE'));
         $sqlStatuts = ' AND ( ';
         foreach ($listStatuts as $statut) {
-            $sqlStatuts .= ' current_state = ' . $statut . ' OR ';
+            $sqlStatuts .= ' current_state = ' . pSQL($statut) . ' OR ';
         }
         $sqlStatuts = substr($sqlStatuts, 0, -3) . ')';
 
         $filterCoach = ($idFilterCoach != 0)
-            ? ' AND id_employee = ' . $idFilterCoach : '';
+            ? ' AND id_employee = ' . (int)$idFilterCoach : '';
 
         $sql = 'SELECT SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) as total
                 FROM ' . _DB_PREFIX_ . 'orders AS o';
@@ -98,10 +98,10 @@ class CaTools
     public static function getNumberCommande($idCoach = 0, $idCodeAction = 0, $current_state = null, $dateBetween)
     {
         $filterCoach = ($idCoach != 0)
-            ? ' AND id_employee = ' . $idCoach : '';
+            ? ' AND id_employee = ' . (int)$idCoach : '';
 
         $filterCodeAction = ($idCodeAction != 0)
-            ? ' AND id_code_action = ' . $idCodeAction : '';
+            ? ' AND id_code_action = ' . (int)$idCodeAction : '';
         $filter_current_state = '';
         if ($current_state) {
             $filter_current_state = ' AND ( ';
@@ -149,7 +149,7 @@ class CaTools
 
     public static function getAjoutSommeById($id)
     {
-        $sql = 'SELECT * FROM ps_ajout_somme WHERE id_ajout_somme = ' . $id;
+        $sql = 'SELECT * FROM ps_ajout_somme WHERE id_ajout_somme = ' . (int)$id;
 
         return Db::getInstance()->getRow($sql);
     }
@@ -170,7 +170,7 @@ class CaTools
 
     public static function getObjectifById($id)
     {
-        $sql = 'SELECT * FROM ps_objectif_coach WHERE id_objectif_coach = ' . $id;
+        $sql = 'SELECT * FROM ps_objectif_coach WHERE id_objectif_coach = ' . (int)$id;
 
         return Db::getInstance()->getRow($sql);
     }
@@ -249,12 +249,12 @@ class CaTools
     public static function getNbrVentes($idFilterCoach = 0, $code_action = null, $dateBetween)
     {
         $filterCoach = ($idFilterCoach != 0)
-            ? ' AND id_employee = ' . $idFilterCoach : '';
+            ? ' AND id_employee = ' . (int)$idFilterCoach : '';
 
         $sql_code_action = '';
         if ($code_action) {
             $code_action = CaTools::getCodeActionByName($code_action);
-            $sql_code_action = ' AND id_code_action = "' . $code_action . '" ';
+            $sql_code_action = ' AND id_code_action = "' . (int)$code_action . '" ';
         }
 
 
@@ -276,12 +276,12 @@ class CaTools
                                           $totalMoney = false, $valid = false, $dateBetween, $lang)
     {
         $filterCoach = ($idFilterCoach != 0)
-            ? " AND e . id_employee = '" . $idFilterCoach . "'" : '';
+            ? " AND e . id_employee = '" . (int)$idFilterCoach . "'" : '';
 
         $sql_code_action = '';
         if ($code_action) {
             $code_action = CaTools::getCodeActionByName($code_action);
-            $sql_code_action = " AND o . id_code_action = '" . $code_action . "'";
+            $sql_code_action = " AND o . id_code_action = '" . (int)$code_action . "'";
         }
 
         $filter_current_state = '';
@@ -337,5 +337,82 @@ class CaTools
         $req = Db::getInstance()->getValue($sql);
 
         return $req;
+    }
+
+    public static function doublons($params)
+    {
+        $retour = '';
+        $customer = new Customer($params['id_customer']);
+
+        $retour .= CaTools::isEmailCustomerUnique($customer);
+        $retour .= CaTools::isCustomerSameNumberPhone($customer, $params);
+        $retour .= CaTools::isCustomerHaveSameName($customer, $params);
+        return $retour;
+    }
+
+    private static function isEmailCustomerUnique(Customer $customer)
+    {
+        $sql = ' SELECT COUNT(`email`) AS total FROM `ps_customer` WHERE `email` = "' . pSQL($customer->email) . '"';
+        $req = Db::getInstance()->getValue($sql);
+
+        $retour = '';
+        if ($req > 1) {
+            $retour = '<span class="text text-danger" title="Doublon Email">@</span>';
+        }
+
+        return $retour;
+    }
+
+    private static function isCustomerSameNumberPhone(Customer $customer, $params)
+    {
+        $address = ($customer->getAddresses($params['lang']));
+        $phone = '';
+        $phone_mobile = '';
+        $req_phone = '';
+        $req_phone_mobile = '';
+
+        if (isset($address[0])) {
+            $phone = $address[0]['phone'];
+            $phone_mobile = $address[0]['phone_mobile'];
+        }
+
+        if (!empty($phone)) {
+            $sql = 'SELECT COUNT(`phone`) FROM `ps_address` 
+                WHERE `phone` = "' . pSQL($phone) . '"
+                OR `phone_mobile` = "' . pSQL($phone) . '"
+                ';
+
+            $req_phone = Db::getInstance()->getValue($sql);
+        }
+        if (!empty($phone_mobile)) {
+            $sql = 'SELECT COUNT(`phone`) FROM `ps_address` 
+                WHERE `phone` = "' . pSQL($phone_mobile) . '"
+                OR `phone_mobile` = "' . pSQL($phone_mobile) . '"
+                ';
+
+            $req_phone_mobile = Db::getInstance()->getValue($sql);
+        }
+        $retour = '';
+        if ($req_phone > 1 || $req_phone_mobile > 1) {
+            $retour = '<i class="icon-phone text-danger" title="Doublon téléphone" ></i>';
+        }
+
+        return $retour;
+    }
+
+    private static function isCustomerHaveSameName(Customer $customer, $params)
+    {
+        $sql = 'SELECT COUNT(`id_customer`) FROM `ps_customer` 
+                WHERE `lastname` = "' . pSQL($customer->lastname) . '" 
+                AND `firstname` = "' . pSQL($customer->firstname) . '" ';
+
+        $req = Db::getInstance()->getValue($sql);
+
+        $retour = '';
+        if ($req > 1 ) {
+            $retour = '<i class="icon-group text-danger" title="Doublon Nom Client" ></i>';
+        }
+
+        return $retour;
     }
 }

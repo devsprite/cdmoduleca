@@ -167,6 +167,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
                 'list' => $traite,
                 'order_key' => 'traite',
                 'class' => 'fixed-width-xs',
+                'callBack' => 'doublons',
             ),
             'injoignable' => array(
                 'title' => $this->l('Injoignable'),
@@ -714,6 +715,18 @@ class AdminCustomersController extends AdminCustomersControllerCore
         }
 
         return $v;
+    }
+
+    public function doublons($value, $params)
+    {
+        $params['lang'] = $this->context->language->id;
+        $alert = CaTools::doublons($params);
+
+        if (!empty($alert)) {
+            $alert = '<p>' .$alert. '</p>';
+        }
+
+        return $value . $alert;
     }
 
 }
