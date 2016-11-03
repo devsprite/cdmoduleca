@@ -1,9 +1,20 @@
 .compteur > table {
     color: #ffffff;
-    background-color: #005512;
 }
 
 .compteur > table > tbody > tr > td {
     padding-left: 14px!important;
     padding-right: 14px!important;
+}
+
+.compteur_danger {
+    background-color: #8e0800;
+}
+
+.compteur_warning {
+    background-color: #8e8a00;
+}
+
+.compteur_success {
+    background-color: #008e0a;
 }

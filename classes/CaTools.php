@@ -225,7 +225,7 @@ class CaTools
                 $dateBetween = '"' . $objectif['date_start'] . '" AND "' . $objectif['date_end'] . '"';
 
                 $caCoach = CaTools::getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
-                $p = round(((100 * $caCoach) / $objectif['somme']), 2);
+                $p = ($objectif['somme'])?round(((100 * $caCoach) / $objectif['somme']), 2):'';
                 $objectifCoachs[$objectifCoach]['pourcentDeObjectif'] = $p;
                 $objectifCoachs[$objectifCoach]['caCoach'] = $caCoach;
                 $class = '';

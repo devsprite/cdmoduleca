@@ -227,13 +227,15 @@ class CdModuleCA extends ModuleGrid
     public function hookDisplayBackOfficeTop()
     {
         $this->context->controller->addCSS($this->_path . 'views/css/compteur.css', 'all');
-        $objectifCoachs[] = CaTools::getObjectifCoach($this->context->employee->id);
-        $caCoach = CaTools::isObjectifAtteint($objectifCoachs);
+        $this->context->controller->addJS($this->_path . 'views/js/compteur.js');
+        $objectifCoach[] = CaTools::getObjectifCoach($this->context->employee->id);
+        $objectif = CaTools::isObjectifAtteint($objectifCoach);
+        $objectif[0]['appels'] = (isset($_COOKIE['appelKeyyo']))?(int)$_COOKIE['appelKeyyo']:'0';
 
-        ddd($caCoach);
+//        ddd($objectif[0]);
 
         $this->smarty->assign(array(
-            'objectif' => $objectifCoachs
+            'objectif' => $objectif[0]
         ));
         return $this->display(__FILE__, 'compteur.tpl');
     }
