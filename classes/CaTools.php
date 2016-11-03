@@ -45,6 +45,32 @@ class CaTools
         return Db::getInstance()->getValue($sql);
     }
 
+    public static function getCaCoachsRembourse($idCoach = 0, $idFilterCodeAction, $dateBetween)
+    {
+        $filterCoach = ($idCoach != 0)
+            ? ' AND id_employee = ' . (int)$idCoach : '';
+
+        $filterCodeAction = '';
+        if ($idFilterCodeAction == 99) {
+            $filterCodeAction = ' AND o.id_code_action != ' . pSQL(CaTools::getCodeActionByName('ABO'));
+        } elseif ($idFilterCodeAction != 0) {
+            $filterCodeAction = ' AND o.id_code_action = ' . (int)$idFilterCodeAction;
+        }
+
+        $sql = 'SELECT SQL_CALC_FOUND_ROWS 
+                if(SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) < 
+                0 , 0, SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2))) as total
+                FROM ' . _DB_PREFIX_ . 'orders AS o';
+        $sql .= ' WHERE date_upd BETWEEN ';
+        $sql .= $dateBetween;
+        $sql .= ' AND valid = 1 ';
+        $sql .= ' AND (current_state = 7)';
+        $sql .= $filterCoach;
+        $sql .= $filterCodeAction;
+
+        return Db::getInstance()->getValue($sql);
+    }
+
     public static function getCodeActionByName($name)
     {
         $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE name = "' . pSQL($name) . '"';

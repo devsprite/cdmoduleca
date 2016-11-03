@@ -38,8 +38,8 @@
         <td class="text-right">{$coach['PourcCaProspect']}</td>
         <td class="text-right">{displayPrice price=$coach['caDejaInscrit']}</td>
         <td class="text-right">{$coach['PourcCaFID']}</td>
-        <td></td>
-        <td></td>
+        <td class="text-right">{displayPrice price=$coach['caRembourse']}
+        <td class="text-right">{$coach['pourCaRembourse']}</td>
         <td></td>
         <td></td>
         <td></td>

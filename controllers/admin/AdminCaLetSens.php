@@ -134,8 +134,18 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['lastname'] = $employee['lastname'];
             $datasEmployees[$employee['id_employee']]['firstname'] = $employee['firstname'];
 
-            $datasEmployees[$employee['id_employee']]['caTotal'] =
-                CaTools::getCaCoachsTotal($employee['id_employee'], 99, $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['caRembourse'] =
+                CaTools::getCaCoachsRembourse($employee['id_employee'], 0, $this->getDateBetween());
+
+            $caTotal = CaTools::getCaCoachsTotal($employee['id_employee'], 99, $this->getDateBetween())
+                - $datasEmployees[$employee['id_employee']]['caRembourse'];
+
+            $datasEmployees[$employee['id_employee']]['caTotal'] = ($caTotal) ? $caTotal : '';
+
+            $pourCaRembourse = ($caTotal) ? round( (($datasEmployees[$employee['id_employee']]['caRembourse'] * 100)
+                / $caTotal),2): '';
+
+            $datasEmployees[$employee['id_employee']]['pourCaRembourse'] = ($pourCaRembourse) ? $pourCaRembourse .' %': '';
 
             $datasEmployees[$employee['id_employee']]['ajustement'] =
                 CaTools::getAjustement($employee['id_employee'], $this->getDateBetween());
