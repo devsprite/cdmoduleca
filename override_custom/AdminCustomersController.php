@@ -182,7 +182,6 @@ class AdminCustomersController extends AdminCustomersControllerCore
                 'filter_key' => 'contacte',
                 'type' => 'text',
                 'order_key' => 'contacte',
-                'class' => 'contact',
                 'callback' => 'contact'
             ),
 //			'newsletter' => array(
@@ -234,6 +233,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
         $this->addJquery();
         $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/adminkeyyo.js');
         $this->addCSS(_PS_MODULE_DIR_ . 'keyyo/views/css/adminkeyyo.css');
+        $this->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/admincustomer.css');
 
         if (Shop::isFeatureActive() && (Shop::getContext() == Shop::CONTEXT_ALL || Shop::getContext() == Shop::CONTEXT_GROUP))
             $this->can_add_customer = false;
@@ -685,36 +685,69 @@ class AdminCustomersController extends AdminCustomersControllerCore
 
     public function contact($value)
     {
-        $v = '';
-        $contacte = Tools::jsonDecode($value);
+        $v = array(
+            'matin' => '',
+            'midi' => '',
+            'apres_midi' => '',
+            'soir' => '',
+            'repondeur' => '',
+        );
+        $messages = array(
+            'matin' => '0',
+            'midi' => '0',
+            'apres_midi' => '0',
+            'soir' => '0',
+            'repondeur' => '0'
+        );
 
+
+        $contacte = Tools::jsonDecode($value);
         if (isset($contacte->matin)) {
+            $messages['matin'] = (count($contacte->matin) > 1) ? '2' : count($contacte->matin);
             foreach ($contacte->matin as $matin) {
-                $v .= '<p style="margin-bottom:0px!important;">Matin : ' . date('à H\hi \l\e d-m',strtotime($matin)) . '</p>';
+                $v['matin'] .= 'Matin : ' . date('à H\hi \l\e d-m', strtotime($matin)) . PHP_EOL;
             }
         }
         if (isset($contacte->midi)) {
+            $messages['midi'] = (count($contacte->midi) > 1) ? '2' : count($contacte->midi);
             foreach ($contacte->midi as $midi) {
-                $v .= '<p style="margin-bottom:0px!important;">Midi : ' . date('à H\hi \l\e d-m',strtotime($midi)) . '</p>';
+                $v['midi'] .= 'Midi : ' . date('à H\hi \l\e d-m', strtotime($midi)) . PHP_EOL;
             }
         }
         if (isset($contacte->apres_midi)) {
+            $messages['apres_midi'] = (count($contacte->apres_midi) > 1) ? '2' : count($contacte->apres_midi);
             foreach ($contacte->apres_midi as $apmidi) {
-                $v .= '<p style="margin-bottom:0px!important;">Après-midi : ' . date('à H\hi \l\e d-m',strtotime($apmidi)) . '</p>';
+                $v['apres_midi'] .= 'Après-midi : ' . date('à H\hi \l\e d-m', strtotime($apmidi)) . PHP_EOL;
             }
         }
         if (isset($contacte->soir)) {
+            $messages['soir'] .= (count($contacte->soir) > 1) ? '2' : count($contacte->soir);
             foreach ($contacte->soir as $soir) {
-                $v .= '<p style="margin-bottom:0px!important;">Soir : ' . date('à H\hi \l\e d-m',strtotime($soir)) . '</p>';
+                $v['soir'] .= 'Soir : ' . date('à H\hi \l\e d-m', strtotime($soir)) . PHP_EOL;
             }
         }
         if (isset($contacte->repondeur)) {
+            $messages['repondeur'] = (count($contacte->repondeur) > 2) ? '3' : count($contacte->repondeur);
             foreach ($contacte->repondeur as $repondeur) {
-                $v .= '<p style="margin-bottom:0px!important;">Répondeur : ' . date('à H\hi \l\e d-m',strtotime($repondeur)) . '</p>';
+                $v['repondeur'] .= 'Répondeur : ' . date('à H\hi \l\e d-m', strtotime($repondeur)) . PHP_EOL;
             }
         }
 
-        return $v;
+        $table = '
+        <table>
+            <tbody>
+                <tr class="cd_contacte">
+                    <td title="' . $v['matin'] . '" class="cd_cel cd_color_' . $messages['matin'] . '"></td>
+                    <td title="' . $v['midi'] . '" class="cd_cel cd_color_' . $messages['midi'] . '"></td>
+                    <td title="' . $v['apres_midi'] . '" class="cd_cel cd_color_' . $messages['apres_midi'] . '"></td>
+                    <td title="' . $v['soir'] . '" class="cd_cel cd_color_' . $messages['soir'] . '"></td>
+                    <td title="' . $v['repondeur'] . '" class="cd_cel cd_color_rep_' . $messages['repondeur'] . '"></td>
+                </tr>
+            </tbody>
+        </table>
+        ';
+
+        return $table;
     }
 
     public function doublons($value, $params)
