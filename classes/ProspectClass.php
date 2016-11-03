@@ -11,7 +11,7 @@ class ProspectClass extends ObjectModel
     public $date_add;
     public $message = array(
         'matin' => array(),
-        'midi'=> array(),
+        'midi' => array(),
         'apres_midi' => array(),
         'soir' => array(),
         'repondeur' => array()
@@ -140,6 +140,16 @@ class ProspectClass extends ObjectModel
             default :
         }
 
+        if (
+            (isset($contacte->matin) && count($contacte->matin) > 1) &&
+            (isset($contacte->midi) && count($contacte->midi) > 1) &&
+            (isset($contacte->apres_midi) && count($contacte->apres_midi) > 1) &&
+            (isset($contacte->soir) && count($contacte->soir) > 1) &&
+            (isset($contacte->repondeur) && count($contacte->repondeur > 2))
+        ) {
+            $prospect->injoignable = 'Oui';
+        }
+
         $prospect->contacte = Tools::jsonEncode($contacte);
         $prospect->traite = 'Non';
         $prospect->update();
@@ -155,6 +165,16 @@ class ProspectClass extends ObjectModel
         $contacte = Tools::jsonDecode($prospect->contacte);
         $contacte->repondeur[] = date('d-m-Y H:i:s');
         $prospect->contacte = Tools::jsonEncode($contacte);
+
+        if (
+            (isset($contacte->matin) && count($contacte->matin) > 1) &&
+            (isset($contacte->midi) && count($contacte->midi) > 1) &&
+            (isset($contacte->apres_midi) && count($contacte->apres_midi) > 1) &&
+            (isset($contacte->soir) && count($contacte->soir) > 1) &&
+            (isset($contacte->repondeur) && count($contacte->repondeur > 2))
+        ) {
+            $prospect->injoignable = 'Oui';
+        }
         $prospect->update();
     }
 
@@ -187,4 +207,5 @@ class ProspectClass extends ObjectModel
 
         return $req;
     }
+
 }
