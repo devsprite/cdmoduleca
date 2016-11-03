@@ -31,3 +31,12 @@
 .cd_color_rep_3 {
     background-color: #00cc00!important;
 }
+
+.cd-group-action {
+    margin-left: 10px;
+    margin-bottom: 3px;
+}
+
+.cd-group-action > a {
+    top:0px!important;
+}
