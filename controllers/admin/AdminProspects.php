@@ -233,18 +233,22 @@ class AdminProspectsController extends ModuleAdminController
     {
         foreach ($prospects as $prospect) {
             $c = new Customer($prospect['id_customer']);
-            $g = $c->getGroups();
-            unset($g[array_search('1', $g)]);
-            $g[] = $id_group;
-            $c->updateGroup($g);
-            $c->id_default_group = (int)$id_group;
-            $c->update();
-            $p = new ProspectClass();
-            $p->id_customer = $c->id;
-            $p->id_prospect_attribue = $ap->id;
-            $p->traite = 'Prospect';
-            $p->injoignable = 'Non';
-            $p->add();
+            if ($this->validateFields($c)) {
+                $g = $c->getGroups();
+                unset($g[array_search('1', $g)]);
+                $g[] = $id_group;
+                $c->updateGroup($g);
+                $c->id_default_group = (int)$id_group;
+                $c->update();
+                $p = new ProspectClass();
+                $p->id_customer = $c->id;
+                $p->id_prospect_attribue = $ap->id;
+                $p->traite = 'Prospect';
+                $p->injoignable = 'Non';
+                $p->add();
+            }else{
+                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id .'. Corriger les informations de ce client.');
+            }
         }
     }
 
@@ -377,14 +381,18 @@ class AdminProspectsController extends ModuleAdminController
         $prospects = ProspectClass::getProspectsByIdPa($pa->id_prospect_attribue);
         foreach ($prospects as $prospect) {
             $c = new Customer($prospect['id_customer']);
-            $g = $c->getGroups();
-            unset($g[array_search($groupOldCoach, $g)]);
-            $g[] = (int)$groupNewCoach;
-            $c->updateGroup($g);
-            $c->id_default_group = (int)$groupNewCoach;
-            $c->update();
-            unset($c);
-            unset($g);
+            if ($this->validateFields($c)) {
+                $g = $c->getGroups();
+                unset($g[array_search($groupOldCoach, $g)]);
+                $g[] = (int)$groupNewCoach;
+                $c->updateGroup($g);
+                $c->id_default_group = (int)$groupNewCoach;
+                $c->update();
+                unset($c);
+                unset($g);
+            }else{
+                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id .'. Corriger les informations de ce client.');
+            }
         }
     }
 
@@ -456,15 +464,34 @@ class AdminProspectsController extends ModuleAdminController
             $prospect->id_prospect_attribue = $attriProspect->id;
 
             $c = new Customer($prospect->id_customer);
-            $g = $c->getGroups();
-            unset($g[array_search('1', $g)]);
-            $g[] = $getGroupeEmployee;
-            $c->updateGroup($g);
-            $c->id_default_group = (int)$getGroupeEmployee;
-            $c->update();
-            $prospect->update();
+            if ($this->validateFields($c)) {
+                ;
+                $g = $c->getGroups();
+                unset($g[array_search('1', $g)]);
+                $g[] = $getGroupeEmployee;
+                $c->updateGroup($g);
+                $c->id_default_group = (int)$getGroupeEmployee;
+                $c->update();
+                $prospect->update();
+            } else {
+                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id .'. Corriger les informations de ce client.');
+                $i--;
+            }
         }
 
+    }
+
+    private function validateFields(Customer $c)
+    {
+        $isOk = true;
+        if (
+            !Validate::isBirthDate($c->birthday) ||
+            !Validate::isName($c->firstname) ||
+            !Validate::isName($c->lastname) ||
+            !Validate::isEmail($c->email)) {
+            $isOk = false;
+        }
+        return $isOk;
     }
 
 

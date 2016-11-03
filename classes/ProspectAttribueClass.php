@@ -30,7 +30,7 @@ class ProspectAttribueClass extends ObjectModel
                 LEFT JOIN `ps_employee` AS e ON pa.id_employee = e.id_employee
                 WHERE `date_debut` BETWEEN ' . $getDateBetween;
         $sql .= $filter;
-        $sql .= ' ORDER BY `date_debut` DESC';
+        $sql .= ' ORDER BY e.`id_employee` ASC, `date_debut` DESC';
         $req = Db::getInstance()->executeS($sql);
 
         return $req;
