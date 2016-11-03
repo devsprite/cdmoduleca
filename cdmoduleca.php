@@ -167,6 +167,7 @@ class CdModuleCA extends ModuleGrid
             !$this->createCodeActionTable() ||
             !$this->updateOrdersTable() ||
             !$this->installConfig() ||
+            !$this->registerHook('displayBackOfficeTop') ||
             !$this->registerHook('ActionValidateOrder')
         ) {
             return false;
@@ -222,6 +223,21 @@ class CdModuleCA extends ModuleGrid
         }
         return true;
     }
+
+    public function hookDisplayBackOfficeTop()
+    {
+        $this->context->controller->addCSS($this->_path . 'views/css/compteur.css', 'all');
+        $objectifCoachs[] = CaTools::getObjectifCoach($this->context->employee->id);
+        $caCoach = CaTools::isObjectifAtteint($objectifCoachs);
+
+        ddd($caCoach);
+
+        $this->smarty->assign(array(
+            'objectif' => $objectifCoachs
+        ));
+        return $this->display(__FILE__, 'compteur.tpl');
+    }
+
 
     private function createTabsStatsCA()
     {
@@ -902,20 +918,17 @@ class CdModuleCA extends ModuleGrid
         $employee = (isset($this->context->employee->id)) ? $this->context->employee->id : false;
         if ($employee) {
             $idOrder = Order::getOrderByCartId($this->context->cart->id);
-            $reqOrder = new DbQuery();
-            $reqOrder->select('id_order, coach, code_action')
-                ->from('orders')
-                ->where('id_order = ' . $idOrder);
-            $order = Db::getInstance()->getRow($reqOrder);
+            $coach = Tools::getValue('coach');
+            $code_action = Tools::getValue('order_code_action');
 
-            if (!empty($order)) {
-                $id_coach = $this->getIdCoach($order['coach']);
-                $id_code_action = $this->getIdCodeAction($order['code_action']);
+            if (!empty($coach) && !empty($code_action) ) {
+                $id_coach = $this->getIdCoach($coach);
+                $id_code_action = $this->getIdCodeAction($code_action);
 
                 if (!empty($id_coach) && !empty($id_code_action)) {
                     $req = 'UPDATE `' . _DB_PREFIX_ . 'orders`
-                    SET id_employee = ' . $id_coach . ', id_code_action = ' . $id_code_action . ' 
-                    WHERE id_order = ' . $order['id_order'];
+                    SET id_employee = ' . (int)$id_coach . ', id_code_action = ' . (int)$id_code_action . ' 
+                    WHERE id_order = ' . (int)$idOrder;
 
                     Db::getInstance()->execute($req);
                 }
@@ -1002,7 +1015,7 @@ class CdModuleCA extends ModuleGrid
         $req = new DbQuery();
         $req->select('id_employee')
             ->from('employee')
-            ->where('lastname = ' . $coach);
+            ->where('lastname = "' . pSQL($coach) . '"');
 
         return Db::getInstance()->getValue($req);
     }
@@ -1012,7 +1025,7 @@ class CdModuleCA extends ModuleGrid
         $req = new DbQuery();
         $req->select('id_code_action')
             ->from('code_action')
-            ->where('name = ' . $code_action);
+            ->where('name = "' . pSQL($code_action) . '"');
 
         return Db::getInstance()->getValue($req);
     }

@@ -519,7 +519,7 @@ class AdminCaLetSensController extends ModuleAdminController
         }
 
         $objectifCoachs = CaTools::getObjectifCoachs($this->idFilterCoach, $this->getDateBetween());
-        $objectifs = CaTools::isObjectifAteint($objectifCoachs);
+        $objectifs = CaTools::isObjectifAtteint($objectifCoachs);
         $this->smarty->assign(array(
             'objectifCoachs' => $objectifs
         ));

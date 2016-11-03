@@ -217,7 +217,7 @@ class CaTools
         return Db::getInstance()->executeS($sql);
     }
 
-    public static function isObjectifAteint($objectifCoachs)
+    public static function isObjectifAtteint($objectifCoachs)
     {
         if ($objectifCoachs) {
 
@@ -440,6 +440,20 @@ class CaTools
         }
 
         return $retour;
+    }
+
+    public static function getObjectifCoach($id_employee)
+    {
+        $sql = 'SELECT SUM(`somme`) AS somme, MIN(`date_start`) AS date_start, MAX(`date_end`) AS date_end,
+                `id_employee`
+                FROM `ps_objectif_coach` 
+                WHERE `id_employee` = ' . (int)$id_employee . ' 
+                AND NOW() > `date_start` 
+                AND NOW() < `date_end` ';
+
+        $req = Db::getInstance()->getRow($sql);
+
+        return $req;
     }
 
 }
