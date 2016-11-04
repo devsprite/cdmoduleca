@@ -308,9 +308,9 @@ class CdModuleCA extends ModuleGrid
         `id_prospect` INT(12) NOT NULL AUTO_INCREMENT,
         `id_customer` INT(12) NOT NULL UNIQUE,
         `id_prospect_attribue` INT(12) NOT NULL,
-        `traite` VARCHAR(64) NULL,
-        `injoignable` VARCHAR(64) NULL,
-        `contacte` VARCHAR(64) NULL,
+        `traite` TEXT NULL,
+        `injoignable` TEXT NULL,
+        `contacte` TEXT NULL,
         `date_add` DATETIME NOT NULL,
         PRIMARY KEY (`id_prospect`))
         ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=' . $this->table_charset . ';';
@@ -366,7 +366,7 @@ class CdModuleCA extends ModuleGrid
         $sql = "CREATE TABLE `" . _DB_PREFIX_ . "ajout_somme` (
         `id_ajout_somme` INT (12) NOT NULL AUTO_INCREMENT,
         `somme` DECIMAL (8,2) NULL,
-        `commentaire` VARCHAR(255) NULL,
+        `commentaire` TEXT NULL,
         `id_employee` INT (12),
         `date_add` DATETIME NOT NULL,
         `date_upd` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
