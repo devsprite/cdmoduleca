@@ -3,7 +3,7 @@
     <table>
         <tbody class="compteur_{if isset($objectif['class'])}{$objectif['class']}{/if}">
             <tr>
-                <td><span id="compteurAppels"></span> <i class="icon-phone"></i></td>
+                <td><span id="compteurAppels"></span> <i id="iconCompteurAppels" class="icon-phone"></i></td>
                 <td>{if !empty($objectif['pourcentDeObjectif'])}{$objectif['pourcentDeObjectif']}%{/if}</td>
             </tr>
             <tr>

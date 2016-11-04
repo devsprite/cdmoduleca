@@ -22,6 +22,7 @@
 */
 
 require_once(dirname(__FILE__) . '/../../../modules/cdmoduleca/classes/ProspectClass.php');
+require_once(dirname(__FILE__) . '/../../../modules/cdmoduleca/classes/CaTools.php');
 
 class AdminCustomersController extends AdminCustomersControllerCore
 {
@@ -485,28 +486,13 @@ class AdminCustomersController extends AdminCustomersControllerCore
         $callee = Tools::getValue('CALLEE');
         $calle_name = Tools::getValue('CALLE_NAME');
 
-        $log = array(
-            'keyyo_url' => $keyyo_url,
-            'account' => $account,
-            'callee' => $callee,
-            'calle_name' => $calle_name,
-            'erreur' => '',
-            'keyyo_link' => '',
-            'retour_keyyo' => '',
-            'heure' => date('H:i:s Y:m:d')
-        );
-
         if (!$account) {
             $return = Tools::jsonEncode(array('msg' => 'Veuillez configurer votre numéro de compte KEYYO.'));
-            $log['erreur'] = $return;
-            $this->logKeyyo($log);
             die($return);
         }
 
         if (!$callee || !$calle_name) {
             $return = Tools::jsonEncode(array('msg' => 'Il manque une information pour composer le numéro.'));
-            $log['erreur'] = $return;
-            $this->logKeyyo($log);
             die($return);
         } else {
             $keyyo_link = $keyyo_url . '?ACCOUNT=' . $account;
@@ -516,35 +502,19 @@ class AdminCustomersController extends AdminCustomersControllerCore
 
             $fp = fopen($keyyo_link, 'r');
             $buffer = fgets($fp, 4096);
-            $log['reponseHttp'] = $http_response_header[0];
             fclose($fp);
 
-            $log['keyyo_link'] = $keyyo_link;
-            $log['retour_keyyo'] = $buffer;
-
-
             if ($buffer == 'OK') {
+                $appels = (int)$_COOKIE['appelKeyyo'] + 1;
+                setcookie('appelKeyyo', $appels, strtotime(date('Y-m-d 23:59:59')));
                 $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $callee . ' en cours.'));
-                $log['erreur'] = $return;
-                $this->logKeyyo($log);
                 die($return);
             } else {
                 $return = Tools::jsonEncode(array('msg' => 'Problème lors de l\'appel.'));
-                $log['erreur'] = $return;
-                $this->logKeyyo($log);
                 die($return);
             }
         }
     }
-
-    public function logKeyyo($log)
-    {
-        $f = Tools::jsonEncode($log);
-        $file = fopen(_PS_MODULE_DIR_ . '/logKeyyo.txt', 'a+');
-        fwrite($file, $f . PHP_EOL);
-        fclose($file);
-    }
-
 
     /*
 	* module: keyyo
@@ -683,7 +653,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
         return $tpl->fetch();
     }
 
-    public function contact($value)
+    public function contact($value, $params)
     {
         $v = array(
             'matin' => '',
@@ -756,7 +726,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
         $alert = CaTools::doublons($params);
 
         if (!empty($alert)) {
-            $alert = '<p>' .$alert. '</p>';
+            $alert = '<p>' . $alert . '</p>';
         }
 
         return $value . $alert;

@@ -1,3 +1,7 @@
+.compteur {
+    display: inline-block;
+    margin-left: 12px;
+}
 .compteur > table {
     color: #ffffff;
 }
@@ -17,4 +21,8 @@
 
 .compteur_success {
     background-color: #008e0a;
+}
+
+#iconCompteurAppels {
+    display: none;
 }
