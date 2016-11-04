@@ -338,7 +338,7 @@ class CdModuleCA extends ModuleGrid
         `somme` DECIMAL (8,2) NULL,
         `commentaire` TEXT NULL,
         `heure_absence` DECIMAL(6,2) NULL,
-        `jour_abscence` INT(12) NULL,
+        `jour_absence` INT(12) NULL,
         `date_start` DATETIME NOT NULL,
         `date_end` DATETIME NOT NULL,
         PRIMARY KEY (`id_objectif_coach`))

@@ -161,7 +161,7 @@
                         </div>
                     </div>
                     <div class="col-lg-1">
-                        <label for="oc_somme">Heure d'abscence</label>
+                        <label for="oc_somme">Heure d'absence</label>
                         <div class="input input-group">
                             <input type="text" id="oc_heure" name="oc_heure" value="{if isset($smarty.post.oc_heure)
                             }{$smarty.post.oc_heure}{/if}">
@@ -169,7 +169,7 @@
                         </div>
                     </div>
                     <div class="col-lg-1">
-                        <label for="oc_somme">Jour d'abscence</label>
+                        <label for="oc_somme">Jour d'absence</label>
                         <div class="input input-group">
                             <input type="text" id="oc_jour" name="oc_jour" value="{if isset($smarty.post.oc_jour)
                             }{$smarty.post.oc_jour}{/if}">
