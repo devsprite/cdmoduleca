@@ -1,7 +1,7 @@
 <div id="calendar" class="panel">
 	<form action="{$action|escape}" method="post" id="calendar_form" name="calendar_form" class="form-inline">
 		<div class="row">
-			<div class="col-lg-6">
+			<div class="col-lg-5">
 				<div class="btn-group">
 					<button type="submit" name="submitDateDay" class="btn btn-default submitDateDay">{$translations.Day}</button>
 					<button type="submit" name="submitDateMonth" class="btn btn-default submitDateMonth">{$translations.Month}</button>

@@ -118,6 +118,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $this->module->lang),
             'coach' => new Employee($this->idFilterCoach),
             'filterCodeAction' => $this->getCodeActionByID(),
+            'nbrJourOuvre' => CaTools::get_nb_open_days($this->getDateBetween())
         ));
     }
 

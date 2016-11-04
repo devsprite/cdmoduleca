@@ -1,4 +1,7 @@
 <hr>
+<div class="col-lg-1">
+    {$nbrJourOuvre}
+</div>
 <div class="row synthesecontent">
     <div class="col-xs-3">
         <div class="row group">

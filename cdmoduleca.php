@@ -50,7 +50,10 @@ class CdModuleCA extends ModuleGrid
     public $config = array(
         'CDMODULECA' => '1',
         'CDMODULECA_ORDERS_STATE' => '7',
-        'CDMODULECA_ORDERS_STATE_JOURS' => '60'
+        'CDMODULECA_ORDERS_STATE_JOURS' => '60',
+        'CDMODULECA_PRIME_FICHIER' => '0.5',
+        'CDMODULECA_PROSPECTS_JOUR' => '26',
+        'CDMODULECA_PROSPECTS_HEURE' => '4.33'
     );
 
     public function __construct()
@@ -615,6 +618,10 @@ class CdModuleCA extends ModuleGrid
             $confStatus = implode(',', $statuts);
             Configuration::updateValue('CDMODULECA_ORDERS_STATE', $confStatus);
             Configuration::updateValue('CDMODULECA_ORDERS_STATE_JOURS', (int)Tools::getValue('os_nbr_jours'));
+        } elseif (Tools::isSubmit('submitConfiguration')) {
+            Configuration::updateValue('CDMODULECA_PRIME_FICHIER', floatval(Tools::getValue('co_prime_fichier')));
+            Configuration::updateValue('CDMODULECA_PROSPECTS_JOUR', floatval(Tools::getValue('co_prospects_jour')));
+            Configuration::updateValue('CDMODULECA_PROSPECTS_HEURE', floatval(Tools::getValue('co_prospects_heure')));
         }
 
         if ($error) {
@@ -627,9 +634,66 @@ class CdModuleCA extends ModuleGrid
 
     private function displayForm()
     {
+        $this->html .= $this->generateFormConstantes();
         $this->html .= $this->generateFormCodeAction();
         $this->html .= $this->generateFormStatutsCommande();
         $this->html .= $this->generateFormGroupeParrain();
+    }
+
+    private function generateFormConstantes()
+    {
+        $inputs = array();
+        $inputs[] = array(
+            'type' => 'text',
+            'label' => 'Prime fichier',
+            'name' => 'co_prime_fichier',
+            'desc' => 'Montant de la prime fichier',
+            'class' => 'input fixed-width-md',
+            'suffix' => '€'
+        );
+        $inputs[] = array(
+            'type' => 'text',
+            'label' => 'Prospects par jour',
+            'name' => 'co_prospects_jour',
+            'desc' => 'Nombre de prospects affectés par jour travaillé',
+            'class' => 'input fixed-width-md',
+        );
+        $inputs[] = array(
+            'type' => 'text',
+            'label' => 'Prospects par heure',
+            'name' => 'co_prospects_heure',
+            'desc' => 'Nombre de prospects par heure travaillé',
+            'class' => 'input fixed-width-md',
+        );
+
+        $fields_form = array(
+            'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Configuration'),
+                    'icon' => 'icon-cogs'
+                ),
+                'input' => $inputs,
+                'submit' => array(
+                    'title' => $this->l('Save'),
+                    'class' => 'btn btn-default pull-right',
+                    'name' => 'submitConfiguration'
+                )
+            )
+        );
+
+        $lang = new Language((int)Configuration::get('PS_LANG_DEFAULT'));
+        $helper = new HelperForm();
+        $helper->default_form_language = $lang->id;
+        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false) . '&configure=' . $this->name
+            . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
+        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $helper->tpl_vars = array(
+            'fields_value' => $this->getConfigConfiguration(),
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id
+        );
+        return $helper->generateForm(array($fields_form));
+
     }
 
     private function generateFormCodeAction()
@@ -847,6 +911,17 @@ class CdModuleCA extends ModuleGrid
         $groups = Db::getInstance()->executeS($sql);
 
         return $groups;
+    }
+
+    public function getConfigConfiguration()
+    {
+        $values = array(
+            'co_prime_fichier' => Configuration::get('CDMODULECA_PRIME_FICHIER'),
+            'co_prospects_jour' => Configuration::get('CDMODULECA_PROSPECTS_JOUR'),
+            'co_prospects_heure' => Configuration::get('CDMODULECA_PROSPECTS_HEURE')
+        );
+
+        return $values;
     }
 
     /**
