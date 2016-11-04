@@ -118,7 +118,9 @@ class AdminCaLetSensController extends ModuleAdminController
                 $this->module->lang),
             'coach' => new Employee($this->idFilterCoach),
             'filterCodeAction' => $this->getCodeActionByID(),
-            'nbrJourOuvre' => CaTools::get_nb_open_days($this->getDateBetween())
+            'nbrJourOuvre' => CaTools::get_nb_open_days($this->getDateBetween()),
+            'primeFichierTotal' => CaTools::primeFichier(0, $this->getDateBetween()),
+            'primeFichierCoach' => CaTools::primeFichier($this->idFilterCoach, $this->getDateBetween()),
         ));
     }
 
@@ -251,6 +253,9 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] =
                 CaTools::getNbrGrVentes($employee['id_employee'], 'PAR', null, true, false,
                     $this->getDateBetween(), $this->module->lang);
+
+            $datasEmployees[$employee['id_employee']]['primeFichierCoach'] =
+                CaTools::primeFichier($employee['id_employee'], $this->getDateBetween());
         }
 
 
@@ -455,17 +460,25 @@ class AdminCaLetSensController extends ModuleAdminController
                     'id_employee' => (int)Tools::getValue('oc_id_employee'),
                     'somme' => Tools::getValue('oc_somme'),
                     'commentaire' => pSQL(Tools::getValue('oc_commentaire')),
+                    'heure_absence' => Tools::getValue('oc_heure'),
+                    'jour_absence' => Tools::getValue('oc_jour'),
                     'date_start' => Tools::getValue('oc_date_start'),
                     'date_end' => date('Y-m-d 23:59:59', strtotime(Tools::getValue('oc_date_end')))
                 );
                 if (!Validate::isInt($data['id_employee'])) {
                     $this->errors[] = 'L\'id de l\'employee n\'est pas valide';
                 }
-                if (!Validate::isFloat(str_replace(',', '.', $data['somme']))) {
+                if (!empty($data['somme']) && !Validate::isFloat(str_replace(',', '.', $data['somme']))) {
                     $this->errors[] = 'La somme n\'est pas valide';
                 }
                 if (!Validate::isString($data['commentaire'])) {
                     $this->errors[] = 'Erreur du champ commentaire';
+                }
+                if (!empty($data['heure_absence']) && !Validate::isFloat(str_replace(',', '.', $data['heure_absence']))) {
+                    $this->errors[] = 'Erreur du champ heure d\'absence';
+                }
+                if (!empty($data['jour_absence']) && !Validate::isInt($data['jour_absence'])) {
+                    $this->errors[] = 'Erreur du champ jour d\'absence';
                 }
                 if (!Validate::isDate($data['date_start'])) {
                     $this->errors[] = 'Erreur du champ date début';
@@ -495,6 +508,8 @@ class AdminCaLetSensController extends ModuleAdminController
                         unset($_POST['oc_id_employee']);
                         unset($_POST['oc_somme']);
                         unset($_POST['oc_commentaire']);
+                        unset($_POST['oc_heure']);
+                        unset($_POST['oc_jour']);
                         unset($_POST['oc_date_start']);
                         unset($_POST['oc_date_end']);
                         unset($_POST['oc_id']);
@@ -513,6 +528,8 @@ class AdminCaLetSensController extends ModuleAdminController
                 $_POST['oc_id_employee'] = $oc['id_employee'];
                 $_POST['oc_somme'] = $oc['somme'];
                 $_POST['oc_commentaire'] = $oc['commentaire'];
+                $_POST['oc_heure'] = $oc['heure_absence'];
+                $_POST['oc_jour'] = $oc['jour_absence'];
                 $_POST['oc_date_start'] = $oc['date_start'];
                 $_POST['oc_date_end'] = $oc['date_end'];
                 $_POST['oc_id'] = $oc['id_objectif_coach'];

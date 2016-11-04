@@ -203,7 +203,8 @@ class CaTools
 
     public static function getObjectifCoachs($id_employee, $dateBetween)
     {
-        $sql = 'SELECT id_objectif_coach, somme, commentaire, a.id_employee, date_start, date_end, lastname
+        $sql = 'SELECT id_objectif_coach, somme, commentaire, a.id_employee, date_start, date_end, lastname,
+                heure_absence, jour_absence
                 FROM `ps_objectif_coach` AS a
                 LEFT JOIN `ps_employee` AS e ON a.id_employee = e.id_employee
                 WHERE date_start BETWEEN ' . $dateBetween;
@@ -225,7 +226,8 @@ class CaTools
                 $dateBetween = '"' . $objectif['date_start'] . '" AND "' . $objectif['date_end'] . '"';
 
                 $caCoach = CaTools::getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
-                $p = ($objectif['somme'])?round(((100 * $caCoach) / $objectif['somme']), 2):'';
+
+                $p = ($objectif['somme'] != 0) ? round(((100 * $caCoach) / $objectif['somme']), 2) : '';
                 $objectifCoachs[$objectifCoach]['pourcentDeObjectif'] = $p;
                 $objectifCoachs[$objectifCoach]['caCoach'] = $caCoach;
                 $class = '';
@@ -435,7 +437,7 @@ class CaTools
         $req = Db::getInstance()->getValue($sql);
 
         $retour = '';
-        if ($req > 1 ) {
+        if ($req > 1) {
             $retour = '<i class="icon-group text-danger" title="Doublon Nom Client" ></i>';
         }
 
@@ -456,10 +458,11 @@ class CaTools
         return $req;
     }
 
-    public static function get_nb_open_days($dateBetween) {
+    public static function get_nb_open_days($dateBetween)
+    {
 
-        $date_start = strtotime(substr($dateBetween, 2,10));
-        $date_stop = strtotime(substr($dateBetween, 28,10));
+        $date_start = strtotime(substr($dateBetween, 2, 10));
+        $date_stop = strtotime(substr($dateBetween, 28, 10));
 
         $arr_bank_holidays = array(); // Tableau des jours feriés
 
@@ -468,20 +471,20 @@ class CaTools
         for ($i = 0; $i <= $diff_year; $i++) {
             $year = (int)date('Y', $date_start) + $i;
             // Liste des jours feriés
-            $arr_bank_holidays[] = '1_1_'.$year; // Jour de l'an
-            $arr_bank_holidays[] = '1_5_'.$year; // Fete du travail
-            $arr_bank_holidays[] = '8_5_'.$year; // Victoire 1945
-            $arr_bank_holidays[] = '14_7_'.$year; // Fete nationale
-            $arr_bank_holidays[] = '15_8_'.$year; // Assomption
-            $arr_bank_holidays[] = '1_11_'.$year; // Toussaint
-            $arr_bank_holidays[] = '11_11_'.$year; // Armistice 1918
-            $arr_bank_holidays[] = '25_12_'.$year; // Noel
+            $arr_bank_holidays[] = '1_1_' . $year; // Jour de l'an
+            $arr_bank_holidays[] = '1_5_' . $year; // Fete du travail
+            $arr_bank_holidays[] = '8_5_' . $year; // Victoire 1945
+            $arr_bank_holidays[] = '14_7_' . $year; // Fete nationale
+            $arr_bank_holidays[] = '15_8_' . $year; // Assomption
+            $arr_bank_holidays[] = '1_11_' . $year; // Toussaint
+            $arr_bank_holidays[] = '11_11_' . $year; // Armistice 1918
+            $arr_bank_holidays[] = '25_12_' . $year; // Noel
 
             // Récupération de paques. Permet ensuite d'obtenir le jour de l'ascension et celui de la pentecote
             $easter = easter_date($year);
-            $arr_bank_holidays[] = date('j_n_'.$year, $easter + 86400); // Paques
-            $arr_bank_holidays[] = date('j_n_'.$year, $easter + (86400*39)); // Ascension
-            $arr_bank_holidays[] = date('j_n_'.$year, $easter + (86400*50)); // Pentecote
+            $arr_bank_holidays[] = date('j_n_' . $year, $easter + 86400); // Paques
+            $arr_bank_holidays[] = date('j_n_' . $year, $easter + (86400 * 39)); // Ascension
+            $arr_bank_holidays[] = date('j_n_' . $year, $easter + (86400 * 50)); // Pentecote
         }
         //print_r($arr_bank_holidays);
         $nb_days_open = 0;
@@ -489,12 +492,49 @@ class CaTools
         while ($date_start <= $date_stop) {
             // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
             if (!in_array(date('w', $date_start), array(0, 6))
-                && !in_array(date('j_n_'.date('Y', $date_start), $date_start), $arr_bank_holidays)) {
+                && !in_array(date('j_n_' . date('Y', $date_start), $date_start), $arr_bank_holidays)
+            ) {
                 $nb_days_open++;
             }
             $date_start = mktime(date('H', $date_start), date('i', $date_start), date('s', $date_start), date('m', $date_start), date('d', $date_start) + 1, date('Y', $date_start));
         }
         return $nb_days_open;
+    }
+
+    public static function getAbsenceEmployee($id_employee = 0, $dateBetween)
+    {
+        $filter = '';
+        if ($id_employee != 0) {
+            $filter = ' AND `id_employee` = ' . (int)$id_employee;
+        }
+        $sql = 'SELECT SUM(`heure_absence`) as heures, SUM(`jour_absence`) AS jours
+                FROM `ps_objectif_coach`
+                WHERE `date_start` BETWEEN ' . $dateBetween . '
+                AND `date_end` BETWEEN ' . $dateBetween;
+        $sql .= $filter;
+
+        $req = Db::getInstance()->getRow($sql);
+
+        return $req;
+    }
+
+    public static function primeFichier($id_employee = 0, $dateBetween)
+    {
+        $taux = Configuration::get('CDMODULECA_PRIME_FICHIER');
+        $pros_jour = Configuration::get('CDMODULECA_PROSPECTS_JOUR');
+        $pros_heure = Configuration::get('CDMODULECA_PROSPECTS_HEURE');
+        $nbr_jours_ouvre = CaTools::get_nb_open_days($dateBetween);
+        $nbr_prospects = ProspectAttribueClass::getNbrProspectsAttriByCoach($id_employee, $dateBetween);
+        $absence = CaTools::getAbsenceEmployee($id_employee, $dateBetween);
+
+        if ($nbr_prospects == 0) {
+            return '';
+        }
+
+        $prime = ( (($pros_jour*($nbr_jours_ouvre - $absence['jours'])) - ($absence['heures'] * $pros_heure))
+        - $nbr_prospects ) * $taux;
+
+        return round($prime, 2);
     }
 
 }

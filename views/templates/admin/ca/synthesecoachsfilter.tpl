@@ -65,7 +65,7 @@
     {if isset($coachs) && $filterActif != 0}
         <div class="col-xs-12 hidden-print">
             <br>
-            <h3>Ajout manuel</h3>
+            <h2>Ajustement</h2>
             <form id="form_as_date" action="{$linkFilter}" method="post">
                 <div class="form-group">
                     <div class="col-lg-1">
@@ -99,23 +99,25 @@
                         <input type="text" id="as_commentaire" value="{if isset($smarty.post.as_commentaire)
                         }{$smarty.post.as_commentaire}{/if}" name="as_commentaire">
                     </div>
-                    <div class="col-lg-1">
-                        <label for="">Enregistrer</label>
-                        <button class="btn btn-success" type="submit" id="as_submit" name="as_submit">Enregistrer
-                        </button>
-                        <input type="hidden" id="as_id_employee" name="as_id_employee"
-                               value="{if isset($smarty.post.as_id_employee)
-                               }{$smarty.post.as_id_employee}{else}{$filterActif}{/if}">
-                        <input type="hidden" id="as_id" name="as_id"
-                               value="{if isset($smarty.post.as_id)
-                               }{$smarty.post.as_id}{/if}">
+                    <div class="col-lg-12">
+                        <div class="col-lg-1">
+                            <br>
+                            <button class="btn btn-success" type="submit" id="as_submit" name="as_submit">Enregistrer
+                            </button>
+                            <input type="hidden" id="as_id_employee" name="as_id_employee"
+                                   value="{if isset($smarty.post.as_id_employee)
+                                   }{$smarty.post.as_id_employee}{else}{$filterActif}{/if}">
+                            <input type="hidden" id="as_id" name="as_id"
+                                   value="{if isset($smarty.post.as_id)
+                                   }{$smarty.post.as_id}{/if}">
+                        </div>
                     </div>
                 </div>
             </form>
         </div>
         <div class="col-xs-12 hidden-print">
             <br>
-            <h3>Objectif coach</h3>
+            <h2>Coach</h2>
             <form id="form_oc_objectif" action="{$linkFilter}" method="post">
                 <div class="form-group">
                     <div class="col-lg-1">
@@ -158,13 +160,31 @@
                             <span class="input-group-addon">€</span>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <label for="oc_commentaire">Commentaire</label>
-                        <input type="text" id="oc_commentaire" value="{if isset($smarty.post.oc_commentaire)
-                        }{$smarty.post.oc_commentaire}{/if}" name="oc_commentaire">
+                    <div class="col-lg-1">
+                        <label for="oc_somme">Heure d'abscence</label>
+                        <div class="input input-group">
+                            <input type="text" id="oc_heure" name="oc_heure" value="{if isset($smarty.post.oc_heure)
+                            }{$smarty.post.oc_heure}{/if}">
+                            <span class="input-group-addon">Heure</span>
+                        </div>
                     </div>
                     <div class="col-lg-1">
-                        <label for="">Enregistrer</label>
+                        <label for="oc_somme">Jour d'abscence</label>
+                        <div class="input input-group">
+                            <input type="text" id="oc_jour" name="oc_jour" value="{if isset($smarty.post.oc_jour)
+                            }{$smarty.post.oc_jour}{/if}">
+                            <span class="input-group-addon">Jour</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="col-lg-7">
+                            <label for="oc_commentaire">Commentaire</label>
+                            <input type="text" id="oc_commentaire" value="{if isset($smarty.post.oc_commentaire)
+                            }{$smarty.post.oc_commentaire}{/if}" name="oc_commentaire">
+                        </div>
+                    </div>
+                    <div class="col-lg-1">
+                        <br>
                         <button class="btn btn-success" type="submit" id="oc_submit" name="oc_submit">Enregistrer
                         </button>
                         <input type="hidden" id="oc_id_employee" name="oc_id_employee"

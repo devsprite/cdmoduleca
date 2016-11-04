@@ -45,12 +45,16 @@ class ProspectAttribueClass extends ObjectModel
         return ($req) ? true : false;
     }
 
-    public static function getNbrProspectsAttriByCoach($id_employee, $getDateBetween)
+    public static function getNbrProspectsAttriByCoach($id_employee = 0, $getDateBetween)
     {
+        $filter ='';
+        if ($id_employee != 0 ) {
+            $filter = ' AND `id_employee` = ' . (int)$id_employee .' ';
+        }
         $sql = 'SELECT SUM(`nbr_prospect_attribue`) FROM `ps_prospect_attribue`
-                WHERE `id_employee` = ' . (int)$id_employee .' 
-                AND `date_debut` BETWEEN ' . $getDateBetween . '
+                WHERE `date_debut` BETWEEN ' . $getDateBetween . '
                 AND `date_fin` BETWEEN ' .$getDateBetween ;
+        $sql .= $filter;
         $req = Db::getInstance()->getValue($sql);
 
         return $req;

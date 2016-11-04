@@ -9,16 +9,17 @@
         <th style="width: 7%;text-align: right">CA Ajusté</th>
         <th style="width: 5%;text-align: center">Nbre de ventes TOTAL</th>
         <th style="width: 5%;text-align: center">Nbre de prospects</th>
+        <th style="width: 5%;text-align: center">Prime Fichier</th>
         <th style="width: 5%;text-align: right">Panier Moyen</th>
-        <th style="width: 6%;text-align: center">CA/Contact</th>
+        <th style="width: 5%;text-align: center">CA/Contact</th>
         <th style="width: 5%;text-align: right">% Taux de transfo. prospect</th>
-        <th style="width: 6%;text-align: right">CA prospect</th>
+        <th style="width: 5%;text-align: right">CA prospect</th>
         <th style="width: 5%;text-align: center">% CA prospect</th>
-        <th style="width: 6%;text-align: right">CA FID</th>
+        <th style="width: 5%;text-align: right">CA FID</th>
         <th style="width: 5%;text-align: center">% CA FID</th>
-        <th style="width: 6%;text-align: right">CA Retour</th>
+        <th style="width: 5%;text-align: right">CA Retour</th>
         <th style="width: 5%;text-align: center">% CA Retour</th>
-        <th style="width: 6%;text-align: right">CA Impayé</th>
+        <th style="width: 5%;text-align: right">CA Impayé</th>
         <th style="width: 5%;text-align: center">% Impayé</th>
     </tr>
     </thead>
@@ -31,6 +32,7 @@
         <td class="text-right">{displayPrice price=$coach['caAjuste']}</td>
         <td class="text-center">{$coach['NbreVentesTotal']}</td>
         <td class="text-center">{$coach['NbreDeProspects']}</td>
+        <td class="text-right">{displayPrice price=$coach['primeFichierCoach']}</td>
         <td class="text-right">{displayPrice price=$coach['panierMoyen']}</td>
         <td class="text-center">{$coach['CaContact']}</td>
         <td class="text-right">{$coach['tauxTransfo']}</td>

@@ -334,9 +334,11 @@ class CdModuleCA extends ModuleGrid
     {
         $sql = "CREATE TABLE `" . _DB_PREFIX_ . "objectif_coach` (
         `id_objectif_coach` INT (12) NOT NULL AUTO_INCREMENT,
+        `id_employee` INT(12),
         `somme` DECIMAL (8,2) NULL,
-        `commentaire` VARCHAR(255) NULL,
-        `id_employee` INT (12),
+        `commentaire` TEXT NULL,
+        `heure_absence` DECIMAL(6,2) NULL,
+        `jour_abscence` INT(12) NULL,
         `date_start` DATETIME NOT NULL,
         `date_end` DATETIME NOT NULL,
         PRIMARY KEY (`id_objectif_coach`))
