@@ -160,8 +160,10 @@ class CdModuleCA extends ModuleGrid
         if (!parent::install() ||
             !$this->createTabsStatsCA() ||
             !$this->createTabsProspects() ||
+            !$this->createTabsAppel() ||
             !$this->createTableProspectAttribue() ||
             !$this->createTableProspect() ||
+            !$this->createTableAppel() ||
             !$this->createTableObjectifCoach() ||
             !$this->createTableAjoutSomme() ||
             !$this->alterGroupLangTable() ||
@@ -185,8 +187,10 @@ class CdModuleCA extends ModuleGrid
             !parent::uninstall() ||
             !$this->eraseTabsStatsCA() ||
             !$this->eraseTabsProspects() ||
+            !$this->eraseTabsAppel() ||
             !$this->eraseTableProspectAttribue() ||
             !$this->eraseTableProspect() ||
+            !$this->eraseTableAppel() ||
             !$this->eraseTableObjectifCoach() ||
             !$this->eraseTableAjoutSomme() ||
             !$this->removeCodeActionTable() ||
@@ -200,13 +204,37 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    private function createTabsAppel()
+    {
+        $tab = new Tab();
+        $tab->active = 1;
+        $names = array(1 => 'Appels', 'Appels');
+        foreach (Language::getLanguages() as $language) {
+            $tab->name[$language['id_lang']] = isset($names[$language['id_lang']]) ? $names[$language['id_lang']] : $names[1];
+        }
+        $tab->class_name = 'AdminAppel';
+        $tab->module = $this->name;
+        $tab->id_parent = Tab::getIdFromClassName('AdminParentStats');
+
+        return (bool)$tab->add();
+    }
+
+    private function eraseTabsAppel()
+    {
+        $id_tab = (int)Tab::getIdFromClassName('AdminAppel');
+        if ($id_tab) {
+            $tab = new Tab($id_tab);
+            $tab->delete();
+        }
+        return true;
+    }
+
     private function createTabsProspects()
     {
         $tab = new Tab();
         $tab->active = 1;
-        $names = array(1=>'Prospects', 'Prospects');
-        foreach (Language::getLanguages() as $language)
-        {
+        $names = array(1 => 'Prospects', 'Prospects');
+        foreach (Language::getLanguages() as $language) {
             $tab->name[$language['id_lang']] = isset($names[$language['id_lang']]) ? $names[$language['id_lang']] : $names[1];
         }
         $tab->class_name = 'AdminProspects';
@@ -219,8 +247,7 @@ class CdModuleCA extends ModuleGrid
     private function eraseTabsProspects()
     {
         $id_tab = (int)Tab::getIdFromClassName('AdminProspects');
-        if($id_tab)
-        {
+        if ($id_tab) {
             $tab = new Tab($id_tab);
             $tab->delete();
         }
@@ -233,7 +260,7 @@ class CdModuleCA extends ModuleGrid
         $this->context->controller->addJS($this->_path . 'views/js/compteur.js');
         $objectifCoach[] = CaTools::getObjectifCoach($this->context->employee->id);
         $objectif = CaTools::isObjectifAtteint($objectifCoach);
-        $objectif[0]['appels'] = (isset($_COOKIE['appelKeyyo']))?(int)$_COOKIE['appelKeyyo']:'0';
+        $objectif[0]['appels'] = (isset($_COOKIE['appelKeyyo'])) ? (int)$_COOKIE['appelKeyyo'] : '0';
 
         $this->smarty->assign(array(
             'objectif' => $objectif[0]
@@ -246,9 +273,8 @@ class CdModuleCA extends ModuleGrid
     {
         $tab = new Tab();
         $tab->active = 1;
-        $names = array(1=>'CA L&Sens', 'CA L&Sens');
-        foreach (Language::getLanguages() as $language)
-        {
+        $names = array(1 => 'CA L&Sens', 'CA L&Sens');
+        foreach (Language::getLanguages() as $language) {
             $tab->name[$language['id_lang']] = isset($names[$language['id_lang']]) ? $names[$language['id_lang']] : $names[1];
         }
         $tab->class_name = 'AdminCaLetSens';
@@ -261,8 +287,7 @@ class CdModuleCA extends ModuleGrid
     private function eraseTabsStatsCA()
     {
         $id_tab = (int)Tab::getIdFromClassName('AdminCaLetSens');
-        if($id_tab)
-        {
+        if ($id_tab) {
             $tab = new Tab($id_tab);
             $tab->delete();
         }
@@ -294,6 +319,28 @@ class CdModuleCA extends ModuleGrid
     private function eraseTableProspectAttribue()
     {
         return Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'prospect_attribue`');
+    }
+
+    private function createTableAppel()
+    {
+        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'appel` (
+        `id_appel` INT(12) NOT NULL AUTO_INCREMENT,
+        `id_employee` INT(12) NOT NULL,
+        `compteur` INT(12) NULL,
+        `date_upd` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (`id_appel`))
+        ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=' . $this->table_charset . ';';
+
+        if (!Db::getInstance()->execute($sql)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function eraseTableAppel()
+    {
+        return Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'appel`');
     }
 
     /**
@@ -998,7 +1045,7 @@ class CdModuleCA extends ModuleGrid
             $coach = Tools::getValue('coach');
             $code_action = Tools::getValue('order_code_action');
 
-            if (!empty($coach) && !empty($code_action) ) {
+            if (!empty($coach) && !empty($code_action)) {
                 $id_coach = $this->getIdCoach($coach);
                 $id_code_action = $this->getIdCodeAction($code_action);
 
