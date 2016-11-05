@@ -77,16 +77,17 @@ class ProspectClass extends ObjectModel
             return false;
         }
 
-        if (Db::getInstance()->getValue('SELECT `traite` FROM `ps_prospect` WHERE `id_customer` = ' . $id) == 'Oui') {
-            if (!Db::getInstance()->update('prospect', array('traite' => 'Non'), 'id_customer = ' . $id)) ;
-            {
+        $v = Db::getInstance()->getValue('SELECT `traite` FROM `ps_prospect` WHERE `id_customer` = ' . $id);
+        if ($v == 'non') {
+            if (!Db::getInstance()->update('prospect', array('traite' => 'oui'), 'id_customer = ' . (int)$id)) {
                 return false;
             }
         } else {
-            if (!Db::getInstance()->update('prospect', array('traite' => 'Oui'), 'id_customer = ' . (int)$id)) {
+            if (!Db::getInstance()->update('prospect', array('traite' => 'non'), 'id_customer = ' . (int)$id)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -96,13 +97,12 @@ class ProspectClass extends ObjectModel
         if (!ProspectClass::isProspectExistByIdCustomer($id)) {
             return false;
         }
-        if (Db::getInstance()->getValue('SELECT `injoignable` FROM `ps_prospect` WHERE `id_customer` = ' . $id) == 'Oui') {
-            if (!Db::getInstance()->update('prospect', array('injoignable' => 'Non'), 'id_customer = ' . $id)) ;
-            {
+        if (Db::getInstance()->getValue('SELECT `injoignable` FROM `ps_prospect` WHERE `id_customer` = ' . $id) == 'oui') {
+            if (!Db::getInstance()->update('prospect', array('injoignable' => 'non'), 'id_customer = ' . (int)$id)) {
                 return false;
             }
         } else {
-            if (!Db::getInstance()->update('prospect', array('injoignable' => 'Oui'), 'id_customer = ' . (int)$id)) {
+            if (!Db::getInstance()->update('prospect', array('injoignable' => 'oui'), 'id_customer = ' . (int)$id)) {
                 return false;
             }
         }
@@ -115,27 +115,33 @@ class ProspectClass extends ObjectModel
         if (!ProspectClass::isProspectExistByIdCustomer($id)) {
             return false;
         }
+        $c = Context::getContext();
+        $lastname = $c->employee->lastname;
 
         $midi_debut = date('H:i:s', strtotime('12:00:00'));
         $apresmidi_debut = date('H:i:s', strtotime('14:00:00'));
-        $soir_debut = date('H:i:s', strtotime('18:00:00'));
+        $soir_debut = date('H:i:s', strtotime('17:00:00'));
         $now = date('H:i:s');
         $prospect = ProspectClass::getProspectsByIdCu($id);
 
         $contacte = Tools::jsonDecode($prospect->contacte);
 
+        if (empty($contacte)) {
+            $prospect->traite ='non';
+        }
+
         switch ($now) {
             case ($now < $midi_debut) :
-                $contacte->matin[] = date('d-m-Y H:i:s');
+                $contacte->matin[] = date('\L\e d-m-Y \à H:i:s') . ' - ' . $lastname;
                 break;
             case ($now >= $midi_debut && $now < $apresmidi_debut) :
-                $contacte->midi[] = date('d-m-Y H:i:s');
+                $contacte->midi[] = date('\L\e d-m-Y \à H:i:s') . ' - ' . $lastname;
                 break;
             case ($now >= $apresmidi_debut && $now < $soir_debut):
-                $contacte->apres_midi[] = date('d-m-Y H:i:s');
+                $contacte->apres_midi[] = date('\L\e d-m-Y \à H:i:s') . ' - ' . $lastname;
                 break;
             case ($now >= $soir_debut) :
-                $contacte->soir[] = date('d-m-Y H:i:s');
+                $contacte->soir[] = date('\L\e d-m-Y \à H:i:s') . ' - ' . $lastname;
                 break;
             default :
         }
@@ -147,11 +153,11 @@ class ProspectClass extends ObjectModel
             (isset($contacte->soir) && count($contacte->soir) > 1) &&
             (isset($contacte->repondeur) && count($contacte->repondeur > 2))
         ) {
-            $prospect->injoignable = 'Oui';
+            $prospect->injoignable = 'oui';
         }
 
         $prospect->contacte = Tools::jsonEncode($contacte);
-        $prospect->traite = 'Non';
+
         $prospect->update();
     }
 
@@ -161,9 +167,13 @@ class ProspectClass extends ObjectModel
         if (!ProspectClass::isProspectExistByIdCustomer($id)) {
             return false;
         }
+
+        $c = Context::getContext();
+        $lastname = $c->employee->lastname;
+
         $prospect = ProspectClass::getProspectsByIdCu($id);
         $contacte = Tools::jsonDecode($prospect->contacte);
-        $contacte->repondeur[] = date('d-m-Y H:i:s');
+        $contacte->repondeur[] = date('\L\e d-m-Y \à H:i:s') . ' - ' . $lastname;
         $prospect->contacte = Tools::jsonEncode($contacte);
 
         if (
@@ -173,7 +183,7 @@ class ProspectClass extends ObjectModel
             (isset($contacte->soir) && count($contacte->soir) > 1) &&
             (isset($contacte->repondeur) && count($contacte->repondeur > 2))
         ) {
-            $prospect->injoignable = 'Oui';
+            $prospect->injoignable = 'oui';
         }
         $prospect->update();
     }
@@ -201,8 +211,8 @@ class ProspectClass extends ObjectModel
                 WHERE `id_prospect_attribue`
                 NOT IN 
                 (SELECT `id_prospect_attribue` FROM `ps_prospect_attribue` )
-                AND `traite` != "Oui"
-                AND `injoignable` = "Non"';
+                AND `traite` != "oui"
+                AND `injoignable` = "non"';
         $req = Db::getInstance()->executeS($sql);
 
         return $req;

@@ -67,11 +67,11 @@
                                     <i class="icon-pencil"></i> Traité
                                 </a>
                             </li>
-                            <li>
-                                <a href="index.php?controller=AdminCustomers&amp;token={$token|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;injoignable" title="Injoignable" class="delete">
-                                    <i class="icon-trash"></i> Injoignable
-                                </a>
-                            </li>
+                            {*<li>*}
+                                {*<a href="index.php?controller=AdminCustomers&amp;token={$token|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;injoignable" title="Injoignable" class="delete">*}
+                                    {*<i class="icon-trash"></i> Injoignable*}
+                                {*</a>*}
+                            {*</li>*}
                             <li>
                                 <a href="index.php?controller=AdminCustomers&amp;token={$token|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;repondeur" title="Répondeur" class="default">
                                     <i class="icon-asterisk"></i> Répondeur

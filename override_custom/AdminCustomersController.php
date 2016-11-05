@@ -46,7 +46,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
 
         $this->addRowAction('contact'); // module cdmoduleca
         $this->addRowAction('ctraite'); // module cdmoduleca
-        $this->addRowAction('cinjoignable'); // module cdmoduleca
+//        $this->addRowAction('cinjoignable'); // module cdmoduleca
         $this->addRowAction('crepondeur'); // module cdmoduleca
         $this->addRowAction('edit');
         $this->addRowAction('view');
@@ -60,13 +60,13 @@ class AdminCustomersController extends AdminCustomersControllerCore
         );
 
         $traite = array(
-            'Oui' => 'Oui',
-            'Non' => 'Non',
-            'Prospect' => 'Prospect'
+            'oui' => 'oui',
+            'non' => 'non',
+            'Nouveau' => 'Nouveau'
         );
         $injoignable = array(
-            'Oui' => 'Oui',
-            'Non' => 'Non'
+            'oui' => 'oui',
+            'non' => 'non'
         );
 
         $this->context = Context::getContext();
@@ -214,6 +214,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
 
         // Module cdmoduleca
         if (Tools::isSubmit('traite')) {
+            ProspectClass::setContact();
             ProspectClass::toggleTraite();
         }
         if (Tools::isSubmit('injoignable')) {
@@ -675,31 +676,31 @@ class AdminCustomersController extends AdminCustomersControllerCore
         if (isset($contacte->matin)) {
             $messages['matin'] = (count($contacte->matin) > 1) ? '2' : count($contacte->matin);
             foreach ($contacte->matin as $matin) {
-                $v['matin'] .= 'Matin : ' . date('à H\hi \l\e d-m', strtotime($matin)) . PHP_EOL;
+                $v['matin'] .= $matin . PHP_EOL;
             }
         }
         if (isset($contacte->midi)) {
             $messages['midi'] = (count($contacte->midi) > 1) ? '2' : count($contacte->midi);
             foreach ($contacte->midi as $midi) {
-                $v['midi'] .= 'Midi : ' . date('à H\hi \l\e d-m', strtotime($midi)) . PHP_EOL;
+                $v['midi'] .= $midi . PHP_EOL;
             }
         }
         if (isset($contacte->apres_midi)) {
             $messages['apres_midi'] = (count($contacte->apres_midi) > 1) ? '2' : count($contacte->apres_midi);
             foreach ($contacte->apres_midi as $apmidi) {
-                $v['apres_midi'] .= 'Après-midi : ' . date('à H\hi \l\e d-m', strtotime($apmidi)) . PHP_EOL;
+                $v['apres_midi'] .= $apmidi . PHP_EOL;
             }
         }
         if (isset($contacte->soir)) {
             $messages['soir'] .= (count($contacte->soir) > 1) ? '2' : count($contacte->soir);
             foreach ($contacte->soir as $soir) {
-                $v['soir'] .= 'Soir : ' . date('à H\hi \l\e d-m', strtotime($soir)) . PHP_EOL;
+                $v['soir'] .= $soir . PHP_EOL;
             }
         }
         if (isset($contacte->repondeur)) {
             $messages['repondeur'] = (count($contacte->repondeur) > 2) ? '3' : count($contacte->repondeur);
             foreach ($contacte->repondeur as $repondeur) {
-                $v['repondeur'] .= 'Répondeur : ' . date('à H\hi \l\e d-m', strtotime($repondeur)) . PHP_EOL;
+                $v['repondeur'] .= $repondeur . PHP_EOL;
             }
         }
 
@@ -707,11 +708,11 @@ class AdminCustomersController extends AdminCustomersControllerCore
         <table>
             <tbody>
                 <tr class="cd_contacte">
-                    <td title="' . $v['matin'] . '" class="cd_cel cd_color_' . $messages['matin'] . '"></td>
-                    <td title="' . $v['midi'] . '" class="cd_cel cd_color_' . $messages['midi'] . '"></td>
-                    <td title="' . $v['apres_midi'] . '" class="cd_cel cd_color_' . $messages['apres_midi'] . '"></td>
-                    <td title="' . $v['soir'] . '" class="cd_cel cd_color_' . $messages['soir'] . '"></td>
-                    <td title="' . $v['repondeur'] . '" class="cd_cel cd_color_rep_' . $messages['repondeur'] . '"></td>
+                    <td title="Contact Matin' . PHP_EOL . $v['matin'] . '" class="cd_cel cd_color_' . $messages['matin'] . '"></td>
+                    <td title="Contact Midi' . PHP_EOL . $v['midi'] . '" class="cd_cel cd_color_' . $messages['midi'] . '"></td>
+                    <td title="Contact Aprés-Midi' . PHP_EOL . $v['apres_midi'] . '" class="cd_cel cd_color_' . $messages['apres_midi'] . '"></td>
+                    <td title="Contact Soir' . PHP_EOL . $v['soir'] . '" class="cd_cel cd_color_' . $messages['soir'] . '"></td>
+                    <td title="Contact Répondeur' . PHP_EOL . $v['repondeur'] . '" class="cd_cel cd_color_rep_' . $messages['repondeur'] . '"></td>
                 </tr>
             </tbody>
         </table>

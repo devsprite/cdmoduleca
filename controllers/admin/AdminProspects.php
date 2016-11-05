@@ -243,8 +243,8 @@ class AdminProspectsController extends ModuleAdminController
                 $p = new ProspectClass();
                 $p->id_customer = $c->id;
                 $p->id_prospect_attribue = $ap->id;
-                $p->traite = 'Prospect';
-                $p->injoignable = 'Non';
+                $p->traite = 'Nouveau';
+                $p->injoignable = 'non';
                 $p->add();
             }else{
                 $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id .'. Corriger les informations de ce client.');

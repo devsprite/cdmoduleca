@@ -155,7 +155,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['caAjuste'] = ($datasEmployees[$employee['id_employee']]['ajustement'])
                 ? ($datasEmployees[$employee['id_employee']]['caTotal']
-                    - $datasEmployees[$employee['id_employee']]['ajustement']) : '';
+                    + $datasEmployees[$employee['id_employee']]['ajustement']) : '';
 
             $datasEmployees[$employee['id_employee']]['caDejaInscrit'] =
                 CaTools::getCaDejaInscrit($employee['id_employee'], $this->getDateBetween());

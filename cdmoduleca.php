@@ -235,8 +235,6 @@ class CdModuleCA extends ModuleGrid
         $objectif = CaTools::isObjectifAtteint($objectifCoach);
         $objectif[0]['appels'] = (isset($_COOKIE['appelKeyyo']))?(int)$_COOKIE['appelKeyyo']:'0';
 
-//        ddd($objectif[0]);
-
         $this->smarty->assign(array(
             'objectif' => $objectif[0]
         ));
