@@ -505,9 +505,8 @@ class AdminCustomersController extends AdminCustomersControllerCore
             $buffer = fgets($fp, 4096);
             fclose($fp);
 
+            CaTools::setCompteurAppels($this->context->employee->id);
             if ($buffer == 'OK') {
-                $appels = (int)$_COOKIE['appelKeyyo'] + 1;
-                setcookie('appelKeyyo', $appels, strtotime(date('Y-m-d 23:59:59')));
                 $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $callee . ' en cours.'));
                 die($return);
             } else {

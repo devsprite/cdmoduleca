@@ -1,5 +1,7 @@
 <?php
 
+require_once(dirname(__FILE__) . '/AppelClass.php');
+
 class CaTools
 {
     public static function getEmployees($active = null, $id = null)
@@ -537,4 +539,20 @@ class CaTools
         return round($prime, 2);
     }
 
+    public static function setCompteurAppels($id)
+    {
+        $compteur = AppelClass::getCompteur((int)$id, date('Y-m-d'));
+        if (empty($compteur['compteur'])) {
+            $appels = new AppelClass();
+            $appels->compteur = 1;
+            $appels->id_employee = (int)$id;
+            $appels->save();
+            setcookie('appelKeyyo', '1', strtotime(date('Y-m-d 23:59:59')));
+        } else {
+            $compteur['compteur']++;
+            Db::getInstance()->update('appel', array('compteur' => $compteur['compteur']),
+                '`id_appel` = ' . (int)$compteur['id_appel']);
+            setcookie('appelKeyyo', $compteur['compteur']++, strtotime(date('Y-m-d 23:59:59')));
+        }
+    }
 }
