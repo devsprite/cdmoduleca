@@ -626,8 +626,8 @@ class AdminCaLetSensController extends ModuleAdminController
     {
         $d = $this->getDateBetween();
         $days = Configuration::get('CDMODULECA_ORDERS_STATE_JOURS');
-        $d_start = "'" . date('Y-m-d H:i:s', strtotime(substr($d, 2, 19) . ' - ' . $days . ' days')) . "'";
-        $d_end = "'" . date('Y-m-d H:i:s', strtotime(substr($d, 28, 19) . ' - ' . $days . ' days')) . "'";
+        $d_start = "'" . date('Y-m-d H:i:s', strtotime(Tools::substr($d, 2, 19) . ' - ' . $days . ' days')) . "'";
+        $d_end = "'" . date('Y-m-d H:i:s', strtotime(Tools::substr($d, 28, 19) . ' - ' . $days . ' days')) . "'";
 
         return $d_start . ' AND ' . $d_end;
     }
@@ -763,15 +763,15 @@ class AdminCaLetSensController extends ModuleAdminController
         $pdf->AddPage();
 
         // set some text to print
-        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/pdf/content.tpl');
+        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/pdf/content.tpl');
         $pdf->writeHTML($html_content);
 
         $pdf->AddPage();
-        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/pdf/main_table_coachs.tpl');
+        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/pdf/main_table_coachs.tpl');
         $pdf->writeHTML($html_content);
 
         $pdf->AddPage();
-        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/pdf/main_table_groupes.tpl');
+        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/pdf/main_table_groupes.tpl');
         $pdf->writeHTML($html_content);
         // ---------------------------------------------------------
 
@@ -795,7 +795,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
     private function nameFile()
     {
-        $name = substr($this->getDateBetween(), 2, 10) . '_' . substr($this->getDateBetween(), 28, 10) . '_';
+        $name = Tools::substr($this->getDateBetween(), 2, 10) . '_' . Tools::substr($this->getDateBetween(), 28, 10) . '_';
         if ($this->idFilterCoach == 0) {
             $name .= 'tous_les_coachs';
         } else {

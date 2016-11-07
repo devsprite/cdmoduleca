@@ -49,7 +49,7 @@ class AdminAppelController extends ModuleAdminController
         $this->path_tpl = _PS_MODULE_DIR_ . 'cdmoduleca/views/templates/admin/appel/';
         $this->original_filter = '';
         $this->_select = 'a.*, CONCAT(lastname, " - ", firstname) as name';
-        $this->_join = 'LEFT JOIN `ps_employee` AS e ON a.`id_employee` = e.`id_employee` ';
+        $this->_join = 'LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.`id_employee` = e.`id_employee` ';
 
         $this->fields_list = array(
             'id_appel' => array(

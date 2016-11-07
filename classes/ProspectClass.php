@@ -59,11 +59,11 @@ class ProspectClass extends ObjectModel
     {
         $order = ($index_id == 0) ? 'DESC' : 'ASC';
         $sql = 'SELECT cu.`id_customer`, CONCAT(UPPER(cu.`lastname`)," ", LOWER(cu.`firstname`)) AS nom, cu.`date_add`,
-          (SELECT GROUP_CONCAT(`id_group` SEPARATOR ", ") FROM `ps_customer_group` AS pcg
+          (SELECT GROUP_CONCAT(`id_group` SEPARATOR ", ") FROM `' . _DB_PREFIX_ . 'customer_group` AS pcg
            WHERE pcg.`id_customer` = cu.`id_customer` GROUP BY cu.`id_customer`) AS id_group
-          FROM `ps_customer` AS cu
-          LEFT JOIN `ps_customer_group` AS cg ON cu.`id_customer` = cg.`id_customer`
-          LEFT JOIN `ps_prospect` AS p ON cg.`id_customer` = p.`id_customer`
+          FROM `' . _DB_PREFIX_ . 'customer` AS cu
+          LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON cu.`id_customer` = cg.`id_customer`
+          LEFT JOIN `' . _DB_PREFIX_ . 'prospect` AS p ON cg.`id_customer` = p.`id_customer`
           WHERE cg.`id_group` = "' . (int)$id_group . '"
           AND cu.id_customer > ' . $index_id . '
           AND cu.`deleted` = 0';
@@ -78,10 +78,10 @@ class ProspectClass extends ObjectModel
 
     public static function getProspectsByIdPa($id_prospect_attribue)
     {
-        $sql = 'SELECT p.* , pa.*, cu.firstname, cu.lastname, e.lastname as coach FROM `ps_prospect` AS p 
-                LEFT JOIN `ps_prospect_attribue` AS pa ON p.`id_prospect_attribue` = pa.`id_prospect_attribue`
-                LEFT JOIN `ps_customer` AS cu ON p.`id_customer` = cu.`id_customer`
-                LEFT JOIN `ps_employee` AS e ON pa.`id_employee` = e.`id_employee`
+        $sql = 'SELECT p.* , pa.*, cu.firstname, cu.lastname, e.lastname as coach FROM `' . _DB_PREFIX_ . 'prospect` AS p 
+                LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS pa ON p.`id_prospect_attribue` = pa.`id_prospect_attribue`
+                LEFT JOIN `' . _DB_PREFIX_ . 'customer` AS cu ON p.`id_customer` = cu.`id_customer`
+                LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON pa.`id_employee` = e.`id_employee`
                 WHERE p.`id_prospect_attribue` = ' . $id_prospect_attribue;
         $req = Db::getInstance()->executeS($sql);
 
@@ -90,7 +90,7 @@ class ProspectClass extends ObjectModel
 
     public static function getLastCustomer()
     {
-        $sql = 'SELECT MAX(`id_customer`) FROM `ps_prospect`';
+        $sql = 'SELECT MAX(`id_customer`) FROM `' . _DB_PREFIX_ . 'prospect`';
         $req = DB::getInstance()->getValue($sql);
 
         return (int)$req;
@@ -103,7 +103,7 @@ class ProspectClass extends ObjectModel
             return false;
         }
 
-        $v = Db::getInstance()->getValue('SELECT `traite` FROM `ps_prospect` WHERE `id_customer` = ' . $id);
+        $v = Db::getInstance()->getValue('SELECT `traite` FROM `' . _DB_PREFIX_ . 'prospect` WHERE `id_customer` = ' . $id);
         if ($v == 'non') {
             if (!Db::getInstance()->update('prospect', array('traite' => 'oui'), 'id_customer = ' . (int)$id)) {
                 return false;
@@ -123,7 +123,7 @@ class ProspectClass extends ObjectModel
         if (!ProspectClass::isProspectExistByIdCustomer($id)) {
             return false;
         }
-        if (Db::getInstance()->getValue('SELECT `injoignable` FROM `ps_prospect` WHERE `id_customer` = ' . $id) == 'oui') {
+        if (Db::getInstance()->getValue('SELECT `injoignable` FROM `' . _DB_PREFIX_ . 'prospect` WHERE `id_customer` = ' . $id) == 'oui') {
             if (!Db::getInstance()->update('prospect', array('injoignable' => 'non'), 'id_customer = ' . (int)$id)) {
                 return false;
             }
@@ -153,7 +153,7 @@ class ProspectClass extends ObjectModel
         $contacte = Tools::jsonDecode($prospect->contacte);
 
         if (empty($contacte)) {
-            $prospect->traite ='non';
+            $prospect->traite = 'non';
         }
 
         switch ($now) {
@@ -216,7 +216,7 @@ class ProspectClass extends ObjectModel
 
     private static function getProspectsByIdCu($id)
     {
-        $sql = 'SELECT `id_prospect` FROM `ps_prospect` WHERE `id_customer` = ' . (int)$id;
+        $sql = 'SELECT `id_prospect` FROM `' . _DB_PREFIX_ . 'prospect` WHERE `id_customer` = ' . (int)$id;
         $req = Db::getInstance()->getValue($sql);
         $p = new ProspectClass($req);
 
@@ -225,7 +225,7 @@ class ProspectClass extends ObjectModel
 
     public static function isProspectExistByIdCustomer($id)
     {
-        $sql = 'SELECT `id_prospect` FROM `ps_prospect` WHERE `id_customer` = ' . (int)$id;
+        $sql = 'SELECT `id_prospect` FROM `' . _DB_PREFIX_ . 'prospect` WHERE `id_customer` = ' . (int)$id;
         $req = Db::getInstance()->getValue($sql);
 
         return $req;
@@ -233,10 +233,10 @@ class ProspectClass extends ObjectModel
 
     public static function getProspectsIsole()
     {
-        $sql = 'SELECT * FROM `ps_prospect` 
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'prospect` 
                 WHERE `id_prospect_attribue`
                 NOT IN 
-                (SELECT `id_prospect_attribue` FROM `ps_prospect_attribue` )
+                (SELECT `id_prospect_attribue` FROM `' . _DB_PREFIX_ . 'prospect_attribue` )
                 AND `traite` != "oui"
                 AND `injoignable` = "non"';
         $req = Db::getInstance()->executeS($sql);

@@ -222,7 +222,7 @@ class GridClass extends Module
           IF((o.valid) > 0, "", "Non") AS valid,  
           (SELECT ca.name FROM ps_code_action AS ca WHERE o.id_code_action = ca.id_code_action) as CodeAction,
           (SELECT osl.name FROM ps_order_state_lang AS osl WHERE id_lang = "' . $data['lang'] . '" AND osl.id_order_state = o.current_state ) as current_state ,
-          IF((SELECT so.id_order FROM `ps_orders` so WHERE so.id_customer = o.id_customer 
+          IF((SELECT so.id_order FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.id_customer = o.id_customer 
           AND so.id_order < o.id_order LIMIT 1) > 0, "", "Oui") as new
 				FROM ' . _DB_PREFIX_ . 'orders AS o ';
         $sql .= $filterGroupe;

@@ -52,8 +52,8 @@ class ProspectAttribueClass extends ObjectModel
             $filter = ' AND pa.`id_employee` = ' . (int)$id_employee;
         }
 
-        $sql = 'SELECT pa.*, e.lastname, e.firstname FROM `ps_prospect_attribue` AS pa
-                LEFT JOIN `ps_employee` AS e ON pa.id_employee = e.id_employee
+        $sql = 'SELECT pa.*, e.lastname, e.firstname FROM `' . _DB_PREFIX_ . 'prospect_attribue` AS pa
+                LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON pa.id_employee = e.id_employee
                 WHERE `date_debut` BETWEEN ' . $getDateBetween;
         $sql .= $filter;
         $sql .= ' ORDER BY e.`id_employee` ASC, `date_debut` DESC';
@@ -64,7 +64,7 @@ class ProspectAttribueClass extends ObjectModel
 
     public static function isExist($id)
     {
-        $sql = 'SELECT `id_prospect_attribue` FROM `ps_prospect_attribue`
+        $sql = 'SELECT `id_prospect_attribue` FROM `' . _DB_PREFIX_ . 'prospect_attribue`
                 WHERE `id_prospect_attribue` = ' . pSQL($id);
         $req = Db::getInstance()->getRow($sql);
 
@@ -73,13 +73,13 @@ class ProspectAttribueClass extends ObjectModel
 
     public static function getNbrProspectsAttriByCoach($id_employee = 0, $getDateBetween)
     {
-        $filter ='';
-        if ($id_employee != 0 ) {
-            $filter = ' AND `id_employee` = ' . (int)$id_employee .' ';
+        $filter = '';
+        if ($id_employee != 0) {
+            $filter = ' AND `id_employee` = ' . (int)$id_employee . ' ';
         }
-        $sql = 'SELECT SUM(`nbr_prospect_attribue`) FROM `ps_prospect_attribue`
+        $sql = 'SELECT SUM(`nbr_prospect_attribue`) FROM `' . _DB_PREFIX_ . 'prospect_attribue`
                 WHERE `date_debut` BETWEEN ' . $getDateBetween . '
-                AND `date_fin` BETWEEN ' .$getDateBetween ;
+                AND `date_fin` BETWEEN ' . $getDateBetween;
         $sql .= $filter;
         $req = Db::getInstance()->getValue($sql);
 

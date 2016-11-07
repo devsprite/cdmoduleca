@@ -151,7 +151,7 @@ class AdminProspectsController extends ModuleAdminController
             // Enregistrement d'une nouvelle ligne
         } elseif ($isOk) {
             foreach ($_POST as $key => $nbrProspect) {
-                if (substr($key, 0, 3) == 'em_' && !empty($nbrProspect) && $isOk) {
+                if (Tools::substr($key, 0, 3) == 'em_' && !empty($nbrProspect) && $isOk) {
                     if (!Validate::isInt(str_replace('em_', '', $key)) ||
                         !Validate::isInt($nbrProspect) ||
                         $nbrProspect <= 0
@@ -214,16 +214,16 @@ class AdminProspectsController extends ModuleAdminController
             SELECT gl.`id_group`, e.`id_employee`, e.`lastname`, e.`firstname`, pa.`nbr_prospect_attribue`,pa.`date_debut`,
              pa.`date_fin`,
              (  SELECT COUNT(ppr.`id_prospect_attribue`)
-                FROM `ps_prospect` as ppr
-                LEFT JOIN `ps_prospect_attribue` AS ppa ON ppr.`id_prospect_attribue` = ppa.`id_prospect_attribue`
+                FROM `' . _DB_PREFIX_ . 'prospect` as ppr
+                LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS ppa ON ppr.`id_prospect_attribue` = ppa.`id_prospect_attribue`
                 WHERE e.`id_employee` = ppa.`id_employee`
                 AND ppr.`traite` !=1
                 AND ppr.`injoignable` !=1) AS total_prospect
                 
-            FROM `ps_employee` AS e 
-            LEFT JOIN `ps_prospect_attribue` AS pa ON e.`id_employee` = pa.`id_employee`
-            LEFT JOIN `ps_prospect` AS p ON pa.`id_prospect_attribue` = p.`id_prospect_attribue`
-            LEFT JOIN `ps_group_lang` as gl ON gl.`id_employee` = e.`id_employee`
+            FROM `' . _DB_PREFIX_ . 'employee` AS e 
+            LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS pa ON e.`id_employee` = pa.`id_employee`
+            LEFT JOIN `' . _DB_PREFIX_ . 'prospect` AS p ON pa.`id_prospect_attribue` = p.`id_prospect_attribue`
+            LEFT JOIN `' . _DB_PREFIX_ . 'group_lang` as gl ON gl.`id_employee` = e.`id_employee`
             ';
         $sql .= $actif;
         $sql .= ' GROUP BY e.`id_employee`';
@@ -381,8 +381,8 @@ class AdminProspectsController extends ModuleAdminController
     public function getNbrNouveauProspects($id_customer)
     {
         $sql = 'SELECT COUNT(c.`id_customer`) AS total
-                FROM `ps_customer` as c 
-                LEFT JOIN `ps_customer_group` AS cg ON c.`id_customer` = cg.`id_customer`
+                FROM `' . _DB_PREFIX_ . 'customer` as c 
+                LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON c.`id_customer` = cg.`id_customer`
                 WHERE c.`id_customer` > ' . (int)$id_customer . '
                 AND cg.`id_group` = 1
                 AND c.`deleted` = 0';
@@ -438,7 +438,7 @@ class AdminProspectsController extends ModuleAdminController
 
     private function getLastIdGroupDefaut()
     {
-        $sql = 'SELECT MAX(`id_customer`) FROM `ps_customer_group`
+        $sql = 'SELECT MAX(`id_customer`) FROM `' . _DB_PREFIX_ . 'customer_group`
                 WHERE `id_group` = 1 ';
 
         $req = Db::getInstance()->getValue($sql);
@@ -448,7 +448,7 @@ class AdminProspectsController extends ModuleAdminController
 
     private function nbrProspectsDisponible($index_id)
     {
-        $sql = 'SELECT COUNT(`id_customer`) FROM `ps_customer_group` 
+        $sql = 'SELECT COUNT(`id_customer`) FROM `' . _DB_PREFIX_ . 'customer_group` 
                 WHERE `id_customer` > ' . $index_id . '
                 AND `id_group` = 1 ';
         $req = Db::getInstance()->getValue($sql);
@@ -458,7 +458,7 @@ class AdminProspectsController extends ModuleAdminController
 
     private function deleteProspectsNonTraite($id_prospect_attribue)
     {
-        $sql = 'DELETE FROM `ps_prospect`
+        $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'prospect`
                 WHERE `id_prospect_attribue` = ' . (int)$id_prospect_attribue . '
                 AND `traite` = "Prospect"
                 AND `injoignable` = "Non"

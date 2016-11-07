@@ -304,7 +304,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
         $messages = CustomerThread::getCustomerMessages((int)$customer->id);
         $total_messages = count($messages);
         for ($i = 0; $i < $total_messages; $i++) {
-            $messages[$i]['message'] = substr(strip_tags(html_entity_decode($messages[$i]['message'], ENT_NOQUOTES, 'UTF-8')), 0, 75);
+            $messages[$i]['message'] = Tools::substr(strip_tags(html_entity_decode($messages[$i]['message'], ENT_NOQUOTES, 'UTF-8')), 0, 75);
             $messages[$i]['date_add'] = Tools::displayDate($messages[$i]['date_add'], null, true);
         }
 
@@ -446,7 +446,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
         $phoneNumbers = explode(':', $number);
         foreach ($phoneNumbers as $phoneNumber) {
             $NumberK = $this->sanitizePhoneNumber($phoneNumber);
-            $ln = strlen($NumberK);
+            $ln = Tools::strlen($NumberK);
 
             $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
 
@@ -472,7 +472,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
     {
         $pattern = str_split(Configuration::get('KEYYO_NUMBER_FILTER'));
         $number = str_replace($pattern, '', $number);
-        if (substr($number, 0, 1) != '0') {
+        if (Tools::substr($number, 0, 1) != '0') {
             $number = '0' . $number;
         }
 
@@ -545,7 +545,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
     {
         $keyyo_link = '';
         $NumberK = $this->sanitizePhoneNumber($phoneNumber);
-        $ln = strlen($NumberK);
+        $ln = Tools::strlen($NumberK);
 
         $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
 
