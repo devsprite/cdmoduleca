@@ -468,7 +468,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
             $keyyo_link .= '&CALLEE=' . $callee;
             $keyyo_link .= '&CALLE_NAME=' . $calle_name;
 
-
+            $http_response_header = array();
             $fp = fopen($keyyo_link, 'r');
             $buffer = fgets($fp, 4096);
             $log['reponseHttp'] = $http_response_header[0];

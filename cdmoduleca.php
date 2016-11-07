@@ -216,7 +216,8 @@ class CdModuleCA extends ModuleGrid
         $tab->active = 1;
         $names = array(1 => 'Appels', 'Appels');
         foreach (Language::getLanguages() as $language) {
-            $tab->name[$language['id_lang']] = isset($names[$language['id_lang']]) ? $names[$language['id_lang']] : $names[1];
+            $tab->name[$language['id_lang']] = isset($names[$language['id_lang']])
+                ? $names[$language['id_lang']] : $names[1];
         }
         $tab->class_name = 'AdminAppel';
         $tab->module = $this->name;
@@ -241,7 +242,8 @@ class CdModuleCA extends ModuleGrid
         $tab->active = 1;
         $names = array(1 => 'Prospects', 'Prospects');
         foreach (Language::getLanguages() as $language) {
-            $tab->name[$language['id_lang']] = isset($names[$language['id_lang']]) ? $names[$language['id_lang']] : $names[1];
+            $tab->name[$language['id_lang']] = isset($names[$language['id_lang']])
+                ? $names[$language['id_lang']] : $names[1];
         }
         $tab->class_name = 'AdminProspects';
         $tab->module = $this->name;
@@ -282,7 +284,8 @@ class CdModuleCA extends ModuleGrid
         $tab->active = 1;
         $names = array(1 => 'CA L&Sens', 'CA L&Sens');
         foreach (Language::getLanguages() as $language) {
-            $tab->name[$language['id_lang']] = isset($names[$language['id_lang']]) ? $names[$language['id_lang']] : $names[1];
+            $tab->name[$language['id_lang']] = isset($names[$language['id_lang']])
+                ? $names[$language['id_lang']] : $names[1];
         }
         $tab->class_name = 'AdminCaLetSens';
         $tab->module = $this->name;
@@ -1079,8 +1082,8 @@ class CdModuleCA extends ModuleGrid
         $this->idFilterCodeAction = $this->context->cookie->cdmoduleca_id_filter_code_action;
         $this->commandeValid = $this->context->cookie->cdmoculeca_filter_commande;
 
-        $filterGroupe = ' LEFT JOIN ps_customer_group AS cg ON o.id_customer = cg.id_customer
-                LEFT JOIN ps_group_lang AS gl ON gl.id_group = cg.id_group';
+        $filterGroupe = ' LEFT JOIN ' . _DB_PREFIX_ . 'customer_group AS cg ON o.id_customer = cg.id_customer
+                LEFT JOIN ' . _DB_PREFIX_ . 'group_lang AS gl ON gl.id_group = cg.id_group';
 
         $idGroupEmployee = $this->getGroupeEmployee($this->idFilterCoach);
 
@@ -1109,13 +1112,16 @@ class CdModuleCA extends ModuleGrid
           amount as avoir,
           gl.name AS groupe,
           CONCAT ( ROUND(o.total_products - o.total_discounts_tax_excl,2), " €") AS hthp,
-          (SELECT e.lastname FROM ps_employee AS e WHERE o.id_employee = e.id_employee) AS id_employee,
-          (SELECT UCASE(c.lastname) FROM ps_customer AS c WHERE o.id_customer = c.id_customer) AS id_customer,
+          (SELECT e.lastname FROM ' . _DB_PREFIX_ . 'employee AS e WHERE o.id_employee = e.id_employee) AS id_employee,
+          (SELECT UCASE(c.lastname) FROM ' . _DB_PREFIX_ . 'customer AS c 
+          WHERE o.id_customer = c.id_customer) AS id_customer,
           o.date_add,
           o.date_upd,
           IF((o.valid) > 0, "", "Non") AS valid,
-          (SELECT ca.name FROM ps_code_action AS ca WHERE o.id_code_action = ca.id_code_action) as CodeAction,
-          (SELECT osl.name FROM ps_order_state_lang AS osl WHERE id_lang = "' . $this->lang . '" AND osl.id_order_state = o.current_state ) as current_state ,
+          (SELECT ca.name FROM ' . _DB_PREFIX_ . 'code_action AS ca 
+          WHERE o.id_code_action = ca.id_code_action) as CodeAction,
+          (SELECT osl.name FROM ' . _DB_PREFIX_ . 'order_state_lang AS osl 
+          WHERE id_lang = "' . $this->lang . '" AND osl.id_order_state = o.current_state ) as current_state ,
           IF((SELECT so.id_order FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.id_customer = o.id_customer
           AND so.id_order < o.id_order LIMIT 1) > 0, "", "Oui") as new
 				FROM ' . _DB_PREFIX_ . 'orders AS o ';
@@ -1130,7 +1136,8 @@ class CdModuleCA extends ModuleGrid
 
         if (Validate::IsName($this->_sort)) {
             $this->query .= ' ORDER BY `' . bqSQL($this->_sort) . '`';
-            if (isset($this->_direction) && (Tools::strtoupper($this->_direction) == 'ASC' || Tools::strtoupper($this->_direction) == 'DESC'))
+            if (isset($this->_direction) && (Tools::strtoupper($this->_direction) == 'ASC' ||
+                    Tools::strtoupper($this->_direction) == 'DESC'))
                 $this->query .= ' ' . pSQL($this->_direction);
         }
 
@@ -1176,7 +1183,8 @@ class CdModuleCA extends ModuleGrid
 
     public function getGroupeEmployee($idFilterCoach)
     {
-        $sql = 'SELECT id_group FROM ps_group_lang WHERE id_lang = "' . $this->lang . '" AND id_employee = ' . (int)$idFilterCoach;
+        $sql = 'SELECT id_group FROM ' . _DB_PREFIX_ . 'group_lang 
+        WHERE id_lang = "' . $this->lang . '" AND id_employee = ' . (int)$idFilterCoach;
         return Db::getInstance()->getValue($sql);
     }
 }

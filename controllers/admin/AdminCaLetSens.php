@@ -144,7 +144,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $this->module->lang),
             'coach' => new Employee($this->idFilterCoach),
             'filterCodeAction' => $this->getCodeActionByID(),
-            'nbrJourOuvre' => CaTools::get_nb_open_days($this->getDateBetween()),
+            'nbrJourOuvre' => CaTools::getNbOpenDays($this->getDateBetween()),
             'primeFichierTotal' => CaTools::primeFichier(0, $this->getDateBetween()),
             'primeFichierCoach' => CaTools::primeFichier($this->idFilterCoach, $this->getDateBetween()),
         ));
@@ -211,10 +211,10 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['CaProsp'] = ($caProsp) ? $caProsp : '';
 
             $datasEmployees[$employee['id_employee']]['PourcCaProspect'] =
-                CaTools::PourcCaProspect($datasEmployees[$employee['id_employee']]);
+                CaTools::pourcCaProspect($datasEmployees[$employee['id_employee']]);
 
             $datasEmployees[$employee['id_employee']]['PourcCaFID'] =
-                CaTools::PourcCaFID($datasEmployees[$employee['id_employee']]);
+                CaTools::pourcCaFID($datasEmployees[$employee['id_employee']]);
 
             $datasEmployees[$employee['id_employee']]['caFidTotal'] =
                 CaTools::getCaDejaInscrit($employee['id_employee'], $this->getDateBetween());

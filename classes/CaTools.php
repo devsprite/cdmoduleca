@@ -1,29 +1,30 @@
 <?php
 /**
-* 2007-2016 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author Dominique <dominique@chez-dominique.fr>
-*  @copyright  2007-2016 Chez-dominique
-*/
+ * 2007-2016 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author Dominique <dominique@chez-dominique.fr>
+ * @copyright  2007-2016 Chez-dominique
+ */
 
-if (!defined('_PS_VERSION_'))
+if (!defined('_PS_VERSION_')) {
     exit;
+}
 
 require_once(dirname(__FILE__) . '/AppelClass.php');
 
@@ -202,7 +203,7 @@ class CaTools
 
     public static function getAjoutSommeById($id)
     {
-        $sql = 'SELECT * FROM ps_ajout_somme WHERE id_ajout_somme = ' . (int)$id;
+        $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'ajout_somme WHERE id_ajout_somme = ' . (int)$id;
 
         return Db::getInstance()->getRow($sql);
     }
@@ -223,7 +224,7 @@ class CaTools
 
     public static function getObjectifById($id)
     {
-        $sql = 'SELECT * FROM ps_objectif_coach WHERE id_objectif_coach = ' . (int)$id;
+        $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'objectif_coach WHERE id_objectif_coach = ' . (int)$id;
 
         return Db::getInstance()->getRow($sql);
     }
@@ -277,7 +278,7 @@ class CaTools
         return ($data['caTotal']) ? $data['caTotal'] - $data['caDejaInscrit'] : '';
     }
 
-    public static function PourcCaProspect($data)
+    public static function pourcCaProspect($data)
     {
         if ($data['caTotal'] != 0) {
             return number_format(($data['CaProsp'] * 100) / $data['caAjuste'], 2) . ' %';
@@ -285,7 +286,7 @@ class CaTools
         return '';
     }
 
-    public static function PourcCaFID($data)
+    public static function pourcCaFID($data)
     {
         if ($data['caTotal'] != 0) {
             return number_format(($data['caDejaInscrit'] * 100) / $data['caAjuste'], 2) . ' %';
@@ -327,8 +328,13 @@ class CaTools
         return ($nbrRows) ? $nbrRows : ''; // ($nbrVenteFID) ? $nbrVenteFID : '';
     }
 
-    public static function getNbrGrVentes($idFilterCoach = 0, $code_action = null, $current_state = null,
-                                          $totalMoney = false, $valid = false, $dateBetween, $lang)
+    public static function getNbrGrVentes(
+        $idFilterCoach = 0,
+        $code_action = null,
+        $current_state = null,
+        $totalMoney = false,
+        $valid = false,
+        $dateBetween, $lang)
     {
         $filterCoach = ($idFilterCoach != 0)
             ? " AND e . id_employee = '" . (int)$idFilterCoach . "'" : '';
@@ -353,7 +359,7 @@ class CaTools
             : "SELECT SQL_CALC_FOUND_ROWS o . id_order ";
 
         $sql = $sqlTotal . "
-            FROM ps_orders as o
+            FROM " . _DB_PREFIX_ . "orders as o
             LEFT JOIN " . _DB_PREFIX_ . "customer as c ON o . id_customer = c . id_customer
             LEFT JOIN " . _DB_PREFIX_ . "customer_group as cg ON c . id_customer = cg . id_customer
             LEFT JOIN " . _DB_PREFIX_ . "group_lang as gl ON cg . id_group = gl . id_group AND gl.id_lang = '" . $lang . "'
@@ -485,7 +491,7 @@ class CaTools
         return $req;
     }
 
-    public static function get_nb_open_days($dateBetween)
+    public static function getNbOpenDays($dateBetween)
     {
 
         $date_start = strtotime(Tools::substr($dateBetween, 2, 10));
@@ -551,7 +557,7 @@ class CaTools
         $pros_jour = Configuration::get('CDMODULECA_PROSPECTS_JOUR');
         $pros_heure = Configuration::get('CDMODULECA_PROSPECTS_HEURE');
         $jour_ouvre = CaTools::getJourOuvreEmploye($id_employee, $dateBetween);
-        $nbr_jours_ouvre = (empty($jour_ouvre)) ? CaTools::get_nb_open_days($dateBetween) : $jour_ouvre;
+        $nbr_jours_ouvre = (empty($jour_ouvre)) ? CaTools::getNbOpenDays($dateBetween) : $jour_ouvre;
         $nbr_prospects = ProspectAttribueClass::getNbrProspectsAttriByCoach($id_employee, $dateBetween);
         $absence = CaTools::getAbsenceEmployee($id_employee, $dateBetween);
 
@@ -576,7 +582,8 @@ class CaTools
             setcookie('appelKeyyo', '1', strtotime(date('Y-m-d 23:59:59')));
         } else {
             $compteur['compteur']++;
-            Db::getInstance()->update('appel', array('compteur' => $compteur['compteur']),
+            Db::getInstance()->update('appel',
+                array('compteur' => $compteur['compteur']),
                 '`id_appel` = ' . (int)$compteur['id_appel']);
             setcookie('appelKeyyo', $compteur['compteur']++, strtotime(date('Y-m-d 23:59:59')));
         }
