@@ -1,5 +1,5 @@
 {*
-* 2007-2015 PrestaShop
+* 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,7 +18,7 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2015 PrestaShop SA
+*  @copyright  2007-2016 PrestaShop SA
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
@@ -41,12 +41,12 @@
 			<div class="panel clearfix">
 				<div class="panel-heading">
 					<i class="icon-user"></i>
-					{$customer->firstname}
-					{$customer->lastname}
-					[{$customer->id|string_format:"%06d"}]
+					{$customer->firstname|escape:'htmlall':'UTF-8'}
+					{$customer->lastname|escape:'htmlall':'UTF-8'}
+					[{$customer->id|string_format:"%06d"|escape:'htmlall':'UTF-8'}]
 					-
-					<a href="mailto:{$customer->email}"><i class="icon-envelope"></i>
-						{$customer->email}
+					<a href="mailto:{$customer->email|escape:'htmlall':'UTF-8'}"><i class="icon-envelope"></i>
+						{$customer->email|escape:'htmlall':'UTF-8'}
 					</a>
 					<div class="panel-heading-action">
 						<a class="btn btn-default" href="{$current|escape:'html':'UTF-8'}&amp;updatecustomer&amp;id_customer={$customer->id|intval}&amp;token={$token|escape:'html':'UTF-8'}">

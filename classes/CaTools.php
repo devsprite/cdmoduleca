@@ -1,5 +1,5 @@
 <?php
-/*
+/**
 * 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -181,7 +181,7 @@ class CaTools
 
     public static function getCodeAction($id)
     {
-        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE id_code_action = ' . (intval($id));
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE id_code_action = ' . ((int)$id);
 
         return Db::getInstance()->getRow($sql);
     }
@@ -354,10 +354,10 @@ class CaTools
 
         $sql = $sqlTotal . "
             FROM ps_orders as o
-            LEFT JOIN ps_customer as c ON o . id_customer = c . id_customer
-            LEFT JOIN ps_customer_group as cg ON c . id_customer = cg . id_customer
-            LEFT JOIN ps_group_lang as gl ON cg . id_group = gl . id_group AND gl.id_lang = '" . $lang . "'
-            LEFT JOIN ps_employee as e ON gl . id_employee = e . id_employee";
+            LEFT JOIN " . _DB_PREFIX_ . "customer as c ON o . id_customer = c . id_customer
+            LEFT JOIN " . _DB_PREFIX_ . "customer_group as cg ON c . id_customer = cg . id_customer
+            LEFT JOIN " . _DB_PREFIX_ . "group_lang as gl ON cg . id_group = gl . id_group AND gl.id_lang = '" . $lang . "'
+            LEFT JOIN " . _DB_PREFIX_ . "employee as e ON gl . id_employee = e . id_employee";
         $sql .= ' WHERE o.date_add BETWEEN ' . $dateBetween;
         $sql .= ($valid) ? ' AND o.valid = 1 ' : '';
         $sql .= $filterCoach;

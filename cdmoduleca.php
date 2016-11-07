@@ -262,6 +262,7 @@ class CdModuleCA extends ModuleGrid
 
     public function hookDisplayBackOfficeTop()
     {
+        $objectifCoach = array();
         $this->context->controller->addCSS($this->_path . 'views/css/compteur.css', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/compteur.js');
         $objectifCoach[] = CaTools::getObjectifCoach($this->context->employee->id);
@@ -306,7 +307,7 @@ class CdModuleCA extends ModuleGrid
      */
     private function createTableProspectAttribue()
     {
-        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'prospect_attribue` (
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'prospect_attribue` (
         `id_prospect_attribue` INT(12) NOT NULL AUTO_INCREMENT,
         `id_employee` INT(12) NOT NULL,
         `nbr_prospect_attribue` INT(12) NULL,
@@ -324,12 +325,12 @@ class CdModuleCA extends ModuleGrid
 
     private function eraseTableProspectAttribue()
     {
-        return Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'prospect_attribue`');
+        return Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'prospect_attribue`');
     }
 
     private function createTableAppel()
     {
-        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'appel` (
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'appel` (
         `id_appel` INT(12) NOT NULL AUTO_INCREMENT,
         `id_employee` INT(12) NOT NULL,
         `compteur` INT(12) NULL,
@@ -346,7 +347,7 @@ class CdModuleCA extends ModuleGrid
 
     private function eraseTableAppel()
     {
-        return Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'appel`');
+        return Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'appel`');
     }
 
     /**
@@ -355,7 +356,7 @@ class CdModuleCA extends ModuleGrid
      */
     private function createTableProspect()
     {
-        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'prospect` (
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'prospect` (
         `id_prospect` INT(12) NOT NULL AUTO_INCREMENT,
         `id_customer` INT(12) NOT NULL UNIQUE,
         `id_prospect_attribue` INT(12) NOT NULL,
@@ -375,7 +376,7 @@ class CdModuleCA extends ModuleGrid
 
     private function eraseTableProspect()
     {
-        return Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'prospect`');
+        return Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'prospect`');
     }
 
     /**
@@ -383,7 +384,7 @@ class CdModuleCA extends ModuleGrid
      */
     private function createTableObjectifCoach()
     {
-        $sql = "CREATE TABLE `" . _DB_PREFIX_ . "objectif_coach` (
+        $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "objectif_coach` (
         `id_objectif_coach` INT (12) NOT NULL AUTO_INCREMENT,
         `id_employee` INT(12),
         `somme` DECIMAL (8,2) NULL,
@@ -404,7 +405,7 @@ class CdModuleCA extends ModuleGrid
 
     private function eraseTableObjectifCoach()
     {
-        if (!Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'objectif_coach`')) {
+        if (!Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'objectif_coach`')) {
             return false;
         }
         return true;
@@ -415,7 +416,7 @@ class CdModuleCA extends ModuleGrid
      */
     private function createTableAjoutSomme()
     {
-        $sql = "CREATE TABLE `" . _DB_PREFIX_ . "ajout_somme` (
+        $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "ajout_somme` (
         `id_ajout_somme` INT (12) NOT NULL AUTO_INCREMENT,
         `somme` DECIMAL (8,2) NULL,
         `commentaire` TEXT NULL,
@@ -433,7 +434,7 @@ class CdModuleCA extends ModuleGrid
 
     private function eraseTableAjoutSomme()
     {
-        if (!Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'ajout_somme`')) {
+        if (!Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'ajout_somme`')) {
             return false;
         }
         return true;
@@ -463,7 +464,7 @@ class CdModuleCA extends ModuleGrid
      */
     private function createCodeActionTable()
     {
-        $sql = 'CREATE TABLE `' . _DB_PREFIX_ . 'code_action` (
+        $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'code_action` (
         `id_code_action` INT(12) NOT NULL AUTO_INCREMENT,
         `name` VARCHAR(64) NOT NULL,
         `description` VARCHAR(255) NULL,
@@ -484,7 +485,7 @@ class CdModuleCA extends ModuleGrid
 
     private function removeCodeActionTable()
     {
-        if (!Db::getInstance()->execute('DROP TABLE `' . _DB_PREFIX_ . 'code_action`')) {
+        if (!Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'code_action`')) {
             return false;
         }
 
@@ -640,7 +641,7 @@ class CdModuleCA extends ModuleGrid
             $groups = $this->getGroupsParrain();
             foreach ($groups as $group) {
                 if (!Db::getInstance()->update('group_lang',
-                    array('id_employee' => intval(str_replace('gp_', '', Tools::getValue('gp_' . $group['id_group'])))),
+                    array('id_employee' => (int)(str_replace('gp_', '', Tools::getValue('gp_' . $group['id_group'])))),
                     'id_lang = "' . $this->lang . '" AND id_group = ' . str_replace('gp_', '', $group['id_group']))
                 ) {
                     $error .= $this->l('Erreur lors de la mise à jour des groupes');
@@ -673,9 +674,9 @@ class CdModuleCA extends ModuleGrid
             Configuration::updateValue('CDMODULECA_ORDERS_STATE', $confStatus);
             Configuration::updateValue('CDMODULECA_ORDERS_STATE_JOURS', (int)Tools::getValue('os_nbr_jours'));
         } elseif (Tools::isSubmit('submitConfiguration')) {
-            Configuration::updateValue('CDMODULECA_PRIME_FICHIER', floatval(Tools::getValue('co_prime_fichier')));
-            Configuration::updateValue('CDMODULECA_PROSPECTS_JOUR', floatval(Tools::getValue('co_prospects_jour')));
-            Configuration::updateValue('CDMODULECA_PROSPECTS_HEURE', floatval(Tools::getValue('co_prospects_heure')));
+            Configuration::updateValue('CDMODULECA_PRIME_FICHIER', (float)(Tools::getValue('co_prime_fichier')));
+            Configuration::updateValue('CDMODULECA_PROSPECTS_JOUR', (float)(Tools::getValue('co_prospects_jour')));
+            Configuration::updateValue('CDMODULECA_PROSPECTS_HEURE', (float)(Tools::getValue('co_prospects_heure')));
         }
 
         if ($error) {
@@ -1115,11 +1116,11 @@ class CdModuleCA extends ModuleGrid
           IF((o.valid) > 0, "", "Non") AS valid,
           (SELECT ca.name FROM ps_code_action AS ca WHERE o.id_code_action = ca.id_code_action) as CodeAction,
           (SELECT osl.name FROM ps_order_state_lang AS osl WHERE id_lang = "' . $this->lang . '" AND osl.id_order_state = o.current_state ) as current_state ,
-          IF((SELECT so.id_order FROM `ps_orders` so WHERE so.id_customer = o.id_customer
+          IF((SELECT so.id_order FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.id_customer = o.id_customer
           AND so.id_order < o.id_order LIMIT 1) > 0, "", "Oui") as new
 				FROM ' . _DB_PREFIX_ . 'orders AS o ';
         $this->query .= $filterGroupe;
-        $this->query .= ' LEFT JOIN `ps_order_slip` AS os ON o.`id_order` = os.`id_order` ';
+        $this->query .= ' LEFT JOIN `' . _DB_PREFIX_ . 'order_slip` AS os ON o.`id_order` = os.`id_order` ';
         $this->query .= ' WHERE o.date_add BETWEEN ' . $this->getDate();
         $this->query .= $filterCoach;
         $this->query .= $filterCodeAction;

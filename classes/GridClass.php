@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
 * 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -186,8 +186,8 @@ class GridClass extends Module
 
     public function getData($data)
     {
-        $filterGroupe = ' LEFT JOIN ps_customer_group AS cg ON o.id_customer = cg.id_customer 
-                LEFT JOIN ps_group_lang AS gl ON gl.id_group = cg.id_group';
+        $filterGroupe = ' LEFT JOIN ' . _DB_PREFIX_ . 'customer_group AS cg ON o.id_customer = cg.id_customer 
+                LEFT JOIN ' . _DB_PREFIX_ . 'group_lang AS gl ON gl.id_group = cg.id_group';
 
         $idGroupEmployee = $data['idGroupEmployee'];
 

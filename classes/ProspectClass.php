@@ -1,30 +1,31 @@
 <?php
 
-/*
-* 2007-2016 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author Dominique <dominique@chez-dominique.fr>
-*  @copyright  2007-2016 Chez-dominique
-*/
+/**
+ * 2007-2016 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author Dominique <dominique@chez-dominique.fr>
+ * @copyright  2007-2016 Chez-dominique
+ */
 
-if (!defined('_PS_VERSION_'))
+if (!defined('_PS_VERSION_')) {
     exit;
+}
 
 class ProspectClass extends ObjectModel
 {
@@ -47,12 +48,18 @@ class ProspectClass extends ObjectModel
         'table' => 'prospect',
         'primary' => 'id_prospect',
         'fields' => array(
-            'id_customer' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId', 'required' => true),
-            'id_prospect_attribue' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId', 'required' => true),
-            'traite' => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false, 'size' => 64),
-            'injoignable' => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false, 'size' => 64),
-            'contacte' => array('type' => self::TYPE_STRING, 'validate' => 'isString', 'required' => false),
-            'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat', 'required' => false, 'size' => 64),
+            'id_customer' => array('type' => self::TYPE_INT,
+                'validate' => 'isNullOrUnsignedId', 'required' => true),
+            'id_prospect_attribue' => array('type' => self::TYPE_INT,
+                'validate' => 'isNullOrUnsignedId', 'required' => true),
+            'traite' => array('type' => self::TYPE_STRING,
+                'validate' => 'isString', 'required' => false, 'size' => 64),
+            'injoignable' => array('type' => self::TYPE_STRING,
+                'validate' => 'isString', 'required' => false, 'size' => 64),
+            'contacte' => array('type' => self::TYPE_STRING,
+                'validate' => 'isString', 'required' => false),
+            'date_add' => array('type' => self::TYPE_DATE,
+                'validate' => 'isDateFormat', 'required' => false, 'size' => 64),
         ));
 
     public static function getAllProspectsGroup($id_group, $limit = 50, $index_id = 0)
@@ -78,8 +85,10 @@ class ProspectClass extends ObjectModel
 
     public static function getProspectsByIdPa($id_prospect_attribue)
     {
-        $sql = 'SELECT p.* , pa.*, cu.firstname, cu.lastname, e.lastname as coach FROM `' . _DB_PREFIX_ . 'prospect` AS p 
-                LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS pa ON p.`id_prospect_attribue` = pa.`id_prospect_attribue`
+        $sql = 'SELECT p.* , pa.*, cu.firstname, cu.lastname, e.lastname as coach 
+                FROM `' . _DB_PREFIX_ . 'prospect` AS p 
+                LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS pa 
+                ON p.`id_prospect_attribue` = pa.`id_prospect_attribue`
                 LEFT JOIN `' . _DB_PREFIX_ . 'customer` AS cu ON p.`id_customer` = cu.`id_customer`
                 LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON pa.`id_employee` = e.`id_employee`
                 WHERE p.`id_prospect_attribue` = ' . $id_prospect_attribue;
@@ -103,7 +112,8 @@ class ProspectClass extends ObjectModel
             return false;
         }
 
-        $v = Db::getInstance()->getValue('SELECT `traite` FROM `' . _DB_PREFIX_ . 'prospect` WHERE `id_customer` = ' . $id);
+        $v = Db::getInstance()->getValue('SELECT `traite` FROM `' . _DB_PREFIX_ . 'prospect` 
+                WHERE `id_customer` = ' . $id);
         if ($v == 'non') {
             if (!Db::getInstance()->update('prospect', array('traite' => 'oui'), 'id_customer = ' . (int)$id)) {
                 return false;
@@ -123,7 +133,8 @@ class ProspectClass extends ObjectModel
         if (!ProspectClass::isProspectExistByIdCustomer($id)) {
             return false;
         }
-        if (Db::getInstance()->getValue('SELECT `injoignable` FROM `' . _DB_PREFIX_ . 'prospect` WHERE `id_customer` = ' . $id) == 'oui') {
+        if (Db::getInstance()->getValue('SELECT `injoignable` FROM `' . _DB_PREFIX_ . 'prospect` 
+        WHERE `id_customer` = ' . $id) == 'oui') {
             if (!Db::getInstance()->update('prospect', array('injoignable' => 'non'), 'id_customer = ' . (int)$id)) {
                 return false;
             }
@@ -157,19 +168,19 @@ class ProspectClass extends ObjectModel
         }
 
         switch ($now) {
-            case ($now < $midi_debut) :
+            case ($now < $midi_debut):
                 $contacte->matin[] = date('\L\e d-m-Y \à H:i:s') . ' - ' . $lastname;
                 break;
-            case ($now >= $midi_debut && $now < $apresmidi_debut) :
+            case ($now >= $midi_debut && $now < $apresmidi_debut):
                 $contacte->midi[] = date('\L\e d-m-Y \à H:i:s') . ' - ' . $lastname;
                 break;
             case ($now >= $apresmidi_debut && $now < $soir_debut):
                 $contacte->apres_midi[] = date('\L\e d-m-Y \à H:i:s') . ' - ' . $lastname;
                 break;
-            case ($now >= $soir_debut) :
+            case ($now >= $soir_debut):
                 $contacte->soir[] = date('\L\e d-m-Y \à H:i:s') . ' - ' . $lastname;
                 break;
-            default :
+            default:
         }
 
         if (
@@ -243,5 +254,4 @@ class ProspectClass extends ObjectModel
 
         return $req;
     }
-
 }

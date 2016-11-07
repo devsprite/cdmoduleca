@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
 * 2007-2016 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -763,15 +763,15 @@ class AdminCaLetSensController extends ModuleAdminController
         $pdf->AddPage();
 
         // set some text to print
-        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/pdf/content.tpl');
+        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/content.tpl');
         $pdf->writeHTML($html_content);
 
         $pdf->AddPage();
-        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/pdf/main_table_coachs.tpl');
+        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/main_table_coachs.tpl');
         $pdf->writeHTML($html_content);
 
         $pdf->AddPage();
-        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/pdf/main_table_groupes.tpl');
+        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/main_table_groupes.tpl');
         $pdf->writeHTML($html_content);
         // ---------------------------------------------------------
 
