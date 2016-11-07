@@ -686,7 +686,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $_POST['oc_commentaire'] = $oc['commentaire'];
                 $_POST['oc_heure'] = $oc['heure_absence'];
                 $_POST['oc_jour'] = $oc['jour_absence'];
-                $_POST['oc_jour'] = $oc['jour_ouvre'];
+                $_POST['oc_jour_ouvre'] = $oc['jour_ouvre'];
                 $_POST['oc_date_start'] = $oc['date_start'];
                 $_POST['oc_date_end'] = $oc['date_end'];
                 $_POST['oc_id'] = $oc['id_objectif_coach'];

@@ -311,9 +311,7 @@ class AdminProspectsController extends ModuleAdminController
         $table = null,
         $identifier = null,
         $id = null
-    )
-    {
-
+    ) {
         $context = $this->context;
 
         $context->controller->addJqueryUI('ui.datepicker');

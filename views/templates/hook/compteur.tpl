@@ -26,10 +26,10 @@
 {if isset($objectif['somme']) || isset($objectif['appels'])}
 <div class="compteur">
     <table>
-        <tbody class="compteur_{if isset($objectif['class'])}{$objectif['class']}{/if}">
+        <tbody class="compteur_{if isset($objectif['class'])}{$objectif['class']|escape:'htmlall':'UTF-8'}{/if}">
             <tr>
                 <td><span id="compteurAppels"></span> <i id="iconCompteurAppels" class="icon-phone"></i></td>
-                <td>{if !empty($objectif['pourcentDeObjectif'])}{$objectif['pourcentDeObjectif']}%{/if}</td>
+                <td>{if !empty($objectif['pourcentDeObjectif'])}{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'}%{/if}</td>
             </tr>
             <tr>
                 <td colspan="2">{if isset($objectif['caCoach'])}{displayPrice price=$objectif['caCoach']}{/if}

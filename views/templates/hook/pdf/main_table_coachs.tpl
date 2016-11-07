@@ -27,8 +27,8 @@
     <tr>
         <td>
             <span style="font-size: 18pt;color: #448B01;">Coach(s)</span>
-            <span style="font-size: 10pt">Du {$datepickerFrom|escape|date_format:'%A %e %B %Y'}
-                au {$datepickerTo|escape|date_format:'%A %e %B %Y'}</span>
+            <span style="font-size: 10pt">Du {$datepickerFrom|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}
+                au {$datepickerTo|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}</span>
         </td>
     </tr>
     <tr>

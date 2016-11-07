@@ -76,8 +76,9 @@ class AdminAppelController extends ModuleAdminController
 
     public function renderList()
     {
-        if (isset($this->_filter) && trim($this->_filter) == '')
+        if (isset($this->_filter) && trim($this->_filter) == '') {
             $this->_filter = $this->original_filter;
+        }
 
         $this->addRowAction('delete');
 

@@ -75,7 +75,7 @@
                 {/if}
                 <tr style="line-height: 1.5pt;">
                     <td>
-                        <span>CA Déduit Total (- {$caDeduitJours} j.) : {displayPrice price=$caDeduitTotal}</span>
+                        <span>CA Déduit Total (- {$caDeduitJours|escape:'htmlall':'UTF-8'} j.) : {displayPrice price=$caDeduitTotal}</span>
                     </td>
                 </tr>
                 {if $coach->lastname}

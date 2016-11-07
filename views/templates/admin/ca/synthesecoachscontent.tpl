@@ -72,7 +72,7 @@
         </div>
         {if !empty({$coach->lastname|escape:'htmlall':'UTF-8'})}
             <div class="row">
-                <div class="col-xs-12">Prime Fichier {$coach->lastname}
+                <div class="col-xs-12">Prime Fichier {$coach->lastname|escape:'htmlall':'UTF-8'}
                     <span class="pull-right">{displayPrice price=$primeFichierCoach}</span></div>
             </div>
         {/if}
@@ -98,10 +98,10 @@
                     <td>{$ajoutSomme['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                     <td>
                         {if isset($coachs)}
-                            <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_as&id_as={$ajoutSomme['id_ajout_somme']}">
+                            <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_as&id_as={$ajoutSomme['id_ajout_somme']|escape:'htmlall':'UTF-8'}">
                                 <i class="icon-edit text-success"></i>
                             </a>
-                            <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&del_as&id_as={$ajoutSomme['id_ajout_somme']}"
+                            <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&del_as&id_as={$ajoutSomme['id_ajout_somme']|escape:'htmlall':'UTF-8'}"
                                onclick="if(confirm('Etes-vous sur de vouloir supprimer ce cet ajout ?')) {} else return false">
                                 <i class="icon-cut text-danger"></i>
                             </a>
@@ -138,10 +138,10 @@
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                         <td>
                             {if isset($coachs)}
-                                <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_oc&id_oc={$objectif['id_objectif_coach']}">
+                                <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}">
                                     <i class="icon-edit text-success"></i>
                                 </a>
-                                <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&del_oc&id_oc={$objectif['id_objectif_coach']}"
+                                <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&del_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}"
                                    onclick="if(confirm('Etes-vous sur de vouloir supprimer cet objectif ?')) {} else return false">
                                     <i class="icon-cut text-danger"></i>
                                 </a>
@@ -160,7 +160,7 @@
                 <th style="width: 10%">Date début</th>
                 <th style="width: 10%">Date fin</th>
                 <th style="width: 10%">Heure</th>
-                <th style="width: 10%">Jour</th>
+                <th style="width: 10%">Jour absence</th>
                 <th style="width: 10%">Jours ouvrés</th>
                 <th style="width: 40%">Commentaire</th>
                 <th style="width: 5%"></th>
@@ -179,10 +179,10 @@
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                         <td>
                             {if isset($coachs)}
-                                <a href="{$linkFilter}&mod_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}">
+                                <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}">
                                     <i class="icon-edit text-success"></i>
                                 </a>
-                                <a href="{$linkFilter}&del_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}"
+                                <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&del_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}"
                                    onclick="if(confirm('Etes-vous sur de vouloir supprimer cette ligne ?')) {} else return false">
                                     <i class="icon-cut text-danger"></i>
                                 </a>

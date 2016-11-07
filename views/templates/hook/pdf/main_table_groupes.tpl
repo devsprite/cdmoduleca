@@ -27,8 +27,8 @@
     <tr>
         <td>
             <span style="font-size: 18pt;color: #448B01;">Groupe(s)</span>
-            <span style="font-size: 10pt">Du {$datepickerFrom|escape|date_format:'%A %e %B %Y'}
-                au {$datepickerTo|escape|date_format:'%A %e %B %Y'}</span>
+            <span style="font-size: 10pt">Du {$datepickerFrom|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}
+                au {$datepickerTo|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}</span>
         </td>
     </tr>
     <tr>
@@ -52,11 +52,11 @@
                 <tbody>
                 {foreach item=coach from=$datasEmployees}
                     <tr>
-                        <td>{$coach['lastname']} ({$coach['firstname']})</td>
+                        <td>{$coach['lastname']|escape:'htmlall':'UTF-8'} ({$coach['firstname']|escape:'htmlall':'UTF-8'})</td>
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['primeVenteGrAbo']}</td>
-                        <td style="text-align: center">{$coach['nbrVenteGrAbo']}</td>
-                        <td style="text-align: center; background-color: #DDDDDD">{$coach['nbrVenteGrDesaAbo']}</td>
-                        <td style="text-align: center">{$coach['pourcenDesabo']}</td>
+                        <td style="text-align: center">{$coach['nbrVenteGrAbo']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{$coach['nbrVenteGrDesaAbo']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center">{$coach['pourcenDesabo']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['totalVenteGrPar']}</td>
                         <td style="text-align: center"></td>
                     </tr>
