@@ -1,30 +1,31 @@
 <?php
 
 /**
-* 2007-2016 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author Dominique <dominique@chez-dominique.fr>
-*  @copyright  2007-2016 Chez-dominique
-*/
+ * 2007-2016 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author Dominique <dominique@chez-dominique.fr>
+ * @copyright  2007-2016 Chez-dominique
+ */
 
-if (!defined('_PS_VERSION_'))
+if (!defined('_PS_VERSION_')) {
     exit;
+}
 
 require_once(dirname(__FILE__) . '/../../classes/GridClass.php');
 require_once(dirname(__FILE__) . '/../../classes/CaTools.php');
@@ -127,21 +128,39 @@ class AdminCaLetSensController extends ModuleAdminController
     {
         $this->smarty->assign(array(
             'caCoachsTotal' => CaTools::getCaCoachsTotal(0, $this->idFilterCodeAction, $this->getDateBetween()),
-            'caCoach' => CaTools::getCaCoachsTotal($this->idFilterCoach, $this->idFilterCodeAction,
-                $this->getDateBetween()),
+            'caCoach' => CaTools::getCaCoachsTotal(
+                $this->idFilterCoach,
+                $this->idFilterCodeAction,
+                $this->getDateBetween()
+            ),
             'caFidTotal' => CaTools::getCaDejaInscrit(0, $this->getDateBetween()),
             'caFidCoach' => CaTools::getCaDejaInscrit($this->idFilterCoach, $this->getDateBetween()),
             'caDeduitTotal' => CaTools::getCaDeduit(0, $this->getDateCaDeduit()),
             'caDeduitCoach' => CaTools::getCaDeduit($this->idFilterCoach, $this->getDateCaDeduit()),
             'caDeduitJours' => (int)Configuration::get('CDMODULECA_ORDERS_STATE_JOURS'),
-            'caTotalNbrCommandes' => CaTools::getNumberCommande(0, $this->idFilterCodeAction, array(460, 443),
-                $this->getDateBetween()),
-            'caCoachNbrCommandes' => CaTools::getNumberCommande($this->idFilterCoach, $this->idFilterCodeAction,
-                array(460, 443), $this->getDateBetween()),
+            'caTotalNbrCommandes' => CaTools::getNumberCommande(
+                0,
+                $this->idFilterCodeAction,
+                array(460, 443),
+                $this->getDateBetween()
+            ),
+            'caCoachNbrCommandes' => CaTools::getNumberCommande(
+                $this->idFilterCoach,
+                $this->idFilterCodeAction,
+                array(460, 443),
+                $this->getDateBetween()
+            ),
             'caTotal' => CaTools::getCaCoachsTotal(0, 0, $this->getDateBetween()),
             'caTotalCoach' => CaTools::getCaCoachsTotal($this->idFilterCoach, 0, $this->getDateBetween()),
-            'caTotalAbo' => CaTools::getNbrGrVentes(0, 'ABO', array(444, 462), false, true, $this->getDateBetween(),
-                $this->module->lang),
+            'caTotalAbo' => CaTools::getNbrGrVentes(
+                0,
+                'ABO',
+                array(444, 462),
+                false,
+                true,
+                $this->getDateBetween(),
+                $this->module->lang
+            ),
             'coach' => new Employee($this->idFilterCoach),
             'filterCodeAction' => $this->getCodeActionByID(),
             'nbrJourOuvre' => CaTools::getNbOpenDays($this->getDateBetween()),
@@ -158,7 +177,7 @@ class AdminCaLetSensController extends ModuleAdminController
             if ($this->idFilterCoach == 0) {
                 $employees = CaTools::getEmployees($this->employees_actif);
             } else {
-                $employees = CaTools::getEmployees(null,$this->idFilterCoach);
+                $employees = CaTools::getEmployees(null, $this->idFilterCoach);
             }
 
         }
@@ -182,25 +201,29 @@ class AdminCaLetSensController extends ModuleAdminController
             $pourCaRembourse = ($caTotal) ? round((($datasEmployees[$employee['id_employee']]['caRembourse'] * 100)
                 / $caTotal), 2) : '';
 
-            $datasEmployees[$employee['id_employee']]['pourCaRembourse'] = ($pourCaRembourse) ? $pourCaRembourse . ' %' : '';
+            $datasEmployees[$employee['id_employee']]['pourCaRembourse'] = ($pourCaRembourse)
+                ? $pourCaRembourse . ' %' : '';
 
             $datasEmployees[$employee['id_employee']]['ajustement'] =
                 CaTools::getAjustement($employee['id_employee'], $this->getDateBetween());
 
-            $datasEmployees[$employee['id_employee']]['caAjuste'] = ($datasEmployees[$employee['id_employee']]['caTotal'])
-                ? ($datasEmployees[$employee['id_employee']]['caTotal']
-                    + $datasEmployees[$employee['id_employee']]['ajustement'])
-                - $datasEmployees[$employee['id_employee']]['caRembourse']
-                - $datasEmployees[$employee['id_employee']]['caAvoir'] : '';
+            $datasEmployees[$employee['id_employee']]['caAjuste'] =
+                ($datasEmployees[$employee['id_employee']]['caTotal'])
+                    ? ($datasEmployees[$employee['id_employee']]['caTotal']
+                        + $datasEmployees[$employee['id_employee']]['ajustement'])
+                    - $datasEmployees[$employee['id_employee']]['caRembourse']
+                    - $datasEmployees[$employee['id_employee']]['caAvoir'] : '';
 
-            $datasEmployees[$employee['id_employee']]['caRembAvoir'] = ($datasEmployees[$employee['id_employee']]['caTotal'])
-                ? $datasEmployees[$employee['id_employee']]['caRembourse']
-                + $datasEmployees[$employee['id_employee']]['caAvoir'] : '';
+            $datasEmployees[$employee['id_employee']]['caRembAvoir'] =
+                ($datasEmployees[$employee['id_employee']]['caTotal'])
+                    ? $datasEmployees[$employee['id_employee']]['caRembourse']
+                    + $datasEmployees[$employee['id_employee']]['caAvoir'] : '';
 
             $pourCaRembAvoir = ($caTotal) ? round((($datasEmployees[$employee['id_employee']]['caRembAvoir'] * 100)
                 / $caTotal), 2) : '';
 
-            $datasEmployees[$employee['id_employee']]['pourCaRembAvoir'] = ($pourCaRembAvoir) ? $pourCaRembAvoir . ' %' : '';
+            $datasEmployees[$employee['id_employee']]['pourCaRembAvoir'] = ($pourCaRembAvoir)
+                ? $pourCaRembAvoir . ' %' : '';
 
             $datasEmployees[$employee['id_employee']]['caDejaInscrit'] =
                 CaTools::getCaDejaInscrit($employee['id_employee'], $this->getDateBetween());
@@ -225,8 +248,9 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['NbreDeProspects'] =
                 ProspectAttribueClass::getNbrProspectsAttriByCoach($employee['id_employee'], $this->getDateBetween());
 
-            $datasEmployees[$employee['id_employee']]['CaContact'] = ($datasEmployees[$employee['id_employee']]['NbreDeProspects'])
-                ? round((($datasEmployees[$employee['id_employee']]['caAjuste']
+            $datasEmployees[$employee['id_employee']]['CaContact'] =
+                ($datasEmployees[$employee['id_employee']]['NbreDeProspects'])
+                    ? round((($datasEmployees[$employee['id_employee']]['caAjuste']
                         - $datasEmployees[$employee['id_employee']]['caFidTotal'])
                     / $datasEmployees[$employee['id_employee']]['NbreDeProspects']), 2) : '';
 
@@ -242,10 +266,11 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['nbrVenteFid'] =
                 CaTools::getNbrVentes($employee['id_employee'], 'FID', $this->getDateBetween());
 
-            $datasEmployees[$employee['id_employee']]['tauxTransfo'] = ($datasEmployees[$employee['id_employee']]['NbreDeProspects'] != 0) ?
-                (round(((($datasEmployees[$employee['id_employee']]['NbreVentesTotal']
-                            - $datasEmployees[$employee['id_employee']]['nbrVenteFid']) * 100)
-                    / $datasEmployees[$employee['id_employee']]['NbreDeProspects']), 2)) . ' %' : '';
+            $datasEmployees[$employee['id_employee']]['tauxTransfo'] =
+                ($datasEmployees[$employee['id_employee']]['NbreDeProspects'] != 0)
+                    ? (round(((($datasEmployees[$employee['id_employee']]['NbreVentesTotal']
+                                - $datasEmployees[$employee['id_employee']]['nbrVenteFid']) * 100)
+                        / $datasEmployees[$employee['id_employee']]['NbreDeProspects']), 2)) . ' %' : '';
 
             $datasEmployees[$employee['id_employee']]['nbrVentePar'] =
                 CaTools::getNbrVentes($employee['id_employee'], 'PAR', $this->getDateBetween());
@@ -260,8 +285,9 @@ class AdminCaLetSensController extends ModuleAdminController
                 CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), false, false,
                     $this->getDateBetween(), $this->module->lang);
 
-            $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] = CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), true, true,
-                $this->getDateBetween(), $this->module->lang);
+            $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] =
+                CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), true, true,
+                    $this->getDateBetween(), $this->module->lang);
 
             $n = $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'];
 
@@ -269,8 +295,15 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['primeVenteGrAbo'] = $primeVenteGrAbo;
 
             $datasEmployees[$employee['id_employee']]['nbrVenteGrDesaAbo'] =
-                CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(440, 453), false, false,
-                    $this->getDateBetween(), $this->module->lang);
+                CaTools::getNbrGrVentes(
+                    $employee['id_employee'],
+                    'ABO',
+                    array(440, 453),
+                    false,
+                    false,
+                    $this->getDateBetween(),
+                    $this->module->lang
+                );
 
             $datasEmployees[$employee['id_employee']]['pourcenDesabo'] =
                 ($datasEmployees[$employee['id_employee']]['nbrVenteGrAbo'])
@@ -278,28 +311,70 @@ class AdminCaLetSensController extends ModuleAdminController
                         / $datasEmployees[$employee['id_employee']]['nbrVenteGrAbo']), 2) . ' %' : '';
 
             $datasEmployees[$employee['id_employee']]['nbrVenteGrFid'] =
-                CaTools::getNbrGrVentes($employee['id_employee'], 'FID', null, false, false,
-                    $this->getDateBetween(), $this->module->lang);
+                CaTools::getNbrGrVentes(
+                    $employee['id_employee'],
+                    'FID',
+                    null,
+                    false,
+                    false,
+                    $this->getDateBetween(),
+                    $this->module->lang
+                );
 
             $datasEmployees[$employee['id_employee']]['totalVenteGrFid'] =
-                CaTools::getNbrGrVentes($employee['id_employee'], 'FID', null, true, false,
-                    $this->getDateBetween(), $this->module->lang);
+                CaTools::getNbrGrVentes(
+                    $employee['id_employee'],
+                    'FID',
+                    null,
+                    true,
+                    false,
+                    $this->getDateBetween(),
+                    $this->module->lang
+                );
 
             $datasEmployees[$employee['id_employee']]['nbrVenteGrProsp'] =
-                CaTools::getNbrGrVentes($employee['id_employee'], 'PROSP', null, false, false,
-                    $this->getDateBetween(), $this->module->lang);
+                CaTools::getNbrGrVentes(
+                    $employee['id_employee'],
+                    'PROSP',
+                    null,
+                    false,
+                    false,
+                    $this->getDateBetween(),
+                    $this->module->lang
+                );
 
             $datasEmployees[$employee['id_employee']]['totalVenteGrProsp'] =
-                CaTools::getNbrGrVentes($employee['id_employee'], 'PROSP', null, true, false,
-                    $this->getDateBetween(), $this->module->lang);
+                CaTools::getNbrGrVentes(
+                    $employee['id_employee'],
+                    'PROSP',
+                    null,
+                    true,
+                    false,
+                    $this->getDateBetween(),
+                    $this->module->lang
+                );
 
             $datasEmployees[$employee['id_employee']]['nbrVenteGrPar'] =
-                CaTools::getNbrGrVentes($employee['id_employee'], 'PAR', null, false, false,
-                    $this->getDateBetween(), $this->module->lang);
+                CaTools::getNbrGrVentes(
+                    $employee['id_employee'],
+                    'PAR',
+                    null,
+                    false,
+                    false,
+                    $this->getDateBetween(),
+                    $this->module->lang
+                );
 
             $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] =
-                CaTools::getNbrGrVentes($employee['id_employee'], 'PAR', null, true, false,
-                    $this->getDateBetween(), $this->module->lang);
+                CaTools::getNbrGrVentes(
+                    $employee['id_employee'],
+                    'PAR',
+                    null,
+                    true,
+                    false,
+                    $this->getDateBetween(),
+                    $this->module->lang
+                );
 
             $datasEmployees[$employee['id_employee']]['pourVenteGrPar'] =
                 ($datasEmployees[$employee['id_employee']]['totalVenteGrPar'])
@@ -452,14 +527,18 @@ class AdminCaLetSensController extends ModuleAdminController
                     // Modifie
                     if (Tools::getValue('as_id')) {
                         $data['id_ajout_somme'] = (int)Tools::getValue('as_id');
-                        if (!Db::getInstance()->update('ajout_somme', $data, 'id_ajout_somme = '
-                            . (int)Tools::getValue('as_id'))
+                        if (!Db::getInstance()->update(
+                            'ajout_somme',
+                            $data,
+                            'id_ajout_somme = ' . (int)Tools::getValue('as_id')
+                        )
                         ) {
                             $this->errors[] = $this->l('Erreur lors de la mise à jour');
                         }
                     } else {
                         // Insert
-                        if (!Db::getInstance()->insert('ajout_somme', $data)) {
+                        if (!Db::getInstance()->insert('ajout_somme', $data)
+                        ) {
                             $this->errors[] = $this->l('Erreur lors de l\'ajout.');
                         }
                     }
@@ -548,8 +627,11 @@ class AdminCaLetSensController extends ModuleAdminController
                     // Modifie
                     if (Tools::getValue('oc_id')) {
                         $data['id_objectif_coach'] = (int)Tools::getValue('oc_id');
-                        if (!Db::getInstance()->update('objectif_coach', $data, 'id_objectif_coach = '
-                            . (int)Tools::getValue('oc_id'))
+                        if (!Db::getInstance()->update(
+                            'objectif_coach',
+                            $data,
+                            'id_objectif_coach = ' . (int)Tools::getValue('oc_id')
+                        )
                         ) {
                             $this->errors[] = $this->l('Erreur lors de la mise à jour');
                         }
@@ -681,8 +763,12 @@ class AdminCaLetSensController extends ModuleAdminController
     public function processDateRange()
     {
         if (Tools::isSubmit('submitDatePicker')) {
-            if ((!Validate::isDate($from = Tools::getValue('datepickerFrom')) || !Validate::isDate($to = Tools::getValue('datepickerTo'))) || (strtotime($from) > strtotime($to)))
+            if ((!Validate::isDate($from = Tools::getValue('datepickerFrom')) ||
+                    !Validate::isDate($to = Tools::getValue('datepickerTo'))) ||
+                (strtotime($from) > strtotime($to))
+            ) {
                 $this->errors[] = Tools::displayError('The specified date is invalid.');
+            }
         }
         if (Tools::isSubmit('submitDateDay')) {
             $from = date('Y-m-d');
@@ -715,8 +801,9 @@ class AdminCaLetSensController extends ModuleAdminController
             $this->context->employee->stats_date_from = $from;
             $this->context->employee->stats_date_to = $to;
             $this->context->employee->update();
-            if (!$this->isXmlHttpRequest())
+            if (!$this->isXmlHttpRequest()) {
                 Tools::redirectAdmin($_SERVER['REQUEST_URI']);
+            }
         }
     }
 

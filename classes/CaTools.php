@@ -334,7 +334,8 @@ class CaTools
         $current_state = null,
         $totalMoney = false,
         $valid = false,
-        $dateBetween, $lang)
+        $dateBetween,
+        $lang)
     {
         $filterCoach = ($idFilterCoach != 0)
             ? " AND e . id_employee = '" . (int)$idFilterCoach . "'" : '';
@@ -582,9 +583,11 @@ class CaTools
             setcookie('appelKeyyo', '1', strtotime(date('Y-m-d 23:59:59')));
         } else {
             $compteur['compteur']++;
-            Db::getInstance()->update('appel',
+            Db::getInstance()->update(
+                'appel',
                 array('compteur' => $compteur['compteur']),
-                '`id_appel` = ' . (int)$compteur['id_appel']);
+                '`id_appel` = ' . (int)$compteur['id_appel']
+            );
             setcookie('appelKeyyo', $compteur['compteur']++, strtotime(date('Y-m-d 23:59:59')));
         }
     }
