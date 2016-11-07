@@ -282,12 +282,26 @@ class AdminCaLetSensController extends ModuleAdminController
                 CaTools::getNbrVentes($employee['id_employee'], 'CONT ENTR', $this->getDateBetween());
 
             $datasEmployees[$employee['id_employee']]['nbrVenteGrAbo'] =
-                CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), false, false,
-                    $this->getDateBetween(), $this->module->lang);
+                CaTools::getNbrGrVentes(
+                    $employee['id_employee'],
+                    'ABO',
+                    array(444, 462),
+                    false,
+                    false,
+                    $this->getDateBetween(),
+                    $this->module->lang
+                );
 
             $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] =
-                CaTools::getNbrGrVentes($employee['id_employee'], 'ABO', array(444, 462), true, true,
-                    $this->getDateBetween(), $this->module->lang);
+                CaTools::getNbrGrVentes(
+                    $employee['id_employee'],
+                    'ABO',
+                    array(444, 462),
+                    true,
+                    true,
+                    $this->getDateBetween(),
+                    $this->module->lang
+                );
 
             $n = $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'];
 
@@ -378,8 +392,11 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['pourVenteGrPar'] =
                 ($datasEmployees[$employee['id_employee']]['totalVenteGrPar'])
-                    ? round(($datasEmployees[$employee['id_employee']]['totalVenteGrPar'] * 100)
-                        / $datasEmployees[$employee['id_employee']]['caAjuste'], 2) . ' %' : '';
+                    ? round(
+                        ($datasEmployees[$employee['id_employee']]['totalVenteGrPar'] * 100) /
+                        $datasEmployees[$employee['id_employee']]['caAjuste'],
+                        2
+                    ) . ' %' : '';
 
             $datasEmployees[$employee['id_employee']]['primeFichierCoach'] =
                 CaTools::primeFichier($employee['id_employee'], $this->getDateBetween());
@@ -500,7 +517,7 @@ class AdminCaLetSensController extends ModuleAdminController
     /**
      * Enregistre, modifie, oou efface une ligne de la table ajout_somme
      */
-    private function AjoutSomme()
+    private function ajoutSomme()
     {
         if ($this->module->viewAllCoachs[$this->context->employee->id_profile]) {
             if (Tools::isSubmit('as_submit')) {
@@ -583,7 +600,7 @@ class AdminCaLetSensController extends ModuleAdminController
     /**
      * Enregistre, modifie, ou efface une ligne de la table objectif_coach
      */
-    private function AjoutObjectif()
+    private function ajoutObjectif()
     {
         if ($this->module->viewAllCoachs[$this->context->employee->id_profile]) {
             if (Tools::isSubmit('oc_submit')) {
@@ -693,8 +710,8 @@ class AdminCaLetSensController extends ModuleAdminController
         $this->setIdFilterCoach();
         $this->setIdFilterCodeAction();
         $this->setFilterCommandeValid();
-        $this->AjoutSomme();
-        $this->AjoutObjectif();
+        $this->ajoutSomme();
+        $this->ajoutObjectif();
 
         return parent::postProcess();
     }
@@ -829,7 +846,7 @@ class AdminCaLetSensController extends ModuleAdminController
         $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
 
         // set auto page breaks
-        $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+        $pdf->SetAutoPageBreak(true, PDF_MARGIN_BOTTOM);
 
         // set image scale factor
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
@@ -896,14 +913,13 @@ class AdminCaLetSensController extends ModuleAdminController
 
         return utf8_decode($name);
     }
-
 }
 
 class MYPDF extends TCPDF
 {
 
     // Page footer
-    public function Footer()
+    public function footer()
     {
         // Position at 15 mm from bottom
         $this->SetY(-15);

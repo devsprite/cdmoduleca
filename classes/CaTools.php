@@ -335,7 +335,8 @@ class CaTools
         $totalMoney = false,
         $valid = false,
         $dateBetween,
-        $lang)
+        $lang
+    )
     {
         $filterCoach = ($idFilterCoach != 0)
             ? " AND e . id_employee = '" . (int)$idFilterCoach . "'" : '';

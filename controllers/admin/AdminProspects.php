@@ -1,30 +1,31 @@
 <?php
 
 /**
-* 2007-2016 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author Dominique <dominique@chez-dominique.fr>
-*  @copyright  2007-2016 Chez-dominique
-*/
+ * 2007-2016 PrestaShop
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
+ * versions in the future. If you wish to customize PrestaShop for your
+ * needs please refer to http://www.prestashop.com for more information.
+ *
+ * @author Dominique <dominique@chez-dominique.fr>
+ * @copyright  2007-2016 Chez-dominique
+ */
 
-if (!defined('_PS_VERSION_'))
+if (!defined('_PS_VERSION_')) {
     exit;
+}
 
 require_once(dirname(__FILE__) . '/../../classes/ProspectClass.php');
 require_once(dirname(__FILE__) . '/../../classes/ProspectAttribueClass.php');
@@ -272,10 +273,10 @@ class AdminProspectsController extends ModuleAdminController
                 $p->traite = 'Nouveau';
                 $p->injoignable = 'non';
                 $p->add();
-            }else{
+            } else {
                 $ap->nbr_prospect_attribue = $ap->nbr_prospect_attribue - 1;
                 $ap->update();
-                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id .'. Corriger les informations de ce client.');
+                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id . '. Corriger les informations de ce client.');
             }
         }
     }
@@ -303,7 +304,14 @@ class AdminProspectsController extends ModuleAdminController
         ), $this->token);
     }
 
-    public function displayCalendarForm($translations, $token, $action = null, $table = null, $identifier = null, $id = null)
+    public function displayCalendarForm(
+        $translations,
+        $token,
+        $action = null,
+        $table = null,
+        $identifier = null,
+        $id = null
+    )
     {
 
         $context = $this->context;
@@ -339,8 +347,12 @@ class AdminProspectsController extends ModuleAdminController
     public function processDateRange()
     {
         if (Tools::isSubmit('submitDatePicker')) {
-            if ((!Validate::isDate($from = Tools::getValue('datepickerFrom')) || !Validate::isDate($to = Tools::getValue('datepickerTo'))) || (strtotime($from) > strtotime($to)))
+            if ((!Validate::isDate($from = Tools::getValue('datepickerFrom')) ||
+                    !Validate::isDate($to = Tools::getValue('datepickerTo'))) ||
+                (strtotime($from) > strtotime($to))
+            ) {
                 $this->errors[] = Tools::displayError('The specified date is invalid.');
+            }
         }
         if (Tools::isSubmit('submitDateDay')) {
             $from = date('Y-m-d');
@@ -373,8 +385,9 @@ class AdminProspectsController extends ModuleAdminController
             $this->context->employee->stats_date_from = $from;
             $this->context->employee->stats_date_to = $to;
             $this->context->employee->update();
-            if (!$this->isXmlHttpRequest())
+            if (!$this->isXmlHttpRequest()) {
                 Tools::redirectAdmin($_SERVER['REQUEST_URI']);
+            }
         }
     }
 
@@ -416,8 +429,8 @@ class AdminProspectsController extends ModuleAdminController
                 $c->update();
                 unset($c);
                 unset($g);
-            }else{
-                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id .'. Corriger les informations de ce client.');
+            } else {
+                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id . '. Corriger les informations de ce client.');
             }
         }
     }
@@ -500,7 +513,7 @@ class AdminProspectsController extends ModuleAdminController
                 $c->update();
                 $prospect->update();
             } else {
-                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id .'. Corriger les informations de ce client.');
+                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id . '. Corriger les informations de ce client.');
                 $i--;
             }
         }
@@ -514,11 +527,10 @@ class AdminProspectsController extends ModuleAdminController
             !Validate::isBirthDate($c->birthday) ||
             !Validate::isName($c->firstname) ||
             !Validate::isName($c->lastname) ||
-            !Validate::isEmail($c->email)) {
+            !Validate::isEmail($c->email)
+        ) {
             $isOk = false;
         }
         return $isOk;
     }
-
-
 }

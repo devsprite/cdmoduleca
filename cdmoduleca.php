@@ -580,8 +580,11 @@ class CdModuleCA extends ModuleGrid
         );
 
         foreach ($confGroupes as $groupe => $value) {
-            Db::getInstance()->update('group_lang', array('id_employee' => $value), 'id_group = ' . $groupe
-                . ' AND id_lang = "' . $this->lang . '"');
+            Db::getInstance()->update(
+                'group_lang',
+                array('id_employee' => $value),
+                'id_group = ' . $groupe . ' AND id_lang = "' . $this->lang . '"'
+            );
         }
 
         return true;
@@ -643,9 +646,11 @@ class CdModuleCA extends ModuleGrid
         if (Tools::isSubmit('submitUpdateGroups')) {
             $groups = $this->getGroupsParrain();
             foreach ($groups as $group) {
-                if (!Db::getInstance()->update('group_lang',
+                if (!Db::getInstance()->update(
+                    'group_lang',
                     array('id_employee' => (int)(str_replace('gp_', '', Tools::getValue('gp_' . $group['id_group'])))),
-                    'id_lang = "' . $this->lang . '" AND id_group = ' . str_replace('gp_', '', $group['id_group']))
+                    'id_lang = "' . $this->lang . '" AND id_group = ' . str_replace('gp_', '', $group['id_group'])
+                )
                 ) {
                     $error .= $this->l('Erreur lors de la mise à jour des groupes');
                 }
@@ -654,9 +659,11 @@ class CdModuleCA extends ModuleGrid
         } elseif (Tools::isSubmit('submitUpdateCodeAction')) {
             $codes_action = $this->getAllCodesAction();
             foreach ($codes_action as $code) {
-                if (Db::getInstance()->update('code_action',
+                if (Db::getInstance()->update(
+                    'code_action',
                     array('groupe' => str_replace('ca_', '', Tools::getValue('ca_' . $code['id_code_action']))),
-                    'id_code_action = ' . str_replace('ca_', '', $code['id_code_action']))
+                    'id_code_action = ' . str_replace('ca_', '', $code['id_code_action'])
+                )
                 ) {
                     $this->updateOrdersTableIdCodeAction();
                 } else {
@@ -1137,12 +1144,15 @@ class CdModuleCA extends ModuleGrid
         if (Validate::IsName($this->_sort)) {
             $this->query .= ' ORDER BY `' . bqSQL($this->_sort) . '`';
             if (isset($this->_direction) && (Tools::strtoupper($this->_direction) == 'ASC' ||
-                    Tools::strtoupper($this->_direction) == 'DESC'))
+                    Tools::strtoupper($this->_direction) == 'DESC')
+            ) {
                 $this->query .= ' ' . pSQL($this->_direction);
+            }
         }
 
-        if (($this->_start === 0 || Validate::IsUnsignedInt($this->_start)) && Validate::IsUnsignedInt($this->_limit))
+        if (($this->_start === 0 || Validate::IsUnsignedInt($this->_start)) && Validate::IsUnsignedInt($this->_limit)) {
             $this->query .= ' LIMIT ' . (int)$this->_start . ', ' . (int)$this->_limit;
+        }
 
 //        ddd($this->query);
         $values = Db::getInstance()->executeS($this->query);
