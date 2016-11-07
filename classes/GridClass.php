@@ -157,7 +157,7 @@ class GridClass extends Module
             foreach ($this->_values as $value) {
                 foreach ($datas['columns'] as $column)
                     $this->_csv .= $value[$column['dataIndex']] . ';';
-                $this->_csv = rtrim($this->_csv, ';') . "\n";
+                $this->_csv = rtrim(str_replace('.', ',', $this->_csv), ';') . "\n";
             }
         }
         $this->_displayCsv($nameFile);

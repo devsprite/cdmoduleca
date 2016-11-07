@@ -176,6 +176,14 @@
                             <span class="input-group-addon">Jour</span>
                         </div>
                     </div>
+                    <div class="col-lg-1">
+                        <label for="oc_somme">Nbre de jours ouvrés</label>
+                        <div class="input input-group">
+                            <input type="text" id="oc_jour_ouvre" name="oc_jour_ouvre" value="{if isset($smarty.post.oc_jour_ouvre)
+                            }{$smarty.post.oc_jour_ouvre}{/if}">
+                            <span class="input-group-addon">Jour</span>
+                        </div>
+                    </div>
                     <div class="col-lg-12">
                         <div class="col-lg-7">
                             <label for="oc_commentaire">Commentaire</label>

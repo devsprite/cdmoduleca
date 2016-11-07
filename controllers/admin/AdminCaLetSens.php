@@ -127,8 +127,14 @@ class AdminCaLetSensController extends ModuleAdminController
     private function syntheseCoachsTable()
     {
         $employees = CaTools::getEmployees(1, $this->context->employee->id);
+
         if ($this->module->viewAllCoachs[$this->context->employee->id_profile]) {
-            $employees = CaTools::getEmployees($this->employees_actif);
+            if ($this->idFilterCoach == 0) {
+                $employees = CaTools::getEmployees($this->employees_actif);
+            } else {
+                $employees = CaTools::getEmployees(null,$this->idFilterCoach);
+            }
+
         }
 
         $datasEmployees = array();
@@ -140,28 +146,43 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['caRembourse'] =
                 CaTools::getCaCoachsRembourse($employee['id_employee'], 0, $this->getDateBetween());
 
-            $caTotal = CaTools::getCaCoachsTotal($employee['id_employee'], 99, $this->getDateBetween())
-                - $datasEmployees[$employee['id_employee']]['caRembourse'];
+            $datasEmployees[$employee['id_employee']]['caAvoir'] =
+                CaTools::getCaCoachsAvoir($employee['id_employee'], $this->getDateBetween());
+
+            $caTotal = CaTools::getCaCoachsTotal($employee['id_employee'], 99, $this->getDateBetween());
 
             $datasEmployees[$employee['id_employee']]['caTotal'] = ($caTotal) ? $caTotal : '';
 
-            $pourCaRembourse = ($caTotal) ? round( (($datasEmployees[$employee['id_employee']]['caRembourse'] * 100)
-                / $caTotal),2): '';
+            $pourCaRembourse = ($caTotal) ? round((($datasEmployees[$employee['id_employee']]['caRembourse'] * 100)
+                / $caTotal), 2) : '';
 
-            $datasEmployees[$employee['id_employee']]['pourCaRembourse'] = ($pourCaRembourse) ? $pourCaRembourse .' %': '';
+            $datasEmployees[$employee['id_employee']]['pourCaRembourse'] = ($pourCaRembourse) ? $pourCaRembourse . ' %' : '';
 
             $datasEmployees[$employee['id_employee']]['ajustement'] =
                 CaTools::getAjustement($employee['id_employee'], $this->getDateBetween());
 
-            $datasEmployees[$employee['id_employee']]['caAjuste'] = ($datasEmployees[$employee['id_employee']]['ajustement'])
+            $datasEmployees[$employee['id_employee']]['caAjuste'] = ($datasEmployees[$employee['id_employee']]['caTotal'])
                 ? ($datasEmployees[$employee['id_employee']]['caTotal']
-                    + $datasEmployees[$employee['id_employee']]['ajustement']) : '';
+                    + $datasEmployees[$employee['id_employee']]['ajustement'])
+                - $datasEmployees[$employee['id_employee']]['caRembourse']
+                - $datasEmployees[$employee['id_employee']]['caAvoir'] : '';
+
+            $datasEmployees[$employee['id_employee']]['caRembAvoir'] = ($datasEmployees[$employee['id_employee']]['caTotal'])
+                ? $datasEmployees[$employee['id_employee']]['caRembourse']
+                + $datasEmployees[$employee['id_employee']]['caAvoir'] : '';
+
+            $pourCaRembAvoir = ($caTotal) ? round((($datasEmployees[$employee['id_employee']]['caRembAvoir'] * 100)
+                / $caTotal), 2) : '';
+
+            $datasEmployees[$employee['id_employee']]['pourCaRembAvoir'] = ($pourCaRembAvoir) ? $pourCaRembAvoir . ' %' : '';
 
             $datasEmployees[$employee['id_employee']]['caDejaInscrit'] =
                 CaTools::getCaDejaInscrit($employee['id_employee'], $this->getDateBetween());
 
-            $datasEmployees[$employee['id_employee']]['CaProsp'] =
-                CaTools::caProsp($datasEmployees[$employee['id_employee']]);
+            $caProsp = CaTools::caProsp($datasEmployees[$employee['id_employee']])
+                - $datasEmployees[$employee['id_employee']]['caRembAvoir'];
+
+            $datasEmployees[$employee['id_employee']]['CaProsp'] = ($caProsp) ? $caProsp : '';
 
             $datasEmployees[$employee['id_employee']]['PourcCaProspect'] =
                 CaTools::PourcCaProspect($datasEmployees[$employee['id_employee']]);
@@ -179,7 +200,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 ProspectAttribueClass::getNbrProspectsAttriByCoach($employee['id_employee'], $this->getDateBetween());
 
             $datasEmployees[$employee['id_employee']]['CaContact'] = ($datasEmployees[$employee['id_employee']]['NbreDeProspects'])
-                ? round((($datasEmployees[$employee['id_employee']]['caTotal']
+                ? round((($datasEmployees[$employee['id_employee']]['caAjuste']
                         - $datasEmployees[$employee['id_employee']]['caFidTotal'])
                     / $datasEmployees[$employee['id_employee']]['NbreDeProspects']), 2) : '';
 
@@ -253,6 +274,11 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] =
                 CaTools::getNbrGrVentes($employee['id_employee'], 'PAR', null, true, false,
                     $this->getDateBetween(), $this->module->lang);
+
+            $datasEmployees[$employee['id_employee']]['pourVenteGrPar'] =
+                ($datasEmployees[$employee['id_employee']]['totalVenteGrPar'])
+                    ? round(($datasEmployees[$employee['id_employee']]['totalVenteGrPar'] * 100)
+                        / $datasEmployees[$employee['id_employee']]['caAjuste'], 2) . ' %' : '';
 
             $datasEmployees[$employee['id_employee']]['primeFichierCoach'] =
                 CaTools::primeFichier($employee['id_employee'], $this->getDateBetween());
@@ -462,6 +488,7 @@ class AdminCaLetSensController extends ModuleAdminController
                     'commentaire' => pSQL(Tools::getValue('oc_commentaire')),
                     'heure_absence' => Tools::getValue('oc_heure'),
                     'jour_absence' => Tools::getValue('oc_jour'),
+                    'jour_ouvre' => Tools::getValue('oc_jour_ouvre'),
                     'date_start' => Tools::getValue('oc_date_start'),
                     'date_end' => date('Y-m-d 23:59:59', strtotime(Tools::getValue('oc_date_end')))
                 );
@@ -479,6 +506,9 @@ class AdminCaLetSensController extends ModuleAdminController
                 }
                 if (!empty($data['jour_absence']) && !Validate::isInt($data['jour_absence'])) {
                     $this->errors[] = 'Erreur du champ jour d\'absence';
+                }
+                if (!empty($data['jour_ouvre']) && !Validate::isInt($data['jour_ouvre'])) {
+                    $this->errors[] = 'Erreur du champ jour ouvré';
                 }
                 if (!Validate::isDate($data['date_start'])) {
                     $this->errors[] = 'Erreur du champ date début';
@@ -510,6 +540,7 @@ class AdminCaLetSensController extends ModuleAdminController
                         unset($_POST['oc_commentaire']);
                         unset($_POST['oc_heure']);
                         unset($_POST['oc_jour']);
+                        unset($_POST['oc_jour_ouvre']);
                         unset($_POST['oc_date_start']);
                         unset($_POST['oc_date_end']);
                         unset($_POST['oc_id']);
@@ -530,6 +561,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $_POST['oc_commentaire'] = $oc['commentaire'];
                 $_POST['oc_heure'] = $oc['heure_absence'];
                 $_POST['oc_jour'] = $oc['jour_absence'];
+                $_POST['oc_jour'] = $oc['jour_ouvre'];
                 $_POST['oc_date_start'] = $oc['date_start'];
                 $_POST['oc_date_end'] = $oc['date_end'];
                 $_POST['oc_id'] = $oc['id_objectif_coach'];

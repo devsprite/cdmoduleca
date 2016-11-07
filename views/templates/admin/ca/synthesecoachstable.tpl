@@ -17,8 +17,8 @@
         <th style="width: 5%;text-align: center">% CA prospect</th>
         <th style="width: 5%;text-align: right">CA FID</th>
         <th style="width: 5%;text-align: center">% CA FID</th>
-        <th style="width: 5%;text-align: right">CA Retour</th>
-        <th style="width: 5%;text-align: center">% CA Retour</th>
+        <th style="width: 5%;text-align: right">CA Remb/Avoir</th>
+        <th style="width: 5%;text-align: center">% CA Remb/Avoir</th>
         <th style="width: 5%;text-align: right">CA Impayé</th>
         <th style="width: 5%;text-align: center">% Impayé</th>
     </tr>
@@ -40,8 +40,8 @@
         <td class="text-right">{$coach['PourcCaProspect']}</td>
         <td class="text-right">{displayPrice price=$coach['caDejaInscrit']}</td>
         <td class="text-right">{$coach['PourcCaFID']}</td>
-        <td class="text-right">{displayPrice price=$coach['caRembourse']}
-        <td class="text-right">{$coach['pourCaRembourse']}</td>
+        <td class="text-right">{displayPrice price=$coach['caRembAvoir']}
+        <td class="text-right">{$coach['pourCaRembAvoir']}</td>
         <td></td>
         <td></td>
         <td></td>
@@ -74,6 +74,7 @@
             <td class="text-center">{$coach['nbrVenteGrDesaAbo']}</td>
             <td class="text-right">{$coach['pourcenDesabo']}</td>
             <td class="text-right">{displayPrice price=$coach['totalVenteGrPar']}</td>
+            <td class="text-left">{$coach['pourVenteGrPar']}</td>
             <td></td>
         </tr>
     {/foreach}

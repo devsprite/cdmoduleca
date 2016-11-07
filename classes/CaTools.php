@@ -63,7 +63,7 @@ class CaTools
                 if(SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) < 
                 0 , 0, SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2))) as total
                 FROM ' . _DB_PREFIX_ . 'orders AS o';
-        $sql .= ' WHERE date_upd BETWEEN ';
+        $sql .= ' WHERE date_add BETWEEN ';
         $sql .= $dateBetween;
         $sql .= ' AND valid = 1 ';
         $sql .= ' AND (current_state = 7)';
@@ -206,7 +206,7 @@ class CaTools
     public static function getObjectifCoachs($id_employee, $dateBetween)
     {
         $sql = 'SELECT id_objectif_coach, somme, commentaire, a.id_employee, date_start, date_end, lastname,
-                heure_absence, jour_absence
+                heure_absence, jour_absence, jour_ouvre
                 FROM `ps_objectif_coach` AS a
                 LEFT JOIN `ps_employee` AS e ON a.id_employee = e.id_employee
                 WHERE date_start BETWEEN ' . $dateBetween;
@@ -255,7 +255,7 @@ class CaTools
     public static function PourcCaProspect($data)
     {
         if ($data['caTotal'] != 0) {
-            return number_format(($data['CaProsp'] * 100) / $data['caTotal'], 2) . ' %';
+            return number_format(($data['CaProsp'] * 100) / $data['caAjuste'], 2) . ' %';
         }
         return '';
     }
@@ -263,7 +263,7 @@ class CaTools
     public static function PourcCaFID($data)
     {
         if ($data['caTotal'] != 0) {
-            return number_format(($data['caDejaInscrit'] * 100) / $data['caTotal'], 2) . ' %';
+            return number_format(($data['caDejaInscrit'] * 100) / $data['caAjuste'], 2) . ' %';
         }
         return '';
     }
@@ -271,7 +271,7 @@ class CaTools
     public static function getPanierMoyen($data)
     {
         if ($data['NbreVentesTotal'] != 0) {
-            return $data['caTotal'] / $data['NbreVentesTotal'];
+            return $data['caAjuste'] / $data['NbreVentesTotal'];
         }
         return '';
     }
@@ -525,7 +525,8 @@ class CaTools
         $taux = Configuration::get('CDMODULECA_PRIME_FICHIER');
         $pros_jour = Configuration::get('CDMODULECA_PROSPECTS_JOUR');
         $pros_heure = Configuration::get('CDMODULECA_PROSPECTS_HEURE');
-        $nbr_jours_ouvre = CaTools::get_nb_open_days($dateBetween);
+        $jour_ouvre = CaTools::getJourOuvreEmploye($id_employee, $dateBetween);
+        $nbr_jours_ouvre = (empty($jour_ouvre)) ? CaTools::get_nb_open_days($dateBetween) : $jour_ouvre;
         $nbr_prospects = ProspectAttribueClass::getNbrProspectsAttriByCoach($id_employee, $dateBetween);
         $absence = CaTools::getAbsenceEmployee($id_employee, $dateBetween);
 
@@ -533,8 +534,8 @@ class CaTools
             return '';
         }
 
-        $prime = ( (($pros_jour*($nbr_jours_ouvre - $absence['jours'])) - ($absence['heures'] * $pros_heure))
-        - $nbr_prospects ) * $taux;
+        $prime = ((($pros_jour * ($nbr_jours_ouvre - $absence['jours'])) - ($absence['heures'] * $pros_heure))
+                - $nbr_prospects) * $taux;
 
         return round($prime, 2);
     }
@@ -554,5 +555,28 @@ class CaTools
                 '`id_appel` = ' . (int)$compteur['id_appel']);
             setcookie('appelKeyyo', $compteur['compteur']++, strtotime(date('Y-m-d 23:59:59')));
         }
+    }
+
+    public static function getCaCoachsAvoir($idCoach, $dateBetween)
+    {
+        $sql = 'SELECT SUM(amount) FROM `ps_order_slip` AS os
+                LEFT JOIN `ps_orders` AS o ON o.`id_order` = os.`id_order` 
+                WHERE os.date_add BETWEEN ' . $dateBetween . '
+                AND o.`id_employee` = ' . $idCoach;
+
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
+    }
+
+    private static function getJourOuvreEmploye($id_employee, $dateBetween)
+    {
+        $sql = 'SELECT SUM(`jour_ouvre`) FROM `ps_objectif_coach` 
+                WHERE `id_employee` = ' . (int)$id_employee . ' 
+                AND `date_start` BETWEEN ' . $dateBetween;
+
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
     }
 }

@@ -127,7 +127,7 @@
             {/foreach}
             </tbody>
         </table>
-        <h2>Absence Coach</h2>
+        <h2>Horaire Coach</h2>
         <table class="table table-hover">
             <thead>
             <tr>
@@ -136,19 +136,21 @@
                 <th style="width: 10%">Date fin</th>
                 <th style="width: 10%">Heure</th>
                 <th style="width: 10%">Jour</th>
+                <th style="width: 10%">Jours ouvrés</th>
                 <th style="width: 40%">Commentaire</th>
                 <th style="width: 5%"></th>
             </tr>
             </thead>
             <tbody>
             {foreach item=objectif from=$objectifCoachs}
-                {if $objectif['heure_absence'] != 0 || $objectif['jour_absence'] != 0}
+                {if $objectif['heure_absence'] != 0 || $objectif['jour_absence'] != 0 || $objectif['jour_ouvre'] != 0}
                     <tr>
                         <td>{$objectif['lastname']}</td>
                         <td>{$objectif['date_start']|date_format:'%d/%m/%Y'}</td>
                         <td>{$objectif['date_end']|date_format:'%d/%m/%Y'}</td>
                         <td>{$objectif['heure_absence']}</td>
                         <td>{$objectif['jour_absence']}</td>
+                        <td>{$objectif['jour_ouvre']}</td>
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true}</td>
                         <td>
                             {if isset($coachs)}

@@ -147,8 +147,14 @@ class CdModuleCA extends ModuleGrid
             ),
             array(
                 'id' => 'date_add',
-                'header' => $this->l('date add'),
+                'header' => $this->l('Date'),
                 'dataIndex' => 'date_add',
+                'align' => 'center'
+            ),
+            array(
+                'id' => 'date_upd',
+                'header' => $this->l('Mise à jour'),
+                'dataIndex' => 'date_upd',
                 'align' => 'center'
             ),
 
@@ -384,6 +390,7 @@ class CdModuleCA extends ModuleGrid
         `commentaire` TEXT NULL,
         `heure_absence` DECIMAL(6,2) NULL,
         `jour_absence` INT(12) NULL,
+        `jour_ouvre` INT(12) NULL,
         `date_start` DATETIME NOT NULL,
         `date_end` DATETIME NOT NULL,
         PRIMARY KEY (`id_objectif_coach`))
@@ -1098,6 +1105,7 @@ class CdModuleCA extends ModuleGrid
         $this->query = '
           SELECT SQL_CALC_FOUND_ROWS
           DISTINCT o.id_order AS id,
+          amount as avoir,
           gl.name AS groupe,
           CONCAT ( ROUND(o.total_products - o.total_discounts_tax_excl,2), " €") AS hthp,
           (SELECT e.lastname FROM ps_employee AS e WHERE o.id_employee = e.id_employee) AS id_employee,
@@ -1111,6 +1119,7 @@ class CdModuleCA extends ModuleGrid
           AND so.id_order < o.id_order LIMIT 1) > 0, "", "Oui") as new
 				FROM ' . _DB_PREFIX_ . 'orders AS o ';
         $this->query .= $filterGroupe;
+        $this->query .= ' LEFT JOIN `ps_order_slip` AS os ON o.`id_order` = os.`id_order` ';
         $this->query .= ' WHERE o.date_add BETWEEN ' . $this->getDate();
         $this->query .= $filterCoach;
         $this->query .= $filterCodeAction;

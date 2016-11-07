@@ -247,6 +247,8 @@ class AdminProspectsController extends ModuleAdminController
                 $p->injoignable = 'non';
                 $p->add();
             }else{
+                $ap->nbr_prospect_attribue = $ap->nbr_prospect_attribue - 1;
+                $ap->update();
                 $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id .'. Corriger les informations de ce client.');
             }
         }
@@ -259,7 +261,6 @@ class AdminProspectsController extends ModuleAdminController
         if ($index_prospects != null) {
             $nbr_nouveaux_prospects = $this->getNbrNouveauProspects($index_prospects);
         }
-
         return $nbr_nouveaux_prospects;
     }
 
@@ -361,7 +362,6 @@ class AdminProspectsController extends ModuleAdminController
                 AND c.`deleted` = 0';
 
         $req = Db::getInstance()->getValue($sql);
-
         return $req;
     }
 
