@@ -18,7 +18,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    Dominique <dominique@chez-dominique.fr>
- * @copyright 2007-2015 PrestaShop SA / 2011-2015 Dominique
+ * @copyright 2007-2016 PrestaShop SA / 2011-2016 Dominique
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  * International Registred Trademark & Property of PrestaShop SA
  *}
@@ -72,10 +72,10 @@
                     <div class="col-lg-3 col-md-3 col-xs-12">
                         <label class="control-label" for="">Nbre Prosprects Attribués
                             <input type="text" name="" id=""
-                                   value="{$pa->nbr_prospect_attribue}"
+                                   value="{$pa->nbr_prospect_attribue|escape:'htmlall':'UTF-8'}"
                                    class="form-control" disabled></label>
                     </div>
-                    <input type="hidden" name="pa_id_pa" value="{$pa->id_prospect_attribue}">
+                    <input type="hidden" name="pa_id_pa" value="{$pa->id_prospect_attribue|escape:'htmlall':'UTF-8'}">
                 {elseif !empty($nbrProspectsIsoles)}
                     <div class="col-lg-3 col-md-3 col-xs-12">
                         <label class="control-label">
@@ -83,8 +83,8 @@
                             <select name="pi_id_employee" class="" id="pi_id_employee">
                                 {foreach item=coach from=$coachs}
                                     {if !empty($coach['id_group'])}
-                                        <option value="{$coach['id_employee']}">{$coach['lastname']} -
-                                            ({$coach['firstname']})
+                                        <option value="{$coach['id_employee']|escape:'htmlall':'UTF-8'}">{$coach['lastname']|escape:'htmlall':'UTF-8'} -
+                                            ({$coach['firstname']|escape:'htmlall':'UTF-8'})
                                         </option>
                                     {/if}
                                 {/foreach}
@@ -92,9 +92,9 @@
                         </label>
                     </div>
                     <div class="col-lg-3 col-md-3 col-xs-12">
-                        <label class="control-label" for="">{$nbrProspectsIsoles} Prospect(s) Isolé(s)
+                        <label class="control-label" for="">{$nbrProspectsIsoles|escape:'htmlall':'UTF-8'} Prospect(s) Isolé(s)
                             <input type="text" name="pi_nbr_pr" id="pi_nbr_pr"
-                                   value="{$nbrProspectsIsoles}"
+                                   value="{$nbrProspectsIsoles|escape:'htmlall':'UTF-8'}"
                                    class="form-control"></label>
                     </div>
                 {/if}
@@ -104,7 +104,7 @@
                     </div>
                     <div>
                         <input type="checkbox" name="employeActif" id="employeActif" onchange="this.form.submit();"
-                                {if $employeActif}{$employeActif}{/if}>
+                                {if $employeActif}{$employeActif|escape:'htmlall':'UTF-8'}{/if}>
                         <input type="hidden" name="submitEmployeActif" value="1"/>
                     </div>
                 </div>
@@ -135,12 +135,12 @@
                             {if !empty($employe['id_group'])}
                                 <div class="col-lg-4 col-md-6 col-xs-12">
                                     <label class="control-label"
-                                           for="{$employe['lastname']}{$employe['firstname']}"><strong>{$employe['lastname']}</strong>
-                                        {if !empty({$employe['total_prospect']})} - {$employe['total_prospect']} Prospects{/if}
-                                        <p>({$employe['firstname']} - {$employe['id_group']}
+                                           for="{$employe['lastname']|escape:'htmlall':'UTF-8'}{$employe['firstname']|escape:'htmlall':'UTF-8'}"><strong>{$employe['lastname']|escape:'htmlall':'UTF-8'}</strong>
+                                        {if !empty({$employe['total_prospect']})} - {$employe['total_prospect']|escape:'htmlall':'UTF-8'} Prospects{/if}
+                                        <p>({$employe['firstname']|escape:'htmlall':'UTF-8'} - {$employe['id_group']|escape:'htmlall':'UTF-8'}
                                             )</p></label>
-                                    <input type="text" name="em_{$employe['id_employee']}"
-                                           id="{$employe['lastname']}{$employe['firstname']}" value="">
+                                    <input type="text" name="em_{$employe['id_employee']|escape:'htmlall':'UTF-8'}"
+                                           id="{$employe['lastname']|escape:'htmlall':'UTF-8'}{$employe['firstname']|escape:'htmlall':'UTF-8'}" value="">
 
                                 </div>
                             {/if}

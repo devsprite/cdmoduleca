@@ -1,5 +1,4 @@
 <?php
-
 /**
 * 2007-2016 PrestaShop
 *
@@ -19,8 +18,8 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author Dominique <dominique@chez-dominique.fr>
-*  @copyright  2007-2016 Chez-dominique
+*  @author  Dominique <dominique@chez-dominique.fr>
+*  @copyright   2007-2016 Chez-dominique
 */
 
 if (!defined('_PS_VERSION_'))
@@ -696,7 +695,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
             }
         }
         if (isset($contacte->soir)) {
-            $messages['soir'] .= (count($contacte->soir) > 1) ? '2' : count($contacte->soir);
+            $messages['soir'] = (count($contacte->soir) > 1) ? '2' : count($contacte->soir);
             foreach ($contacte->soir as $soir) {
                 $v['soir'] .= $soir . PHP_EOL;
             }

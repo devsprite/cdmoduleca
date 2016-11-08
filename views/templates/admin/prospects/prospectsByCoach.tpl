@@ -18,7 +18,7 @@
  * needs please refer to http://www.prestashop.com for more information.
  *
  * @author    Dominique <dominique@chez-dominique.fr>
- * @copyright 2007-2015 PrestaShop SA / 2011-2015 Dominique
+ * @copyright 2007-2016 PrestaShop SA / 2011-2016 Dominique
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  * International Registred Trademark & Property of PrestaShop SA
  *}
@@ -43,7 +43,7 @@
                 <tr>
                     <td>{$coach['date_debut']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
                     <td>{$coach['date_fin']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
-                    <td>{$coach['lastname']} ({$coach['firstname']|escape:'htmlall':'UTF-8'})</td>
+                    <td>{$coach['lastname']|escape:'htmlall':'UTF-8'} ({$coach['firstname']|escape:'htmlall':'UTF-8'})</td>
                     <td>{$coach['nbr_prospect_attribue']|escape:'htmlall':'UTF-8'}</td>
                     <td>
                         <a href="{$linkFilter}&view_pa&id_pa={$coach['id_prospect_attribue']|intval}">
