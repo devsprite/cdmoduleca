@@ -21,6 +21,9 @@
 *  @license    http:*  International Registered Trademark & Property of PrestaShop SA
 */
 
+require_once(dirname(__FILE__) . '/../../../modules/cdmoduleca/classes/ProspectClass.php');
+require_once(dirname(__FILE__) . '/../../../modules/cdmoduleca/classes/CaTools.php');
+
 class AdminCustomersController extends AdminCustomersControllerCore
 {
 	/*
@@ -41,6 +44,10 @@ class AdminCustomersController extends AdminCustomersControllerCore
 
 		$this->allow_export = false;
 
+        $this->addRowAction('contact'); // module cdmoduleca
+        $this->addRowAction('crepondeur'); // module cdmoduleca
+        $this->addRowAction('ctraite'); // module cdmoduleca
+//        $this->addRowAction('cinjoignable'); // module cdmoduleca
 		$this->addRowAction('edit');
 		$this->addRowAction('view');
 		$this->addRowAction('delete');
@@ -52,6 +59,16 @@ class AdminCustomersController extends AdminCustomersControllerCore
 			)
 		);
 
+        $traite = array(
+            'oui' => 'oui',
+            'non' => 'non',
+            'Nouveau' => 'Nouveau'
+        );
+        $injoignable = array(
+            'oui' => 'oui',
+            'non' => 'non'
+        );
+
 		$this->context = Context::getContext();
 
 		$this->default_form_language = $this->context->language->id;
@@ -62,8 +79,9 @@ class AdminCustomersController extends AdminCustomersControllerCore
 			$titles_array[$gender->id_gender] = $gender->name;
 
 		$this->_select = '
-		a.date_add, gl.name as title, (
-			SELECT SUM(total_paid_real / conversion_rate)
+		a.date_add, gl.name as title, traite, injoignable, contacte,
+		    (SELECT GROUP_CONCAT(id_group SEPARATOR ", ") FROM `' . _DB_PREFIX_ . 'customer_group` cg  WHERE cg.`id_customer`=a.`id_customer` GROUP by cg.`id_customer`) as id_group,
+		    (SELECT SUM(total_paid_real / conversion_rate)
 			FROM '._DB_PREFIX_.'orders o
 			WHERE o.id_customer = a.id_customer
 			'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
@@ -75,8 +93,16 @@ class AdminCustomersController extends AdminCustomersControllerCore
 			ORDER BY c.date_add DESC
 			LIMIT 1
 		) as connect, (SELECT CONCAT(b.phone, ":", b.phone_mobile) as phone FROM '._DB_PREFIX_.'address b WHERE b.id_customer = a.id_customer LIMIT 1) as phone
-		'; 		$this->_join = 'LEFT JOIN '._DB_PREFIX_.'gender_lang gl ON (a.id_gender = gl.id_gender AND gl.id_lang = '.(int)$this->context->language->id.')';
-		$this->fields_list = array(
+		';
+        $this->_join = 'LEFT JOIN '._DB_PREFIX_.'gender_lang gl ON (a.id_gender = gl.id_gender AND gl.id_lang = '.(int)$this->context->language->id.')';
+        $this->_join .= ' LEFT JOIN `' . _DB_PREFIX_ . 'prospect` AS pr ON a.`id_customer` = pr.`id_customer` ';
+        $this->fields_list = array(
+            'id_group' => array(
+                'title' => $this->l('Gr.'),
+                'havingFilter' => true,
+                'align' => 'text-center',
+                'class' => 'fixed-width-xs'
+            ),
 			'id_customer' => array(
 				'title' => $this->l('ID'),
 				'align' => 'text-center',
@@ -128,8 +154,6 @@ class AdminCustomersController extends AdminCustomersControllerCore
 				'align' => 'text-right',
 				'badge_success' => true
 			),
-
-
 			'active' => array(
 				'title' => $this->l('Enabled'),
 				'align' => 'text-center',
@@ -138,41 +162,81 @@ class AdminCustomersController extends AdminCustomersControllerCore
 				'orderby' => false,
 				'filter_key' => 'a!active'
 			),
-			'newsletter' => array(
-				'title' => $this->l('Newsletter'),
-				'align' => 'text-center',
-				'type' => 'bool',
-				'callback' => 'printNewsIcon',
-				'orderby' => false
-			),
-			'optin' => array(
-				'title' => $this->l('Opt-in'),
-				'align' => 'text-center',
-				'type' => 'bool',
-				'callback' => 'printOptinIcon',
-				'orderby' => false
-			),
+            'traite' => array(
+                'title' => $this->l('Traité'),
+                'filter_key' => 'traite',
+                'type' => 'select',
+                'list' => $traite,
+                'order_key' => 'traite',
+                'class' => 'fixed-width-xs',
+                'callback' => 'doublons',
+            ),
+            'injoignable' => array(
+                'title' => $this->l('Injoignable'),
+                'filter_key' => 'injoignable',
+                'type' => 'select',
+                'list' => $injoignable,
+                'order_key' => 'injoignable',
+                'class' => 'fixed-width-xs'
+            ),
+            'contacte' => array(
+                'title' => $this->l('Contacté'),
+                'filter_key' => 'contacte',
+                'type' => 'text',
+                'order_key' => 'contacte',
+                'callback' => 'contact'
+            ),
+//			'newsletter' => array(
+//				'title' => $this->l('Newsletter'),
+//				'align' => 'text-center',
+//				'type' => 'bool',
+//				'callback' => 'printNewsIcon',
+//				'orderby' => false
+//			),
+//			'optin' => array(
+//				'title' => $this->l('Opt-in'),
+//				'align' => 'text-center',
+//				'type' => 'bool',
+//				'callback' => 'printOptinIcon',
+//				'orderby' => false
+//			),
 			'date_add' => array(
 				'title' => $this->l('Registration'),
 				'type' => 'date',
 				'align' => 'text-right'
 			),
-			'connect' => array(
-				'title' => $this->l('Last visit'),
-				'type' => 'datetime',
-				'search' => false,
-				'havingFilter' => true
-			)
+//			'connect' => array(
+//				'title' => $this->l('Last visit'),
+//				'type' => 'datetime',
+//				'search' => false,
+//				'havingFilter' => true
+//			)
 		));
+
+        // Module cdmoduleca
+        if (Tools::isSubmit('traite')) {
+            ProspectClass::setContact();
+            ProspectClass::toggleTraite();
+        }
+        if (Tools::isSubmit('injoignable')) {
+            ProspectClass::toggleInjoignable();
+        }
+        if (Tools::isSubmit('contact')) {
+            ProspectClass::setContact();
+        }
+        if (Tools::isSubmit('repondeur')) {
+            ProspectClass::setRepondeur();
+        }
 
 		$this->shopLinkType = 'shop';
 		$this->shopShareDatas = Shop::SHARE_CUSTOMER;
 
 		AdminController::__construct();
 
-                $this->addJquery();
+        $this->addJquery();
         $this->addJS(_PS_MODULE_DIR_ . 'keyyo/views/js/adminkeyyo.js');
         $this->addCSS(_PS_MODULE_DIR_ . 'keyyo/views/css/adminkeyyo.css');
+        $this->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/admincustomer.css');
 
 				if (Shop::isFeatureActive() && (Shop::getContext() == Shop::CONTEXT_ALL || Shop::getContext() == Shop::CONTEXT_GROUP))
 			$this->can_add_customer = false;
@@ -338,7 +402,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
 			'customer' => $customer,
 			'gender' => $gender,
 			'gender_image' => $gender_image,
-						'registration_date' => Tools::displayDate($customer->date_add,null , true),
+            'registration_date' => Tools::displayDate($customer->date_add,null , true),
 			'customer_stats' => $customer_stats,
 			'last_visit' => Tools::displayDate($customer_stats['last_visit'],null , true),
 			'count_better_customers' => $count_better_customers,
@@ -349,23 +413,22 @@ class AdminCustomersController extends AdminCustomersControllerCore
 			'customer_exists' => Customer::customerExists($customer->email),
 			'id_lang' => $customer->id_lang,
 			'customerLanguage' => $customerLanguage,
-						'customer_note' => Tools::htmlentitiesUTF8($customer->note),
-						'messages' => $messages,
-						'groups' => $groups,
-						'orders' => $orders,
+            'customer_note' => Tools::htmlentitiesUTF8($customer->note),
+            'messages' => $messages,
+            'groups' => $groups,
+            'orders' => $orders,
 			'orders_ok' => $orders_ok,
 			'orders_ko' => $orders_ko,
 			'total_ok' => Tools::displayPrice($total_ok, $this->context->currency->id),
-						'products' => $products,
-			            'addresses' => $this->makePhoneCallFiche($customer->getAddresses($this->default_form_language)), 									'discounts' => CartRule::getCustomerCartRules($this->default_form_language, $customer->id, false, false),
-						'carts' => $carts,
-						'interested' => $interested,
-						'emails' => $emails,
-						'connections' => $connections,
-						'referrers' => $referrers,
+            'products' => $products,
+            'addresses' => $this->makePhoneCallFiche($customer->getAddresses($this->default_form_language)), 									'discounts' => CartRule::getCustomerCartRules($this->default_form_language, $customer->id, false, false),
+            'carts' => $carts,
+            'interested' => $interested,
+            'emails' => $emails,
+            'connections' => $connections,
+            'referrers' => $referrers,
 			'show_toolbar' => true
 		);
-
 
 
 		return AdminController::renderView();
@@ -435,28 +498,13 @@ class AdminCustomersController extends AdminCustomersControllerCore
         $callee = Tools::getValue('CALLEE');
         $calle_name = Tools::getValue('CALLE_NAME');
 
-        $log = array(
-            'keyyo_url' => $keyyo_url,
-            'account' => $account,
-            'callee' => $callee,
-            'calle_name' => $calle_name,
-            'erreur' => '',
-            'keyyo_link' => '',
-            'retour_keyyo' => '',
-            'heure' => date('H:i:s Y:m:d')
-        );
-
         if (!$account) {
             $return = Tools::jsonEncode(array('msg' => 'Veuillez configurer votre numéro de compte KEYYO.'));
-                $log['erreur'] = $return;
-                $this->logKeyyo($log);
             die($return);
         }
 
         if (!$callee || !$calle_name) {
             $return = Tools::jsonEncode(array('msg' => 'Il manque une information pour composer le numéro.'));
-                $log['erreur'] = $return;
-                $this->logKeyyo($log);
             die($return);
         } else {
             $keyyo_link = $keyyo_url . '?ACCOUNT=' . $account;
@@ -466,35 +514,18 @@ class AdminCustomersController extends AdminCustomersControllerCore
 
             $fp = fopen($keyyo_link, 'r');
             $buffer = fgets($fp, 4096);
-            $log['reponseHttp'] = $http_response_header[0];
             fclose($fp);
 
-                $log['keyyo_link'] = $keyyo_link;
-                $log['retour_keyyo'] = $buffer;
-
-
+            CaTools::setCompteurAppels($this->context->employee->id);
             if ($buffer == 'OK') {
                 $return = Tools::jsonEncode(array('msg' => 'Appel du ' . $callee . ' en cours.'));
-                $log['erreur'] = $return;
-                $this->logKeyyo($log);
                 die($return);
             } else {
                 $return = Tools::jsonEncode(array('msg' => 'Problème lors de l\'appel.'));
-                $log['erreur'] = $return;
-                $this->logKeyyo($log);
                 die($return);
             }
         }
     }
-
-    public function logKeyyo($log)
-    {
-        $f = Tools::jsonEncode($log);
-        $file = fopen(_PS_MODULE_DIR_ .'/logKeyyo.txt', 'a+');
-        fwrite($file, $f . PHP_EOL);
-        fclose($file);
-    }
-
 
     /*
 	* module: keyyo
@@ -533,4 +564,182 @@ class AdminCustomersController extends AdminCustomersControllerCore
     return $keyyo_link;
     }
 
+    /**
+     * Module cdmoduleca
+     *
+     * @param null $token
+     * @param $id
+     * @param null $name
+     * @return string
+     */
+    public function displayCtraiteLink($token = null, $id, $name = null)
+    {
+        $tpl = $this->createTemplate('helpers/list/list_action_edit.tpl');
+        if (!array_key_exists('traite', self::$cache_lang))
+            self::$cache_lang['traite'] = $this->l('Traité');
+
+        $tpl->assign(array(
+            'href' =>
+                Context::getContext()->link->getAdminLink('AdminCustomers') . '&'
+                . $this->identifier . '=' . $id . '&traite',
+            'action' => self::$cache_lang['traite'],
+            'id' => $id
+        ));
+
+        return $tpl->fetch();
+    }
+
+    /**
+     * Module cdmoduleca
+     *
+     * @param null $token
+     * @param $id
+     * @param null $name
+     * @return string
+     */
+    public function displayCinjoignableLink($token = null, $id, $name = null)
+    {
+        $tpl = $this->createTemplate('helpers/list/list_action_delete.tpl');
+        if (!array_key_exists('injoignable', self::$cache_lang))
+            self::$cache_lang['injoignable'] = $this->l('Injoignable');
+
+        $tpl->assign(array(
+            'href' =>
+                Context::getContext()->link->getAdminLink('AdminCustomers') . '&'
+                . $this->identifier . '=' . $id . '&injoignable',
+            'action' => self::$cache_lang['injoignable'],
+            'id' => $id
+        ));
+
+        return $tpl->fetch();
+    }
+
+    /**
+     * Module cdmoduleca
+     *
+     * @param null $token
+     * @param $id
+     * @param null $name
+     * @return string
+     */
+    public function displayContactLink($token = null, $id, $name = null)
+    {
+        $tpl = $this->createTemplate('helpers/list/list_action_default.tpl');
+        if (!array_key_exists('contact', self::$cache_lang))
+            self::$cache_lang['contact'] = $this->l('Contacté');
+
+        $tpl->assign(array(
+            'href' =>
+                Context::getContext()->link->getAdminLink('AdminCustomers') . '&'
+                . $this->identifier . '=' . $id . '&contact',
+            'action' => self::$cache_lang['contact'],
+            'id' => $id
+        ));
+
+        return $tpl->fetch();
+    }
+
+    /**
+     * Module cdmoduleca
+     *
+     * @param null $token
+     * @param $id
+     * @param null $name
+     * @return string
+     */
+    public function displayCrepondeurLink($token = null, $id, $name = null)
+    {
+        $tpl = $this->createTemplate('helpers/list/list_action_default.tpl');
+        if (!array_key_exists('repondeur', self::$cache_lang))
+            self::$cache_lang['repondeur'] = $this->l('Répondeur');
+
+        $tpl->assign(array(
+            'href' =>
+                Context::getContext()->link->getAdminLink('AdminCustomers') . '&'
+                . $this->identifier . '=' . $id . '&repondeur',
+            'action' => self::$cache_lang['repondeur'],
+            'id' => $id
+        ));
+
+        return $tpl->fetch();
+    }
+
+    public function contact($value, $params)
+    {
+        $v = array(
+            'matin' => '',
+            'midi' => '',
+            'apres_midi' => '',
+            'soir' => '',
+            'repondeur' => '',
+        );
+        $messages = array(
+            'matin' => '0',
+            'midi' => '0',
+            'apres_midi' => '0',
+            'soir' => '0',
+            'repondeur' => '0'
+        );
+
+
+        $contacte = Tools::jsonDecode($value);
+        if (isset($contacte->matin)) {
+            $messages['matin'] = (count($contacte->matin) > 1) ? '2' : count($contacte->matin);
+            foreach ($contacte->matin as $matin) {
+                $v['matin'] .= $matin . PHP_EOL;
+            }
+        }
+        if (isset($contacte->midi)) {
+            $messages['midi'] = (count($contacte->midi) > 1) ? '2' : count($contacte->midi);
+            foreach ($contacte->midi as $midi) {
+                $v['midi'] .= $midi . PHP_EOL;
+            }
+        }
+        if (isset($contacte->apres_midi)) {
+            $messages['apres_midi'] = (count($contacte->apres_midi) > 1) ? '2' : count($contacte->apres_midi);
+            foreach ($contacte->apres_midi as $apmidi) {
+                $v['apres_midi'] .= $apmidi . PHP_EOL;
+            }
+        }
+        if (isset($contacte->soir)) {
+            $messages['soir'] = (count($contacte->soir) > 1) ? '2' : count($contacte->soir);
+            foreach ($contacte->soir as $soir) {
+                $v['soir'] .= $soir . PHP_EOL;
+            }
+        }
+        if (isset($contacte->repondeur)) {
+            $messages['repondeur'] = (count($contacte->repondeur) > 2) ? '3' : count($contacte->repondeur);
+            foreach ($contacte->repondeur as $repondeur) {
+                $v['repondeur'] .= $repondeur . PHP_EOL;
+            }
+        }
+
+        $table = '
+        <table>
+            <tbody>
+                <tr class="cd_contacte">
+                    <td title="Contact Matin' . PHP_EOL . $v['matin'] . '" class="cd_cel cd_color_' . $messages['matin'] . '"></td>
+                    <td title="Contact Midi' . PHP_EOL . $v['midi'] . '" class="cd_cel cd_color_' . $messages['midi'] . '"></td>
+                    <td title="Contact Aprés-Midi' . PHP_EOL . $v['apres_midi'] . '" class="cd_cel cd_color_' . $messages['apres_midi'] . '"></td>
+                    <td title="Contact Soir' . PHP_EOL . $v['soir'] . '" class="cd_cel cd_color_' . $messages['soir'] . '"></td>
+                    <td title="Contact Répondeur' . PHP_EOL . $v['repondeur'] . '" class="cd_cel cd_color_rep_' . $messages['repondeur'] . '"></td>
+                </tr>
+            </tbody>
+        </table>
+        ';
+
+        return $table;
+    }
+
+    public function doublons($value, $params)
+    {
+        $params['lang'] = $this->context->language->id;
+        $alert = CaTools::doublons($params);
+
+        if (!empty($alert)) {
+            $alert = '<p>' . $alert . '</p>';
+        }
+
+        return $value . $alert;
+    }
 }

@@ -1,14 +1,13 @@
 <?php
-/**
-* 2007-2016 PrestaShop
+/*
+* 2007-2015 PrestaShop
 *
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Academic Free License (AFL 3.0)
+* This source file is subject to the Open Software License (OSL 3.0)
 * that is bundled with this package in the file LICENSE.txt.
 * It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
+* http:* If you did not receive a copy of the license and are unable to
 * obtain it through the world-wide-web, please send an email
 * to license@prestashop.com so we can send you a copy immediately.
 *
@@ -16,14 +15,11 @@
 *
 * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
 * versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author  Dominique <dominique@chez-dominique.fr>
-*  @copyright   2007-2016 Chez-dominique
+* needs please refer to http:*
+*  @author PrestaShop SA <contact@prestashop.com>
+*  @copyright  2007-2015 PrestaShop SA
+*  @license    http:*  International Registered Trademark & Property of PrestaShop SA
 */
-
-if (!defined('_PS_VERSION_'))
-    exit;
 
 require_once(dirname(__FILE__) . '/../../../modules/cdmoduleca/classes/ProspectClass.php');
 require_once(dirname(__FILE__) . '/../../../modules/cdmoduleca/classes/CaTools.php');
@@ -131,7 +127,8 @@ class AdminCustomersController extends AdminCustomersControllerCore
             ),
         );
 
-        if (Configuration::get('PS_B2B_ENABLE')) {
+        if (Configuration::get('PS_B2B_ENABLE'))
+        {
             $this->fields_list = array_merge($this->fields_list, array(
                 'company' => array(
                     'title' => $this->l('Company')
@@ -286,30 +283,35 @@ class AdminCustomersController extends AdminCustomersControllerCore
 
         $customer_stats = $customer->getStats();
         $sql = 'SELECT SUM(total_paid_real) FROM ' . _DB_PREFIX_ . 'orders WHERE id_customer = %d AND valid = 1';
-        if ($total_customer = Db::getInstance()->getValue(sprintf($sql, $customer->id))) {
+        if ($total_customer = Db::getInstance()->getValue(sprintf($sql, $customer->id)))
+        {
             $sql = 'SELECT SQL_CALC_FOUND_ROWS COUNT(*) FROM ' . _DB_PREFIX_ . 'orders WHERE valid = 1 AND id_customer != ' . (int)$customer->id . ' GROUP BY id_customer HAVING SUM(total_paid_real) > %d';
             Db::getInstance()->getValue(sprintf($sql, (int)$total_customer));
             $count_better_customers = (int)Db::getInstance()->getValue('SELECT FOUND_ROWS()') + 1;
-        } else
+        }
+        else
             $count_better_customers = '-';
 
         $orders = Order::getCustomerOrders($customer->id, true);
         $total_orders = count($orders);
-        for ($i = 0; $i < $total_orders; $i++) {
+        for ($i = 0; $i < $total_orders; $i++)
+        {
             $orders[$i]['total_paid_real_not_formated'] = $orders[$i]['total_paid_real'];
             $orders[$i]['total_paid_real'] = Tools::displayPrice($orders[$i]['total_paid_real'], new Currency((int)$orders[$i]['id_currency']));
         }
 
         $messages = CustomerThread::getCustomerMessages((int)$customer->id);
         $total_messages = count($messages);
-        for ($i = 0; $i < $total_messages; $i++) {
-            $messages[$i]['message'] = Tools::substr(strip_tags(html_entity_decode($messages[$i]['message'], ENT_NOQUOTES, 'UTF-8')), 0, 75);
+        for ($i = 0; $i < $total_messages; $i++)
+        {
+            $messages[$i]['message'] = substr(strip_tags(html_entity_decode($messages[$i]['message'], ENT_NOQUOTES, 'UTF-8')), 0, 75);
             $messages[$i]['date_add'] = Tools::displayDate($messages[$i]['date_add'], null, true);
         }
 
         $groups = $customer->getGroups();
         $total_groups = count($groups);
-        for ($i = 0; $i < $total_groups; $i++) {
+        for ($i = 0; $i < $total_groups; $i++)
+        {
             $group = new Group($groups[$i]);
             $groups[$i] = array();
             $groups[$i]['id_group'] = $group->id;
@@ -319,14 +321,17 @@ class AdminCustomersController extends AdminCustomersControllerCore
         $total_ok = 0;
         $orders_ok = array();
         $orders_ko = array();
-        foreach ($orders as $order) {
+        foreach ($orders as $order)
+        {
             if (!isset($order['order_state']))
                 $order['order_state'] = $this->l('There is no status defined for this order.');
 
-            if ($order['valid']) {
+            if ($order['valid'])
+            {
                 $orders_ok[] = $order;
                 $total_ok += $order['total_paid_real_not_formated'];
-            } else
+            }
+            else
                 $orders_ko[] = $order;
         }
 
@@ -334,7 +339,8 @@ class AdminCustomersController extends AdminCustomersControllerCore
 
         $carts = Cart::getCustomerCarts($customer->id);
         $total_carts = count($carts);
-        for ($i = 0; $i < $total_carts; $i++) {
+        for ($i = 0; $i < $total_carts; $i++)
+        {
             $cart = new Cart((int)$carts[$i]['id_cart']);
             $this->context->cart = $cart;
             $summary = $cart->getSummaryDetails();
@@ -359,7 +365,8 @@ class AdminCustomersController extends AdminCustomersControllerCore
 						)';
         $interested = Db::getInstance()->executeS($sql);
         $total_interested = count($interested);
-        for ($i = 0; $i < $total_interested; $i++) {
+        for ($i = 0; $i < $total_interested; $i++)
+        {
             $product = new Product($interested[$i]['id_product'], false, $this->default_form_language, $interested[$i]['id_shop']);
             if (!Validate::isLoadedObject($product))
                 continue;
@@ -445,7 +452,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
         $phoneNumbers = explode(':', $number);
         foreach ($phoneNumbers as $phoneNumber) {
             $NumberK = $this->sanitizePhoneNumber($phoneNumber);
-            $ln = Tools::strlen($NumberK);
+            $ln = strlen($NumberK);
 
             $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
 
@@ -471,7 +478,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
     {
         $pattern = str_split(Configuration::get('KEYYO_NUMBER_FILTER'));
         $number = str_replace($pattern, '', $number);
-        if (Tools::substr($number, 0, 1) != '0') {
+        if (substr($number, 0, 1) != '0') {
             $number = '0' . $number;
         }
 
@@ -544,7 +551,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
     {
         $keyyo_link = '';
         $NumberK = $this->sanitizePhoneNumber($phoneNumber);
-        $ln = Tools::strlen($NumberK);
+        $ln = strlen($NumberK);
 
         $display_message = ($ln != 10 && $ln > 0) ? '<i class="icon-warning text-danger"></i>' : '';
 
@@ -735,6 +742,4 @@ class AdminCustomersController extends AdminCustomersControllerCore
 
         return $value . $alert;
     }
-
 }
-
