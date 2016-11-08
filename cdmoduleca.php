@@ -69,6 +69,7 @@ class CdModuleCA extends ModuleGrid
 
         $this->displayName = $this->l('Module CA');
         $this->description = $this->l('Synthèse CA pour L et Sens');
+        $this->confirmUninstall = $this->l('Etes-vous sur ? Il y aura un override à mettre à jour - ( adminCustomerController) et le fichier view.tpl correspondant');
         // Ajuste les permissions pour accéder au contenu de la page stat
         $this->viewAllCoachs = array(
             '1' => true,    // SuperAdmin
@@ -703,7 +704,7 @@ class CdModuleCA extends ModuleGrid
     {
         $this->html .= $this->generateFormConstantes();
         $this->html .= $this->generateFormCodeAction();
-        $this->html .= $this->generateFormStatutsCommande();
+//        $this->html .= $this->generateFormStatutsCommande();
         $this->html .= $this->generateFormGroupeParrain();
     }
 

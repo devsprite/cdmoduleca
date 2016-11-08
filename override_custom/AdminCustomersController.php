@@ -49,9 +49,9 @@ class AdminCustomersController extends AdminCustomersControllerCore
         $this->allow_export = false;
 
         $this->addRowAction('contact'); // module cdmoduleca
+        $this->addRowAction('crepondeur'); // module cdmoduleca
         $this->addRowAction('ctraite'); // module cdmoduleca
 //        $this->addRowAction('cinjoignable'); // module cdmoduleca
-        $this->addRowAction('crepondeur'); // module cdmoduleca
         $this->addRowAction('edit');
         $this->addRowAction('view');
         $this->addRowAction('delete');
