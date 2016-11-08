@@ -202,14 +202,14 @@ class AdminProspectsController extends ModuleAdminController
     private function generateForm()
     {
         $linkForm = AdminController::$currentIndex . '&token=' . Tools::getValue('token');
-        $employes = $this->getEmployeesCoach();
+        $employes = $this->getEmployeesCoach($this->getDateBetween());
         $this->smarty->assign(array(
             'employes' => $employes,
             'linkForm' => $linkForm
         ));
     }
 
-    private function getEmployeesCoach()
+    private function getEmployeesCoach($dateBetween)
     {
         $actif = (empty($this->employesActif)) ? '' : ' WHERE e.`active` = 1';
         $sql = '
@@ -220,6 +220,7 @@ class AdminProspectsController extends ModuleAdminController
                 LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS ppa 
                 ON ppr.`id_prospect_attribue` = ppa.`id_prospect_attribue`
                 WHERE e.`id_employee` = ppa.`id_employee`
+                AND ppr.`date_debut` BETWEEN ' . $dateBetween . '
                 AND ppr.`traite` !=1
                 AND ppr.`injoignable` !=1) AS total_prospect
             FROM `' . _DB_PREFIX_ . 'employee` AS e 
@@ -273,6 +274,7 @@ class AdminProspectsController extends ModuleAdminController
                 $p->id_prospect_attribue = $ap->id;
                 $p->traite = 'Nouveau';
                 $p->injoignable = 'non';
+                $p->date_debut = $ap->date_debut;
                 $p->add();
             } else {
                 $ap->nbr_prospect_attribue = $ap->nbr_prospect_attribue - 1;
@@ -313,7 +315,8 @@ class AdminProspectsController extends ModuleAdminController
         $table = null,
         $identifier = null,
         $id = null
-    ) {
+    )
+    {
         $context = $this->context;
 
         $context->controller->addJqueryUI('ui.datepicker');
@@ -503,6 +506,7 @@ class AdminProspectsController extends ModuleAdminController
         for ($i = 0; $i < $attriProspect->nbr_prospect_attribue; $i++) {
             $prospect = new ProspectClass($prospectsIsoles[$i]['id_prospect']);
             $prospect->id_prospect_attribue = $attriProspect->id;
+            $prospect->date_debut = $attriProspect->date_debut;
 
             $c = new Customer($prospect->id_customer);
             if ($this->validateFields($c)) {
@@ -515,8 +519,7 @@ class AdminProspectsController extends ModuleAdminController
                 $c->update();
                 $prospect->update();
             } else {
-                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect '
-                    . $c->id . '. Corriger les informations de ce client.');
+                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id . '. Corriger les informations de ce client.');
                 $i--;
             }
         }

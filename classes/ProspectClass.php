@@ -34,6 +34,7 @@ class ProspectClass extends ObjectModel
     public $traite;
     public $injoignable;
     public $contacte;
+    public $date_debut;
     public $date_add;
     public $message = array(
         'matin' => array(),
@@ -57,6 +58,8 @@ class ProspectClass extends ObjectModel
                 'validate' => 'isString', 'required' => false, 'size' => 64),
             'contacte' => array('type' => self::TYPE_STRING,
                 'validate' => 'isString', 'required' => false),
+            'date_debut' => array('type' => self::TYPE_DATE,
+                'validate' => 'isDateFormat', 'required' => false, 'size' => 64),
             'date_add' => array('type' => self::TYPE_DATE,
                 'validate' => 'isDateFormat', 'required' => false, 'size' => 64),
         ));
