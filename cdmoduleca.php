@@ -366,6 +366,7 @@ class CdModuleCA extends ModuleGrid
         `traite` TEXT NULL,
         `injoignable` TEXT NULL,
         `contacte` TEXT NULL,
+        `date_debut` DATETIME NOT NULL,
         `date_add` DATETIME NOT NULL,
         PRIMARY KEY (`id_prospect`))
         ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=' . $this->table_charset . ';';
@@ -390,6 +391,7 @@ class CdModuleCA extends ModuleGrid
         $sql = "CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "objectif_coach` (
         `id_objectif_coach` INT (12) NOT NULL AUTO_INCREMENT,
         `id_employee` INT(12),
+        `id_order` INT(12),
         `somme` DECIMAL (8,2) NULL,
         `commentaire` TEXT NULL,
         `heure_absence` DECIMAL(6,2) NULL,
