@@ -125,17 +125,25 @@
                         }{$smarty.post.as_commentaire}{/if}" name="as_commentaire">
                     </div>
                     <div class="col-lg-12">
+                        {if isset($smarty.post.as_id)}
+                            <div class="col-lg-1">
+                                <br>
+                                <a class="btn btn-primary" href="{$link->getAdminLink('AdminCaLetSens')}">Annulé
+                                </a>
+                            </div>
+                        {/if}
                         <div class="col-lg-1">
                             <br>
                             <button class="btn btn-success" type="submit" id="as_submit" name="as_submit">Enregistrer
                             </button>
-                            <input type="hidden" id="as_id_employee" name="as_id_employee"
-                                   value="{if isset($smarty.post.as_id_employee)
-                                   }{$smarty.post.as_id_employee}{else}{$filterActif}{/if}">
-                            <input type="hidden" id="as_id" name="as_id"
-                                   value="{if isset($smarty.post.as_id)
-                                   }{$smarty.post.as_id}{/if}">
                         </div>
+                        <input type="hidden" id="as_id_employee" name="as_id_employee"
+                               value="{if isset($smarty.post.as_id_employee)
+                               }{$smarty.post.as_id_employee}{else}{$filterActif}{/if}">
+                        <input type="hidden" id="as_id" name="as_id"
+                               value="{if isset($smarty.post.as_id)
+                               }{$smarty.post.as_id}{/if}">
+
                     </div>
                 </div>
             </form>
@@ -204,8 +212,9 @@
                     <div class="col-lg-1">
                         <label for="oc_somme">Nbre de jours ouvrés</label>
                         <div class="input input-group">
-                            <input type="text" id="oc_jour_ouvre" name="oc_jour_ouvre" value="{if isset($smarty.post.oc_jour_ouvre)
-                            }{$smarty.post.oc_jour_ouvre}{/if}">
+                            <input type="text" id="oc_jour_ouvre" name="oc_jour_ouvre"
+                                   value="{if isset($smarty.post.oc_jour_ouvre)
+                                   }{$smarty.post.oc_jour_ouvre}{/if}">
                             <span class="input-group-addon">Jour</span>
                         </div>
                     </div>
@@ -216,16 +225,25 @@
                             }{$smarty.post.oc_commentaire}{/if}" name="oc_commentaire">
                         </div>
                     </div>
-                    <div class="col-lg-1">
-                        <br>
-                        <button class="btn btn-success" type="submit" id="oc_submit" name="oc_submit">Enregistrer
-                        </button>
-                        <input type="hidden" id="oc_id_employee" name="oc_id_employee"
-                               value="{if isset($smarty.post.oc_id_employee)
-                               }{$smarty.post.oc_id_employee}{else}{$filterActif}{/if}">
-                        <input type="hidden" id="oc_id" name="oc_id"
-                               value="{if isset($smarty.post.oc_id)
-                               }{$smarty.post.oc_id}{/if}">
+                    <div class="col-lg-12">
+                        {if isset($smarty.post.oc_id)}
+                            <div class="col-lg-1">
+                                <br>
+                                <a class="btn btn-primary" href="{$link->getAdminLink('AdminCaLetSens')}">Annulé
+                                </a>
+                            </div>
+                        {/if}
+                        <div class="col-lg-1">
+                            <br>
+                            <button class="btn btn-success" type="submit" id="oc_submit" name="oc_submit">Enregistrer
+                            </button>
+                            <input type="hidden" id="oc_id_employee" name="oc_id_employee"
+                                   value="{if isset($smarty.post.oc_id_employee)
+                                   }{$smarty.post.oc_id_employee}{else}{$filterActif}{/if}">
+                            <input type="hidden" id="oc_id" name="oc_id"
+                                   value="{if isset($smarty.post.oc_id)
+                                   }{$smarty.post.oc_id}{/if}">
+                        </div>
                     </div>
                 </div>
             </form>

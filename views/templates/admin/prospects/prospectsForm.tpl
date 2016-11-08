@@ -29,12 +29,12 @@
         <div class="panel-heading">
             Attribution des prospects
         </div>
-            {if $nbr_prospects <= 0}
-            {else}
-                <div class="row panel">
-                    <p>Il y a {$nbr_prospects|escape:'htmlall':'UTF-8'} nouveaux prospect(s)</p>
-                </div>
-            {/if}
+        {if $nbr_prospects <= 0}
+        {else}
+            <div class="row panel">
+                <p>Il y a {$nbr_prospects|escape:'htmlall':'UTF-8'} nouveaux prospect(s)</p>
+            </div>
+        {/if}
 
         <form action="{$linkForm}" method="post" name="employes">
             <div class="row panel">
@@ -62,7 +62,8 @@
                                 {foreach item=coach from=$coachs}
                                     {if !empty($coach['id_group'])}
                                         <option value="{$coach['id_employee']}" {if $pa->id_employee == $coach['id_employee']}
-                                            selected="selected"{/if}>{$coach['lastname']|escape:'htmlall':'UTF-8'} - ({$coach['firstname']|escape:'htmlall':'UTF-8'})
+                                            selected="selected"{/if}>{$coach['lastname']|escape:'htmlall':'UTF-8'} -
+                                            ({$coach['firstname']|escape:'htmlall':'UTF-8'})
                                         </option>
                                     {/if}
                                 {/foreach}
@@ -83,7 +84,8 @@
                             <select name="pi_id_employee" class="" id="pi_id_employee">
                                 {foreach item=coach from=$coachs}
                                     {if !empty($coach['id_group'])}
-                                        <option value="{$coach['id_employee']|escape:'htmlall':'UTF-8'}">{$coach['lastname']|escape:'htmlall':'UTF-8'} -
+                                        <option value="{$coach['id_employee']|escape:'htmlall':'UTF-8'}">{$coach['lastname']|escape:'htmlall':'UTF-8'}
+                                            -
                                             ({$coach['firstname']|escape:'htmlall':'UTF-8'})
                                         </option>
                                     {/if}
@@ -92,12 +94,14 @@
                         </label>
                     </div>
                     <div class="col-lg-3 col-md-3 col-xs-12">
-                        <label class="control-label" for="">{$nbrProspectsIsoles|escape:'htmlall':'UTF-8'} Prospect(s) Isolé(s)
+                        <label class="control-label" for="">{$nbrProspectsIsoles|escape:'htmlall':'UTF-8'} Prospect(s)
+                            Isolé(s)
                             <input type="text" name="pi_nbr_pr" id="pi_nbr_pr"
                                    value="{$nbrProspectsIsoles|escape:'htmlall':'UTF-8'}"
                                    class="form-control"></label>
                     </div>
                 {/if}
+                {if !isset($pa)}
                 <div class="col-xs-1">
                     <div>
                         <label for="employeActif">Employés actif</label>
@@ -108,6 +112,7 @@
                         <input type="hidden" name="submitEmployeActif" value="1"/>
                     </div>
                 </div>
+                {/if}
                 <script type="text/javascript">
                     {literal}
                     $(document).ready(function () {
@@ -137,19 +142,30 @@
                                     <label class="control-label"
                                            for="{$employe['lastname']|escape:'htmlall':'UTF-8'}{$employe['firstname']|escape:'htmlall':'UTF-8'}"><strong>{$employe['lastname']|escape:'htmlall':'UTF-8'}</strong>
                                         {if !empty({$employe['total_prospect']})} - {$employe['total_prospect']|escape:'htmlall':'UTF-8'} Prospects{/if}
-                                        <p>({$employe['firstname']|escape:'htmlall':'UTF-8'} - {$employe['id_group']|escape:'htmlall':'UTF-8'}
+                                        <p>({$employe['firstname']|escape:'htmlall':'UTF-8'}
+                                            - {$employe['id_group']|escape:'htmlall':'UTF-8'}
                                             )</p></label>
                                     <input type="text" name="em_{$employe['id_employee']|escape:'htmlall':'UTF-8'}"
-                                           id="{$employe['lastname']|escape:'htmlall':'UTF-8'}{$employe['firstname']|escape:'htmlall':'UTF-8'}" value="">
+                                           id="{$employe['lastname']|escape:'htmlall':'UTF-8'}{$employe['firstname']|escape:'htmlall':'UTF-8'}"
+                                           value="">
 
                                 </div>
                             {/if}
                         {/foreach}
                     {/if}
                     <div class="col-xs-12">
-                        <hr>
-                        <button type="submit" name="submitEmployes" class="btn btn-success fixed-width-lg">Ajouter
-                        </button>
+                        {if isset($pa)}
+                            <div class="col-lg-1">
+                                <hr>
+                                <a class="btn btn-primary" href="{$link->getAdminLink('AdminProspects')}">Annulé
+                                </a>
+                            </div>
+                        {/if}
+                        <div class="col-lg-1">
+                            <hr>
+                            <button type="submit" name="submitEmployes" class="btn btn-success fixed-width-lg">Ajouter
+                            </button>
+                        </div>
                     </div>
                 </div>
         </form>

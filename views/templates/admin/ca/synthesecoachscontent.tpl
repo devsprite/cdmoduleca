@@ -162,7 +162,7 @@
                 <th style="width: 10%">Heure</th>
                 <th style="width: 10%">Jour absence</th>
                 <th style="width: 10%">Jours ouvrés</th>
-                <th style="width: 40%">Commentaire</th>
+                <th style="width: 30%">Commentaire</th>
                 <th style="width: 5%"></th>
             </tr>
             </thead>
