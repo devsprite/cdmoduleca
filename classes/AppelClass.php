@@ -47,7 +47,7 @@ class AppelClass extends ObjectModel
     {
         $sql = 'SELECT `compteur`, `id_appel` FROM `' . _DB_PREFIX_ . 'appel`
                 WHERE `id_employee` = ' . (int)$id_employee . ' 
-                AND  date(`date_upd`) = "' . pSQl($date_jour) . '"';
+                AND  date(`date_upd`) = "' . $date_jour . '"';
 
         $req = Db::getInstance()->getRow($sql);
 

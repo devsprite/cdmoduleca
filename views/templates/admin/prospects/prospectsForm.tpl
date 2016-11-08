@@ -95,7 +95,7 @@
                     </div>
                     <div class="col-lg-3 col-md-3 col-xs-12">
                         <label class="control-label" for="">{$nbrProspectsIsoles|escape:'htmlall':'UTF-8'} Prospect(s)
-                            Isolé(s)
+                            sans coach
                             <input type="text" name="pi_nbr_pr" id="pi_nbr_pr"
                                    value="{$nbrProspectsIsoles|escape:'htmlall':'UTF-8'}"
                                    class="form-control"></label>

@@ -364,7 +364,7 @@ class CaTools
             FROM " . _DB_PREFIX_ . "orders as o
             LEFT JOIN " . _DB_PREFIX_ . "customer as c ON o . id_customer = c . id_customer
             LEFT JOIN " . _DB_PREFIX_ . "customer_group as cg ON c . id_customer = cg . id_customer
-            LEFT JOIN " . _DB_PREFIX_ . "group_lang as gl ON cg . id_group = gl . id_group AND gl.id_lang = '" . $lang . "'
+            LEFT JOIN " . _DB_PREFIX_ . "group_lang as gl ON cg . id_group = gl . id_group AND gl.id_lang = '" . (int)$lang . "'
             LEFT JOIN " . _DB_PREFIX_ . "employee as e ON gl . id_employee = e . id_employee";
         $sql .= ' WHERE o.date_add BETWEEN ' . $dateBetween;
         $sql .= ($valid) ? ' AND o.valid = 1 ' : '';
@@ -607,7 +607,7 @@ class CaTools
         $sql = 'SELECT SUM(amount) FROM `' . _DB_PREFIX_ . 'order_slip` AS os
                 LEFT JOIN `' . _DB_PREFIX_ . 'orders` AS o ON o.`id_order` = os.`id_order` 
                 WHERE os.date_add BETWEEN ' . $dateBetween . '
-                AND o.`id_employee` = ' . $idCoach;
+                AND o.`id_employee` = ' . (int)$idCoach;
 
         $req = Db::getInstance()->getValue($sql);
 

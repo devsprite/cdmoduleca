@@ -53,7 +53,8 @@ class CdModuleCA extends ModuleGrid
         'CDMODULECA_ORDERS_STATE_JOURS' => '60',
         'CDMODULECA_PRIME_FICHIER' => '0.5',
         'CDMODULECA_PROSPECTS_JOUR' => '26',
-        'CDMODULECA_PROSPECTS_HEURE' => '4.33'
+        'CDMODULECA_PROSPECTS_HEURE' => '4.33',
+        'CDMODULECA_NBR_JOUR_MAX_PROSPECTS' => '30'
     );
 
     public function __construct()
@@ -545,10 +546,10 @@ class CdModuleCA extends ModuleGrid
         $c = 1;
         foreach ($code_action as $key => $value) {
             $data[] = array(
-                'id_code_action' => $c,
-                'name' => $key,
-                'description' => $value[0],
-                'groupe' => $value[1]
+                'id_code_action' => (int)$c,
+                'name' => pSQL($key),
+                'description' => pSQL($value[0]),
+                'groupe' => (int)$value[1]
             );
             $c++;
         }
@@ -586,7 +587,7 @@ class CdModuleCA extends ModuleGrid
             Db::getInstance()->update(
                 'group_lang',
                 array('id_employee' => $value),
-                'id_group = ' . $groupe . ' AND id_lang = "' . $this->lang . '"'
+                'id_group = ' . (int)$groupe . ' AND id_lang = "' . (int)$this->lang . '"'
             );
         }
 
@@ -690,6 +691,7 @@ class CdModuleCA extends ModuleGrid
             Configuration::updateValue('CDMODULECA_PRIME_FICHIER', (float)(Tools::getValue('co_prime_fichier')));
             Configuration::updateValue('CDMODULECA_PROSPECTS_JOUR', (float)(Tools::getValue('co_prospects_jour')));
             Configuration::updateValue('CDMODULECA_PROSPECTS_HEURE', (float)(Tools::getValue('co_prospects_heure')));
+            Configuration::updateValue('CDMODULECA_NBR_JOUR_MAX_PROSPECTS', (int)(Tools::getValue('co_prospects_jour_max')));
         }
 
         if ($error) {
@@ -732,6 +734,14 @@ class CdModuleCA extends ModuleGrid
             'name' => 'co_prospects_heure',
             'desc' => 'Nombre de prospects par heure travaillé',
             'class' => 'input fixed-width-md',
+        );
+        $inputs[] = array(
+            'type' => 'text',
+            'label' => 'Ancienneté des prospects',
+            'name' => 'co_prospects_jour_max',
+            'desc' => 'Nombre de jour maximum d\'ancienneté des prospects pour l\'atribution',
+            'class' => 'input fixed-width-md',
+            'suffix' => 'jour'
         );
 
         $fields_form = array(
@@ -975,7 +985,7 @@ class CdModuleCA extends ModuleGrid
     public function getGroupsParrain()
     {
         $sql = 'SELECT id_group, name, id_employee FROM `' . _DB_PREFIX_ . 'group_lang` WHERE id_lang = "'
-            . $this->lang . '"';
+            . (int)$this->lang . '"';
         $groups = Db::getInstance()->executeS($sql);
 
         return $groups;
@@ -986,7 +996,8 @@ class CdModuleCA extends ModuleGrid
         $values = array(
             'co_prime_fichier' => Configuration::get('CDMODULECA_PRIME_FICHIER'),
             'co_prospects_jour' => Configuration::get('CDMODULECA_PROSPECTS_JOUR'),
-            'co_prospects_heure' => Configuration::get('CDMODULECA_PROSPECTS_HEURE')
+            'co_prospects_heure' => Configuration::get('CDMODULECA_PROSPECTS_HEURE'),
+            'co_prospects_jour_max' => Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS'),
         );
 
         return $values;
@@ -1018,8 +1029,8 @@ class CdModuleCA extends ModuleGrid
 
         foreach ($listCoachs as $coach) {
             if (!empty($coach['id_employee'])) {
-                $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET id_employee = ' . $coach['id_employee'] . '
-            WHERE coach = "' . $coach['coach'] . '"';
+                $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET id_employee = ' . (int)$coach['id_employee'] . '
+            WHERE coach = "' . pSQL($coach['coach']) . '"';
                 Db::getInstance()->execute($sql);
             }
         }
@@ -1033,8 +1044,8 @@ class CdModuleCA extends ModuleGrid
         $listCodesAction = $this->getAllCodesAction();
 
         foreach ($listCodesAction as $code) {
-            $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET id_code_action = ' . $code['groupe'] . '
-            WHERE  code_action = "' . $code['name'] . '"';
+            $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET id_code_action = ' . (int)$code['groupe'] . '
+            WHERE  code_action = "' . pSQL($code['name']) . '"';
             Db::getInstance()->execute($sql);
         }
     }
@@ -1189,7 +1200,7 @@ class CdModuleCA extends ModuleGrid
         $sql = 'SELECT `id_employee`, `firstname`, `lastname`
 			FROM `' . _DB_PREFIX_ . 'employee` ';
         $sql .= ($active == 'on') ? 'WHERE active = 1 ' : '';
-        $sql .= ($id) ? ' WHERE id_employee = ' . $id : '';
+        $sql .= ($id) ? ' WHERE id_employee = ' . (int)$id : '';
         $sql .= ' ORDER BY `id_employee` ASC';
         return Db::getInstance()->executeS($sql);
     }
@@ -1197,7 +1208,7 @@ class CdModuleCA extends ModuleGrid
     public function getGroupeEmployee($idFilterCoach)
     {
         $sql = 'SELECT id_group FROM ' . _DB_PREFIX_ . 'group_lang 
-        WHERE id_lang = "' . $this->lang . '" AND id_employee = ' . (int)$idFilterCoach;
+        WHERE id_lang = "' . (int)$this->lang . '" AND id_employee = ' . (int)$idFilterCoach;
         return Db::getInstance()->getValue($sql);
     }
 }

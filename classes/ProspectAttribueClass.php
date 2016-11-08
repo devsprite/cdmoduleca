@@ -66,7 +66,7 @@ class ProspectAttribueClass extends ObjectModel
     public static function isExist($id)
     {
         $sql = 'SELECT `id_prospect_attribue` FROM `' . _DB_PREFIX_ . 'prospect_attribue`
-                WHERE `id_prospect_attribue` = ' . pSQL($id);
+                WHERE `id_prospect_attribue` = ' . (int)$id;
         $req = Db::getInstance()->getRow($sql);
 
         return ($req) ? true : false;

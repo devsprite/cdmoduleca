@@ -67,6 +67,9 @@ class ProspectClass extends ObjectModel
     public static function getAllProspectsGroup($id_group, $limit = 50, $index_id = 0)
     {
         $order = ($index_id == 0) ? 'DESC' : 'ASC';
+        // Nombre de jour max pour la selection des prospects
+        $nbreJourMax = date('Y-m-d', strtotime('-' . (int)Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS').' day'));
+
         $sql = 'SELECT cu.`id_customer`, CONCAT(UPPER(cu.`lastname`)," ", LOWER(cu.`firstname`)) AS nom, cu.`date_add`,
           (SELECT GROUP_CONCAT(`id_group` SEPARATOR ", ") FROM `' . _DB_PREFIX_ . 'customer_group` AS pcg
            WHERE pcg.`id_customer` = cu.`id_customer` GROUP BY cu.`id_customer`) AS id_group
@@ -74,11 +77,12 @@ class ProspectClass extends ObjectModel
           LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON cu.`id_customer` = cg.`id_customer`
           LEFT JOIN `' . _DB_PREFIX_ . 'prospect` AS p ON cg.`id_customer` = p.`id_customer`
           WHERE cg.`id_group` = "' . (int)$id_group . '"
-          AND cu.id_customer > ' . $index_id . '
+          AND cu.date_add > date("' . pSQL($nbreJourMax) . '")
+          AND cu.id_customer > ' . (int)$index_id . '
           AND cu.`deleted` = 0';
         $sql .= ' ORDER BY cu.`id_customer` ' . $order;
 
-        $sql .= ' LIMIT ' . $limit;
+        $sql .= ' LIMIT ' . (int)$limit;
 
         $req = Db::getInstance()->executeS($sql);
 
@@ -93,7 +97,7 @@ class ProspectClass extends ObjectModel
                 ON p.`id_prospect_attribue` = pa.`id_prospect_attribue`
                 LEFT JOIN `' . _DB_PREFIX_ . 'customer` AS cu ON p.`id_customer` = cu.`id_customer`
                 LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON pa.`id_employee` = e.`id_employee`
-                WHERE p.`id_prospect_attribue` = ' . $id_prospect_attribue;
+                WHERE p.`id_prospect_attribue` = ' . (int)$id_prospect_attribue;
         $req = Db::getInstance()->executeS($sql);
 
         return $req;
@@ -136,7 +140,8 @@ class ProspectClass extends ObjectModel
             return false;
         }
         if (Db::getInstance()->getValue('SELECT `injoignable` FROM `' . _DB_PREFIX_ . 'prospect` 
-        WHERE `id_customer` = ' . $id) == 'oui') {
+        WHERE `id_customer` = ' . $id) == 'oui'
+        ) {
             if (!Db::getInstance()->update('prospect', array('injoignable' => 'non'), 'id_customer = ' . (int)$id)) {
                 return false;
             }
@@ -212,6 +217,11 @@ class ProspectClass extends ObjectModel
 
         $prospect = ProspectClass::getProspectsByIdCu($id);
         $contacte = Tools::jsonDecode($prospect->contacte);
+
+        if (empty($contacte)) {
+            $prospect->traite = 'non';
+        }
+
         $contacte->repondeur[] = date('\L\e d-m-Y \à H:i:s') . ' - ' . $lastname;
         $prospect->contacte = Tools::jsonEncode($contacte);
 
@@ -250,7 +260,7 @@ class ProspectClass extends ObjectModel
                 WHERE `id_prospect_attribue`
                 NOT IN 
                 (SELECT `id_prospect_attribue` FROM `' . _DB_PREFIX_ . 'prospect_attribue` )
-                AND `traite` != "oui"
+                AND `traite` != "Nouveau"
                 AND `injoignable` = "non"';
         $req = Db::getInstance()->executeS($sql);
 

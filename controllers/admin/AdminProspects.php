@@ -473,7 +473,7 @@ class AdminProspectsController extends ModuleAdminController
     private function nbrProspectsDisponible($index_id)
     {
         $sql = 'SELECT COUNT(`id_customer`) FROM `' . _DB_PREFIX_ . 'customer_group` 
-                WHERE `id_customer` > ' . $index_id . '
+                WHERE `id_customer` > ' . (int)$index_id . '
                 AND `id_group` = 1 ';
         $req = Db::getInstance()->getValue($sql);
 
@@ -484,7 +484,7 @@ class AdminProspectsController extends ModuleAdminController
     {
         $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'prospect`
                 WHERE `id_prospect_attribue` = ' . (int)$id_prospect_attribue . '
-                AND `traite` = "Prospect"
+                AND `traite` = "Nouveau"
                 AND `injoignable` = "Non"
                 AND `contacte` = "" ';
         $req = Db::getInstance()->execute($sql);
