@@ -336,7 +336,8 @@ class CaTools
         $valid = false,
         $dateBetween,
         $lang
-    ){
+    )
+    {
         $filterCoach = ($idFilterCoach != 0)
             ? " AND e . id_employee = '" . (int)$idFilterCoach . "'" : '';
 
@@ -414,7 +415,8 @@ class CaTools
 
     private static function isEmailCustomerUnique(Customer $customer)
     {
-        $sql = ' SELECT COUNT(`email`) AS total FROM `' . _DB_PREFIX_ . 'customer` WHERE `email` = "' . pSQL($customer->email) . '"';
+        $sql = 'SELECT COUNT(`email`) AS total 
+                FROM `' . _DB_PREFIX_ . 'customer` WHERE `email` = "' . pSQL($customer->email) . '"';
         $req = Db::getInstance()->getValue($sql);
 
         $retour = '';
@@ -524,13 +526,21 @@ class CaTools
         $nb_days_open = 0;
         // Mettre <= si on souhaite prendre en compte le dernier jour dans le décompte
         while ($date_start <= $date_stop) {
-            // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6), ni un jour férié, on incrémente les jours ouvrés
+            // Si le jour suivant n'est ni un dimanche (0) ou un samedi (6),
+            // ni un jour férié, on incrémente les jours ouvrés
             if (!in_array(date('w', $date_start), array(0, 6))
                 && !in_array(date('j_n_' . date('Y', $date_start), $date_start), $arr_bank_holidays)
             ) {
                 $nb_days_open++;
             }
-            $date_start = mktime(date('H', $date_start), date('i', $date_start), date('s', $date_start), date('m', $date_start), date('d', $date_start) + 1, date('Y', $date_start));
+            $date_start = mktime(
+                date('H', $date_start),
+                date('i', $date_start),
+                date('s', $date_start),
+                date('m', $date_start),
+                date('d', $date_start) + 1,
+                date('Y', $date_start)
+            );
         }
         return $nb_days_open;
     }

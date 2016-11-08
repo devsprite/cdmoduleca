@@ -120,8 +120,10 @@ class AdminProspectsController extends ModuleAdminController
         }
         // Modification d'un enregistrement prospects attribué
         if ($isOk && Tools::isSubmit('pa_id_pa')) {
-            $id_pa = (Validate::isInt((int)Tools::getValue('pa_id_pa'))) ? (int)Tools::getValue('pa_id_pa') : false;
-            $id_em = (Validate::isInt((int)Tools::getValue('pa_id_employee'))) ? (int)Tools::getValue('pa_id_employee') : false;
+            $id_pa = (Validate::isInt((int)Tools::getValue('pa_id_pa')))
+                ? (int)Tools::getValue('pa_id_pa') : false;
+            $id_em = (Validate::isInt((int)Tools::getValue('pa_id_employee')))
+                ? (int)Tools::getValue('pa_id_employee') : false;
             if ($id_pa && $id_em) {
                 if (ProspectAttribueClass::isExist($id_pa)) {
                     $pa = new ProspectAttribueClass($id_pa);
@@ -211,15 +213,15 @@ class AdminProspectsController extends ModuleAdminController
     {
         $actif = (empty($this->employesActif)) ? '' : ' WHERE e.`active` = 1';
         $sql = '
-            SELECT gl.`id_group`, e.`id_employee`, e.`lastname`, e.`firstname`, pa.`nbr_prospect_attribue`,pa.`date_debut`,
-             pa.`date_fin`,
+            SELECT gl.`id_group`, e.`id_employee`, e.`lastname`, e.`firstname`, pa.`nbr_prospect_attribue`,
+            pa.`date_debut`, pa.`date_fin`,
              (  SELECT COUNT(ppr.`id_prospect_attribue`)
                 FROM `' . _DB_PREFIX_ . 'prospect` as ppr
-                LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS ppa ON ppr.`id_prospect_attribue` = ppa.`id_prospect_attribue`
+                LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS ppa 
+                ON ppr.`id_prospect_attribue` = ppa.`id_prospect_attribue`
                 WHERE e.`id_employee` = ppa.`id_employee`
                 AND ppr.`traite` !=1
                 AND ppr.`injoignable` !=1) AS total_prospect
-                
             FROM `' . _DB_PREFIX_ . 'employee` AS e 
             LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS pa ON e.`id_employee` = pa.`id_employee`
             LEFT JOIN `' . _DB_PREFIX_ . 'prospect` AS p ON pa.`id_prospect_attribue` = p.`id_prospect_attribue`
@@ -275,7 +277,8 @@ class AdminProspectsController extends ModuleAdminController
             } else {
                 $ap->nbr_prospect_attribue = $ap->nbr_prospect_attribue - 1;
                 $ap->update();
-                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id . '. Corriger les informations de ce client.');
+                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect '
+                    . $c->id . '. Corriger les informations de ce client.');
             }
         }
     }
@@ -324,7 +327,8 @@ class AdminProspectsController extends ModuleAdminController
         $action .= ($identifier && $id ? '&' . Tools::safeOutput($identifier) . '=' . (int)$id : '');
         $module = Tools::getValue('module');
         $action .= ($module ? '&module=' . Tools::safeOutput($module) : '');
-        $action .= (($id_product = Tools::getValue('id_product')) ? '&id_product=' . Tools::safeOutput($id_product) : '');
+        $action .= (($id_product = Tools::getValue('id_product'))
+            ? '&id_product=' . Tools::safeOutput($id_product) : '');
         $this->smarty->assign(array(
             'current' => self::$currentIndex,
             'token' => $token,
@@ -427,7 +431,8 @@ class AdminProspectsController extends ModuleAdminController
                 unset($c);
                 unset($g);
             } else {
-                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id . '. Corriger les informations de ce client.');
+                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect '
+                    . $c->id . '. Corriger les informations de ce client.');
             }
         }
     }
@@ -510,7 +515,8 @@ class AdminProspectsController extends ModuleAdminController
                 $c->update();
                 $prospect->update();
             } else {
-                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect ' . $c->id . '. Corriger les informations de ce client.');
+                $this->errors[] = $this->module->l('Il y a une erreur pour le prospect '
+                    . $c->id . '. Corriger les informations de ce client.');
                 $i--;
             }
         }
