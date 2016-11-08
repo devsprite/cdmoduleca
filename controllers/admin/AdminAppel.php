@@ -44,6 +44,7 @@ class AdminAppelController extends ModuleAdminController
         $this->_orderWay = 'DESC';
         $this->bootstrap = true;
         $this->lang = false;
+        $this->list_no_link = true;
         $this->context = Context::getContext();
         $this->smarty = $this->context->smarty;
         $this->path_tpl = _PS_MODULE_DIR_ . 'cdmoduleca/views/templates/admin/appel/';
