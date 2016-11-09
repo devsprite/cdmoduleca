@@ -61,7 +61,10 @@ class AdminProspectsController extends ModuleAdminController
         $this->generateForm();
 
         $this->smarty->assign(array(
-            'nbr_prospects' => $this->nbrNouveauProspects(),
+            'nbr_prospects' => $this->getNbrNouveauProspects(),
+            'nbr_ancien_prospects' => $this->getNbrAncienProspects(),
+            'jour_max_prospects' => Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS'),
+            'date_index' => Configuration::get('CDMODULECA_PROSPECTS_INDEX_DATE'),
             'prospects_by_coach' => $this->listProspectsByCoach($isAllow, $this->context->employee->id),
             'nbrProspectsIsoles' => count($prospectsIsoles),
             'prospectsIsoles' => $prospectsIsoles,
@@ -91,6 +94,7 @@ class AdminProspectsController extends ModuleAdminController
     public function postProcess()
     {
         $this->processDateRange();
+        $this->postDateIndex();
         if ($this->module->viewAllCoachs[$this->context->employee->id_profile]) {
             if (Tools::isSubmit('submitEmployeActif')) {
                 $this->setEmployeActif(Tools::getValue('employeActif'));
@@ -140,6 +144,7 @@ class AdminProspectsController extends ModuleAdminController
                     $pa->update();
                 };
             }
+            // Traitement des prospects isolés ( sans groupe mais déjà contacté )
         } elseif (Tools::isSubmit('pi_id_employee')) {
             $id_employe = (int)Tools::getValue('pi_id_employee');
             $nb_pros = (int)Tools::getValue('pi_nbr_pr');
@@ -246,15 +251,18 @@ class AdminProspectsController extends ModuleAdminController
 
     private function attribuProspects(ProspectAttribueClass $ap, $id_group)
     {
-        $index_id = ProspectClass::getLastCustomer();
-        $nbr_prospects_disponible = $this->nbrProspectsDisponible($index_id);
+        $newProspects = true;
+        $nbr_prospects_disponible = $this->getNbrNouveauProspects();
+        if ($nbr_prospects_disponible <= 0 ) {
+            $nbr_prospects_disponible = $this->getNbrAncienProspects();
+            $newProspects = false;
+        }
         $ap->add();
         if ($nbr_prospects_disponible >= $ap->nbr_prospect_attribue) {
-            $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $index_id);
+            $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $newProspects);
             $this->addProspects($prospects, $id_group, $ap);
         } elseif ($nbr_prospects_disponible == 0) {
-            $index_id = 0;
-            $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $index_id);
+            $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $newProspects);
             $this->addProspects($prospects, $id_group, $ap);
         } else {
             $this->errors[] = $this->module->l('Il n\'y a pas assez de prospects disponible');
@@ -289,16 +297,6 @@ class AdminProspectsController extends ModuleAdminController
                     . $c->id . '. Corriger les informations de ce client.');
             }
         }
-    }
-
-    private function nbrNouveauProspects()
-    {
-        $nbr_nouveaux_prospects = 0;
-        $index_prospects = ProspectClass::getLastCustomer();
-        if ($index_prospects != null) {
-            $nbr_nouveaux_prospects = $this->getNbrNouveauProspects($index_prospects);
-        }
-        return $nbr_nouveaux_prospects;
     }
 
     public function displayCalendar()
@@ -401,12 +399,30 @@ class AdminProspectsController extends ModuleAdminController
         }
     }
 
-    public function getNbrNouveauProspects($id_customer)
+    public function getNbrNouveauProspects()
     {
+        $indexDate = Configuration::get('CDMODULECA_PROSPECTS_INDEX_DATE');
         $sql = 'SELECT COUNT(c.`id_customer`) AS total
                 FROM `' . _DB_PREFIX_ . 'customer` as c 
                 LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON c.`id_customer` = cg.`id_customer`
-                WHERE c.`id_customer` > ' . (int)$id_customer . '
+                WHERE c.date_add > "' . pSQL($indexDate) . '"
+                AND cg.`id_group` = 1
+                AND c.`deleted` = 0';
+
+        $req = Db::getInstance()->getValue($sql);
+        return $req;
+    }
+
+    public function getNbrAncienProspects()
+    {
+        $indexDate = Configuration::get('CDMODULECA_PROSPECTS_INDEX_DATE');
+        $indexDateMax = date('Y-m-d 00:00:00', strtotime($indexDate . ' -' . Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS') . ' day'));
+
+        $sql = 'SELECT COUNT(c.`id_customer`) AS total
+                FROM `' . _DB_PREFIX_ . 'customer` as c 
+                LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON c.`id_customer` = cg.`id_customer`
+                WHERE c.date_add < "' . pSQL($indexDate) . '"
+                AND c.date_add > "' . pSQL($indexDateMax) . '"
                 AND cg.`id_group` = 1
                 AND c.`deleted` = 0';
 
@@ -472,9 +488,13 @@ class AdminProspectsController extends ModuleAdminController
 
     private function nbrProspectsDisponible($index_id)
     {
-        $sql = 'SELECT COUNT(`id_customer`) FROM `' . _DB_PREFIX_ . 'customer_group` 
-                WHERE `id_customer` > ' . (int)$index_id . '
-                AND `id_group` = 1 ';
+        $indexDate = Configuration::get('CDMODULECA_PROSPECTS_INDEX_DATE');
+
+        $sql = 'SELECT COUNT(c.`id_customer`) FROM `' . _DB_PREFIX_ . 'customer` AS c, `' . _DB_PREFIX_ . 'customer_group` AS cg
+                WHERE c.`date_add` > "' . pSQL($indexDate) . '"
+                AND c.id_customer = cg.id_customer
+                AND cg.`id_group` = 1 
+                AND c.`deleted` = 0';
         $req = Db::getInstance()->getValue($sql);
 
         return $req;
@@ -620,5 +640,23 @@ class AdminProspectsController extends ModuleAdminController
         ';
 
         return $table;
+    }
+
+    private function postDateIndex()
+    {
+        if (Tools::isSubmit('submitDateIndex')) {
+            if (!Validate::isDate($dateIndex = Tools::getValue('p_date_index'))) {
+                $this->errors[] = Tools::displayError('The specified date is invalid.');
+            } else {
+                Configuration::updateValue('CDMODULECA_PROSPECTS_INDEX_DATE', $dateIndex);
+                $this->confirmations = $this->module->l('Index prospects mis à jour');
+            }
+            if (!Validate::isInt($jourMaxProspect = Tools::getValue('p_nbr_jour_max_prospects'))) {
+                $this->errors[] = Tools::displayError('Le nombre de jour n\'est pas valide.');
+            } else {
+                Configuration::updateValue('CDMODULECA_NBR_JOUR_MAX_PROSPECTS', $jourMaxProspect);
+                $this->confirmations = $this->module->l('Nombre de jour d\'ancienneté des prospects mis à jour');
+            }
+        }
     }
 }

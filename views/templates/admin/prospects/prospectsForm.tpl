@@ -29,14 +29,30 @@
         <div class="panel-heading">
             Attribution des prospects
         </div>
-        {if $nbr_prospects <= 0}
-        {else}
-            <div class="row panel">
-                <p>Il y a {$nbr_prospects|escape:'htmlall':'UTF-8'} nouveaux prospect(s)</p>
-            </div>
-        {/if}
-
         <form action="{$linkForm}" method="post" name="employes">
+            <div class="row panel">
+                <div class="col-lg-2">
+                    <p>Il y a {$nbr_prospects|escape:'htmlall':'UTF-8'} nouveau(x) prospect(s)</p>
+                    <p>et {$nbr_ancien_prospects|escape:'htmlall':'UTF-8'} ancien(s) prospect(s)</p>
+                </div>
+                <div class="col-lg-3">
+                    <label class="control-label" for="">Nombre de jours d'ancienneté des prospects
+                        <input type="text" name="p_nbr_jour_max_prospects" id="p_nbr_jour_max_prospects"
+                               value="{$jour_max_prospects|escape:'htmlall':'UTF-8'}"
+                               class="form-control" ></label>
+                </div>
+                <div class="col-lg-2">
+                    <label class="control-label" for="p_date_index">Date index prospects
+                        <input type="text" name="p_date_index" id="p_date_index"
+                               value="{$date_index|date_format:'%Y-%m-%d'|escape:'htmlall':'UTF-8'}"
+                               class="datepicker form-control"></label>
+                </div>
+                <div class="col-lg-2">
+                    <br>
+                    <button type="submit" name="submitDateIndex" id="submitDateIndex" class="btn btn-default"><i
+                                class="icon-save"></i> {l s='Save'}</button>
+                </div>
+            </div>
             <div class="row panel">
                 <div class="col-xs-6 col-md-2 col-xs-12">
                     <label class="control-label" for="p_date_start">Date début
@@ -102,16 +118,16 @@
                     </div>
                 {/if}
                 {if !isset($pa)}
-                <div class="col-xs-1">
-                    <div>
-                        <label for="employeActif">Employés actif</label>
+                    <div class="col-xs-1">
+                        <div>
+                            <label for="employeActif">Employés actif</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" name="employeActif" id="employeActif" onchange="this.form.submit();"
+                                    {if $employeActif}{$employeActif|escape:'htmlall':'UTF-8'}{/if}>
+                            <input type="hidden" name="submitEmployeActif" value="1"/>
+                        </div>
                     </div>
-                    <div>
-                        <input type="checkbox" name="employeActif" id="employeActif" onchange="this.form.submit();"
-                                {if $employeActif}{$employeActif|escape:'htmlall':'UTF-8'}{/if}>
-                        <input type="hidden" name="submitEmployeActif" value="1"/>
-                    </div>
-                </div>
                 {/if}
                 <script type="text/javascript">
                     {literal}
@@ -124,6 +140,12 @@
                             });
                         if ($("#p_date_end").length > 0)
                             $("#p_date_end").datepicker({
+                                prevText: '',
+                                nextText: '',
+                                dateFormat: 'yy-mm-dd'
+                            });
+                        if ($("#p_date_index").length > 0)
+                            $("#p_date_index").datepicker({
                                 prevText: '',
                                 nextText: '',
                                 dateFormat: 'yy-mm-dd'

@@ -54,7 +54,8 @@ class CdModuleCA extends ModuleGrid
         'CDMODULECA_PRIME_FICHIER' => '0.5',
         'CDMODULECA_PROSPECTS_JOUR' => '26',
         'CDMODULECA_PROSPECTS_HEURE' => '4.33',
-        'CDMODULECA_NBR_JOUR_MAX_PROSPECTS' => '30'
+        'CDMODULECA_NBR_JOUR_MAX_PROSPECTS' => '30',
+        'CDMODULECA_PROSPECTS_INDEX_DATE' => '2016-11-08 00:00:00'
     );
 
     public function __construct()

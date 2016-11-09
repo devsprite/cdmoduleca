@@ -64,11 +64,18 @@ class ProspectClass extends ObjectModel
                 'validate' => 'isDateFormat', 'required' => false, 'size' => 64),
         ));
 
-    public static function getAllProspectsGroup($id_group, $limit = 50, $index_id = 0)
+    public static function getAllProspectsGroup($id_group, $limit = 50, $newProspects )
     {
-        $order = ($index_id == 0) ? 'DESC' : 'ASC';
         // Nombre de jour max pour la selection des prospects
-        $nbreJourMax = date('Y-m-d', strtotime('-' . (int)Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS').' day'));
+        $nbreJourMax = date('Y-m-d', strtotime('-' . (int)Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS') . ' day'));
+        $indexDate = Configuration::get('CDMODULECA_PROSPECTS_INDEX_DATE');
+        $filter = '';
+        if ($newProspects) {
+            $filter = ' AND cu.date_add > "' . pSQL($indexDate) . '"';
+        } else {
+            $filter = ' AND cu.date_add > "' . pSQL($nbreJourMax) . '"
+                        AND cu.date_add < "' . pSQL($indexDate) . '"';
+        }
 
         $sql = 'SELECT cu.`id_customer`, CONCAT(UPPER(cu.`lastname`)," ", LOWER(cu.`firstname`)) AS nom, cu.`date_add`,
           (SELECT GROUP_CONCAT(`id_group` SEPARATOR ", ") FROM `' . _DB_PREFIX_ . 'customer_group` AS pcg
@@ -76,16 +83,13 @@ class ProspectClass extends ObjectModel
           FROM `' . _DB_PREFIX_ . 'customer` AS cu
           LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON cu.`id_customer` = cg.`id_customer`
           LEFT JOIN `' . _DB_PREFIX_ . 'prospect` AS p ON cg.`id_customer` = p.`id_customer`
-          WHERE cg.`id_group` = "' . (int)$id_group . '"
-          AND cu.date_add > date("' . pSQL($nbreJourMax) . '")
-          AND cu.id_customer > ' . (int)$index_id . '
-          AND cu.`deleted` = 0';
-        $sql .= ' ORDER BY cu.`id_customer` ' . $order;
-
+          WHERE cg.`id_group` = "' . (int)$id_group . '" ';
+        $sql .= $filter;
+        $sql .= 'AND cu.`deleted` = 0';
+        $sql .= ' ORDER BY RAND()';
         $sql .= ' LIMIT ' . (int)$limit;
 
         $req = Db::getInstance()->executeS($sql);
-
         return $req;
     }
 
