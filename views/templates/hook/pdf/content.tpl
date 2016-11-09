@@ -128,7 +128,7 @@
 <table style="100%">
     <tr>
         <td>
-            <span style="font-size: 18pt;color: #448B01;">Ajout manuel</span>
+            <span style="font-size: 18pt;color: #448B01;">Ajustement</span>
         </td>
     </tr>
     <tr>
@@ -166,7 +166,7 @@
 <table style="100%">
     <tr>
         <td>
-            <span style="font-size: 18pt;color: #448B01;">Objectif Coach</span>
+            <span style="font-size: 18pt;color: #448B01;">Objectif Coachs</span>
         </td>
     </tr>
     <tr>
@@ -195,6 +195,46 @@
                         <td style="text-align: right">{displayPrice price=$objectif['somme']}</td>
                         <td style="text-align: right">{displayPrice price=$objectif['caCoach']}</td>
                         <td style="text-align: right">{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'} %</td>
+                        <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
+                    </tr>
+                {/foreach}
+            </table>
+        </td>
+    </tr>
+</table>
+
+<table style="100%">
+    <tr>
+        <td>
+            <span style="font-size: 18pt;color: #448B01;">Horaire Coachs</span>
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            <table style="width: 100%; font-size: 8pt;border-bottom:1px solid #448B01;">
+                <thead>
+                <tr style="background-color: #AAAAAA">
+                    <th style="width: 10%">Nom</th>
+                    <th style="width: 10%">Date début</th>
+                    <th style="width: 10%">Date fin</th>
+                    <th style="width: 10%;text-align: right">Heure d'absence</th>
+                    <th style="width: 10%;text-align: center">Jour d'absence</th>
+                    <th style="width: 10%;text-align: center">Jours ouvrés</th>
+                    <th style="width: 40%">Commentaire</th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach item=objectif from=$objectifCoachs}
+                    <tr class="{$objectif['class']|escape:'htmlall':'UTF-8'}">
+                        <td>{$objectif['lastname']|escape:'htmlall':'UTF-8'}</td>
+                        <td>{$objectif['date_start']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
+                        <td>{$objectif['date_end']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center">{if !empty({$objectif['heure_absence']})}{$objectif['heure_absence']}{/if}</td>
+                        <td style="text-align: center">{if !empty({$objectif['jour_absence']})}{$objectif['jour_absence']}{/if}</td>
+                        <td style="text-align: center">{if !empty({$objectif['jour_ouvre']})}{$objectif['jour_ouvre']|escape:'htmlall':'UTF-8'} %{/if}</td>
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                     </tr>
                 {/foreach}

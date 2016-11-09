@@ -69,9 +69,6 @@
         <td class="text-right">{$coach['pourCaRembAvoir']|escape:'htmlall':'UTF-8'}</td>
         <td></td>
         <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
     </tr>
     {/foreach}
     </tbody>
