@@ -257,14 +257,11 @@ class AdminProspectsController extends ModuleAdminController
             $nbr_prospects_disponible = $this->getNbrAncienProspects();
             $newProspects = false;
         }
-        $ap->add();
         if ($nbr_prospects_disponible >= $ap->nbr_prospect_attribue) {
+            $ap->add();
             $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $newProspects);
             $this->addProspects($prospects, $id_group, $ap);
-        } elseif ($nbr_prospects_disponible == 0) {
-            $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $newProspects);
-            $this->addProspects($prospects, $id_group, $ap);
-        } else {
+        }else {
             $this->errors[] = $this->module->l('Il n\'y a pas assez de prospects disponible');
             $ap->delete();
             return false;

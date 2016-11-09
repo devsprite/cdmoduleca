@@ -67,8 +67,8 @@ class ProspectClass extends ObjectModel
     public static function getAllProspectsGroup($id_group, $limit = 50, $newProspects )
     {
         // Nombre de jour max pour la selection des prospects
-        $nbreJourMax = date('Y-m-d', strtotime('-' . (int)Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS') . ' day'));
         $indexDate = Configuration::get('CDMODULECA_PROSPECTS_INDEX_DATE');
+        $nbreJourMax = date('Y-m-d', strtotime($indexDate . ' -' . (int)Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS') . ' day'));
         $filter = '';
         if ($newProspects) {
             $filter = ' AND cu.date_add > "' . pSQL($indexDate) . '"';
