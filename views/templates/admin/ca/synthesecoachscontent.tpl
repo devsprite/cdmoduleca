@@ -65,7 +65,8 @@
                 <th style="width: 15%">Nom</th>
                 <th style="width: 10%">Date</th>
                 <th style="width: 10%"><span class="pull-right">Somme</span></th>
-                <th style="width: 60%">Commentaire</th>
+                <th style="width: 50%">Commentaire</th>
+                <th style="width: 10%">id_order</th>
                 <th style="width: 5%"></th>
             </tr>
             </thead>
@@ -73,9 +74,10 @@
             {foreach item=ajoutSomme from=$ajoutSommes}
                 <tr>
                     <td>{$ajoutSomme['lastname']|escape:'htmlall':'UTF-8'}</td>
-                    <td>{$ajoutSomme['date_add']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
+                    <td>{$ajoutSomme['date_ajout_somme']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
                     <td><span class="pull-right">{displayPrice price=$ajoutSomme['somme']}</span></td>
                     <td>{$ajoutSomme['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
+                    <td>{$ajoutSomme['id_order']|escape:'htmlall':'UTF-8'}</td>
                     <td>
                         {if isset($coachs)}
                             <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_as&id_as={$ajoutSomme['id_ajout_somme']|escape:'htmlall':'UTF-8'}">

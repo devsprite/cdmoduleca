@@ -33,17 +33,18 @@ class AjoutSomme extends ObjectModel
     public $id_order;
     public $somme;
     public $commentaire;
+    public $date_ajout_somme;
     public $date_add;
 
     public static $definition = array(
         'table' => 'ajout_somme',
         'primary' => 'id_ajout_somme',
         'fields' => array(
-            'id_employee' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId'),
+            'id_employee' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId', 'required' => true),
             'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId'),
-            'somme' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
+            'somme' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat', 'required' => true),
             'commentaire' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
-            'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDateFormat'),
+            'date_ajout_somme' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
         ),
     );
 }

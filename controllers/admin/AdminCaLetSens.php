@@ -505,6 +505,11 @@ class AdminCaLetSensController extends ModuleAdminController
                                         }
                                     }
                                     fclose($handle);
+                                    if ($this->importFile($datas)) {
+                                        $this->confirmations = $this->module->l('Fichier importé');
+                                    } else {
+                                        $this->errors[] = Tools::displayError('Erreur lors de l\'import du fichier');
+                                    }
                                 }
                             }
                         } else {
@@ -516,6 +521,38 @@ class AdminCaLetSensController extends ModuleAdminController
             }
         }
 
+    }
+
+    private function importfile($datas)
+    {
+        $isOk = true;
+        if ($datas[0][0] == 'id_employe' &&
+            $datas[0][1] == 'id_order' &&
+            $datas[0][2] == 'date' &&
+            $datas[0][3] == 'somme' &&
+            $datas[0][4] == 'commentaire') {
+            array_shift($datas);
+
+            foreach ($datas as $data) {
+                $aj = new AjoutSomme();
+                $aj->id_employee = (int)$data[0];
+                $aj->id_order = (int)$data[1];
+                $aj->date_ajout_somme = date('Y-m-d 00:00:00', strtotime($data[2]));
+                $aj->somme = (int)$data[3];
+                $aj->commentaire = pSQL($data[4]);
+
+                if (!$aj->save()) {
+                    $isOk = false;
+                }
+            }
+
+
+        }else{
+            $isOk = false;
+        }
+
+
+        return $isOk;
     }
 
     /**
@@ -557,7 +594,7 @@ class AdminCaLetSensController extends ModuleAdminController
                     'id_employee' => (int)Tools::getValue('as_id_employee'),
                     'somme' => Tools::getValue('as_somme'),
                     'commentaire' => pSQL(Tools::getValue('as_commentaire')),
-                    'date_add' => Tools::getValue('as_date')
+                    'date_ajout_somme' => Tools::getValue('as_date')
                 );
                 if (!Validate::isInt($data['id_employee'])) {
                     $this->errors[] = 'L\'id de l\'employee n\'est pas valide';
@@ -568,7 +605,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 if (!Validate::isString($data['commentaire'])) {
                     $this->errors[] = 'Erreur du champ commentaire';
                 }
-                if (!Validate::isDate($data['date_add'])) {
+                if (!Validate::isDate($data['date_ajout_somme'])) {
                     $this->errors[] = 'Erreur du champ date';
                 }
 
@@ -613,7 +650,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $_POST['as_id_employee'] = $as['id_employee'];
                 $_POST['as_somme'] = $as['somme'];
                 $_POST['as_commentaire'] = $as['commentaire'];
-                $_POST['as_date'] = $as['date_add'];
+                $_POST['as_date'] = $as['date_ajout_somme'];
                 $_POST['as_id'] = $as['id_ajout_somme'];
             }
         }

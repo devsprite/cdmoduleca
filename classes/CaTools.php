@@ -210,10 +210,10 @@ class CaTools
 
     public static function getAjoutSomme($id_employee, $dateBetween)
     {
-        $sql = 'SELECT id_ajout_somme, somme, commentaire, a.id_employee, date_add, lastname
+        $sql = 'SELECT id_ajout_somme, somme, id_order, commentaire, a.id_employee, date_ajout_somme, lastname
                 FROM `' . _DB_PREFIX_ . 'ajout_somme` AS a
                 LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.id_employee = e.id_employee
-                WHERE date_add BETWEEN ' . $dateBetween;
+                WHERE date_ajout_somme BETWEEN ' . $dateBetween;
 
         if ($id_employee != 0) {
             $sql .= ' AND a.id_employee = ' . (int)$id_employee;
@@ -418,7 +418,7 @@ class CaTools
         }
 
         $sql = 'SELECT SUM(`somme`) FROM `' . _DB_PREFIX_ . 'ajout_somme` 
-                WHERE `date_add` BETWEEN ' . $getDateBetween;
+                WHERE `date_ajout_somme` BETWEEN ' . $getDateBetween;
         $sql .= $filter;
 
         $req = Db::getInstance()->getValue($sql);

@@ -29,9 +29,9 @@
 <div class="row panel">
     <div class="col-lg-2">
         <a class="btn btn-default export-csv" href="{$LinkFile}&export_csv=1">
-            <i class="icon-cloud-upload"></i>CSV</a>
+            <i class="icon-cloud-upload"></i> CSV</a>
         <a class="btn btn-default export-csv" href="{$LinkFile}&export_pdf=1">
-            <i class="icon-cloud-upload"></i>PDF</a>
+            <i class="icon-cloud-upload"></i> PDF</a>
     </div>
 
     {if isset($allow)}
@@ -41,7 +41,8 @@
             <input type="file" name="uploadFile" class="btn btn-default">
             </div>
             <div class="col-lg-1">
-                <button class="btn btn-default" type="submit" name="submitUpload">Envoyer</button>
+                <button class="btn btn-default" type="submit" name="submitUpload">
+                    <i class="icon-cloud-upload"></i> Envoyer</button>
             </div>
         </form>
     {/if}
