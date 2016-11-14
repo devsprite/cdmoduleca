@@ -27,10 +27,24 @@
     <p class="alert alert-success">{$confirmation|escape:'htmlall':'UTF-8'}</p>
 {/if}
 <div class="row panel">
-    <div class="col-lg-1"><a class="btn btn-default export-csv" href="{$LinkFile}&export_csv=1">
+    <div class="col-lg-2">
+        <a class="btn btn-default export-csv" href="{$LinkFile}&export_csv=1">
             <i class="icon-cloud-upload"></i>CSV</a>
         <a class="btn btn-default export-csv" href="{$LinkFile}&export_pdf=1">
-            <i class="icon-cloud-upload"></i>PDF</a></div>
+            <i class="icon-cloud-upload"></i>PDF</a>
+    </div>
+
+    {if isset($allow)}
+        <form enctype="multipart/form-data" action="{$LinkFile}" method="post">
+            <div class="col-lg-2">
+            <input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
+            <input type="file" name="uploadFile" class="btn btn-default">
+            </div>
+            <div class="col-lg-1">
+                <button class="btn btn-default" type="submit" name="submitUpload">Envoyer</button>
+            </div>
+        </form>
+    {/if}
 </div>
 <div class="panel">
     <div class="panel-heading">

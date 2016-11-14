@@ -26,7 +26,7 @@
 <div class="row">
     <div class="col-xs-12">
         {if isset($coachs)}
-            <form action="{$linkFilter|escape:'htmlall':'UTF-8'}" method="post">
+            <form action="{$linkFilter}" method="post">
                 <div class="form-group">
                     <div class="col-lg-3 ">
                         <label class="control-label" for="filterCoach">
@@ -51,7 +51,7 @@
                 </div>
             </form>
         {/if}
-        <form action="{$linkFilter|escape:'htmlall':'UTF-8'}" method="post">
+        <form action="{$linkFilter}" method="post">
             <div class="form-group">
                 <div class="col-lg-3">
                     <label class="control-label" for="filterCodeAction">
@@ -68,7 +68,7 @@
                 </div>
             </div>
         </form>
-        <form action="{$linkFilter|escape:'htmlall':'UTF-8'}" method="post">
+        <form action="{$linkFilter}" method="post">
             <div class="form-group">
                 <div class="col-lg-2 ">
                     <label class="control-label" for="filterCommande">
@@ -91,7 +91,7 @@
         <div class="col-xs-12 hidden-print">
             <br>
             <h2>Ajustement</h2>
-            <form id="form_as_date" action="{$linkFilter|escape:'htmlall':'UTF-8'}" method="post">
+            <form id="form_as_date" action="{$linkFilter}" method="post">
                 <div class="form-group">
                     <div class="col-lg-1">
                         <label for="as_date">Date</label>
@@ -151,7 +151,7 @@
         <div class="col-xs-12 hidden-print">
             <br>
             <h2>Coach</h2>
-            <form id="form_oc_objectif" action="{$linkFilter|escape:'htmlall':'UTF-8'}" method="post">
+            <form id="form_oc_objectif" action="{$linkFilter}" method="post">
                 <div class="form-group">
                     <div class="col-lg-1">
                         <label for="oc_date_start">Date début</label>

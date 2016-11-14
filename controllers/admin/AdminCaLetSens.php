@@ -27,6 +27,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once(dirname(__FILE__) . '/../../classes/GridClass.php');
+require_once(dirname(__FILE__) . '/../../classes/AjoutSommeClass.php');
 require_once(dirname(__FILE__) . '/../../classes/CaTools.php');
 require_once(dirname(__FILE__) . '/../../classes/ProspectAttribueClass.php');
 require_once(dirname(__FILE__) . '/../../../../tools/tcpdf/tcpdf.php');
@@ -87,6 +88,7 @@ class AdminCaLetSensController extends ModuleAdminController
             'LinkFile' => Tools::safeOutput($_SERVER['REQUEST_URI']),
             'errors' => $this->errors,
             'confirmation' => $this->confirmation,
+            'allow' => $this->module->viewAllCoachs[$this->context->employee->id_profile]
         ));
 
         $this->html .= $this->displayCalendar();
@@ -481,6 +483,41 @@ class AdminCaLetSensController extends ModuleAdminController
         }
     }
 
+    private function uploadFile()
+    {
+        if (Tools::isSubmit('submitUpload')) {
+            $error = '';
+            if ($_FILES['uploadFile']['error'] == 0) {
+                $helper = new HelperUploader('uploadFile');
+                $files = $helper->process();
+                if ($files) {
+                    foreach ($files as $file) {
+                        if ($file['type'] == 'text/csv') {
+                            if (isset($file['save_path'])) {
+                                if ($file['size'] > 3000000) {
+                                    $this->errors[] = Tools::displayError('La taille du fichier est trop grande.');
+                                }
+                                if (!$this->errors) {
+                                    if (($handle = fopen($file['save_path'] , "r")) !== FALSE) {
+                                        $datas = array();
+                                        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
+                                            $datas[] = $data;
+                                        }
+                                    }
+                                    fclose($handle);
+                                }
+                            }
+                        } else {
+                            $this->errors[] = Tools::displayError('Seul les fichiers au format csv sont autorisés.');
+                        }
+                        unlink($file['save_path']);
+                    }
+                }
+            }
+        }
+
+    }
+
     /**
      * Enregistrement de la configuration du filtre commande valide dans un cookie
      */
@@ -703,6 +740,7 @@ class AdminCaLetSensController extends ModuleAdminController
     {
         $this->processDateRange();
         $this->setIdFilterCoach();
+        $this->uploadFile();
         $this->setIdFilterCodeAction();
         $this->setFilterCommandeValid();
         $this->ajoutSomme();
