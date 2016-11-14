@@ -379,14 +379,10 @@ class AdminCaLetSensController extends ModuleAdminController
                 );
 
             $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] =
-                CaTools::getNbrGrVentes(
+                CaTools::getParrainage(
                     $employee['id_employee'],
                     'PAR',
-                    null,
-                    true,
-                    false,
-                    $this->getDateBetween(),
-                    $this->module->lang
+                    $this->getDateBetween()
                 );
 
             $datasEmployees[$employee['id_employee']]['pourVenteGrPar'] =

@@ -328,6 +328,30 @@ class CaTools
         return ($nbrRows) ? $nbrRows : ''; // ($nbrVenteFID) ? $nbrVenteFID : '';
     }
 
+    public static function getParrainage($idFilterCoach = 0, $code_action = null, $dateBetween)
+    {
+        $filterCoach = ($idFilterCoach != 0)
+            ? " AND e . id_employee = '" . (int)$idFilterCoach . "'" : '';
+
+        $sql_code_action = '';
+        if ($code_action) {
+            $code_action = CaTools::getCodeActionByName($code_action);
+            $sql_code_action = " AND o . id_code_action = '" . (int)$code_action . "'";
+        }
+
+        $sql = "SELECT SUM(ROUND(o . total_products - o . total_discounts_tax_excl, 2)) as total 
+                FROM " . _DB_PREFIX_ . "orders as o 
+                LEFT JOIN " . _DB_PREFIX_ . "customer as c ON o . id_customer = c . id_customer
+                LEFT JOIN " . _DB_PREFIX_ . "employee as e ON o . id_employee = e . id_employee";
+        $sql .= ' WHERE o.date_add BETWEEN ' . $dateBetween;
+        $sql .= $filterCoach;
+        $sql .= $sql_code_action;
+
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
+    }
+
     public static function getNbrGrVentes(
         $idFilterCoach = 0,
         $code_action = null,

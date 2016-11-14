@@ -1117,6 +1117,7 @@ class CdModuleCA extends ModuleGrid
         $filterCodeAction = '';
         if ($this->idFilterCodeAction == 99) {
             $filterCodeAction = ' AND o.id_code_action != ' . CaTools::getCodeActionByName('ABO');
+            $filterCoach = ($this->idFilterCoach != 0) ? ' AND o.id_employee = ' . $this->idFilterCoach .' ':'';
         } elseif ($this->idFilterCodeAction != 0) {
             $filterCodeAction = ' AND o.id_code_action = ' . $this->idFilterCodeAction;
         }

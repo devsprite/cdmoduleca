@@ -208,9 +208,13 @@ class GridClass extends Module
         return $this->_id_lang;
     }
 
-    public function getData($data)
+    protected function getData($data)
     {
-        $filterGroupe = ' LEFT JOIN ' . _DB_PREFIX_ . 'customer_group AS cg ON o.id_customer = cg.id_customer 
+        $this->idFilterCoach = $this->context->cookie->cdmoculeca_id_filter_coach;
+        $this->idFilterCodeAction = $this->context->cookie->cdmoduleca_id_filter_code_action;
+        $this->commandeValid = $this->context->cookie->cdmoculeca_filter_commande;
+
+        $filterGroupe = ' LEFT JOIN ' . _DB_PREFIX_ . 'customer_group AS cg ON o.id_customer = cg.id_customer
                 LEFT JOIN ' . _DB_PREFIX_ . 'group_lang AS gl ON gl.id_group = cg.id_group';
 
         $idGroupEmployee = $data['idGroupEmployee'];
@@ -222,7 +226,8 @@ class GridClass extends Module
 
         $filterCodeAction = '';
         if ($data['idFilterCodeAction'] == 99) {
-            $filterCodeAction = ' AND o.id_code_action != ' . $data['CodeActionABO'];
+            $filterCodeAction = ' AND o.id_code_action != ' . CaTools::getCodeActionByName('ABO');
+            $filterCoach = ($data['idFilterCoach'] != 0) ? ' AND o.id_employee = ' . $data['idFilterCoach'] .' ':'';
         } elseif ($data['idFilterCodeAction'] != 0) {
             $filterCodeAction = ' AND o.id_code_action = ' . $data['idFilterCodeAction'];
         }
@@ -235,25 +240,27 @@ class GridClass extends Module
         }
 
         $sql = '
-          SELECT SQL_CALC_FOUND_ROWS 
+          SELECT SQL_CALC_FOUND_ROWS
           DISTINCT o.id_order AS id,
+          amount as avoir,
           gl.name AS groupe,
-          ROUND(o.total_products - o.total_discounts_tax_excl,2) AS hthp,
+          CONCAT ( ROUND(o.total_products - o.total_discounts_tax_excl,2), " €") AS hthp,
           (SELECT e.lastname FROM ' . _DB_PREFIX_ . 'employee AS e WHERE o.id_employee = e.id_employee) AS id_employee,
           (SELECT UCASE(c.lastname) FROM ' . _DB_PREFIX_ . 'customer AS c 
           WHERE o.id_customer = c.id_customer) AS id_customer,
-          date_add,
-          date_upd,
-          IF((o.valid) > 0, "", "Non") AS valid,  
+          o.date_add,
+          o.date_upd,
+          IF((o.valid) > 0, "", "Non") AS valid,
           (SELECT ca.name FROM ' . _DB_PREFIX_ . 'code_action AS ca 
           WHERE o.id_code_action = ca.id_code_action) as CodeAction,
           (SELECT osl.name FROM ' . _DB_PREFIX_ . 'order_state_lang AS osl 
           WHERE id_lang = "' . $data['lang'] . '" AND osl.id_order_state = o.current_state ) as current_state ,
-          IF((SELECT so.id_order FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.id_customer = o.id_customer 
+          IF((SELECT so.id_order FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.id_customer = o.id_customer
           AND so.id_order < o.id_order LIMIT 1) > 0, "", "Oui") as new
 				FROM ' . _DB_PREFIX_ . 'orders AS o ';
         $sql .= $filterGroupe;
-        $sql .= ' WHERE date_add BETWEEN ' . $data['date'];
+        $sql .= ' LEFT JOIN `' . _DB_PREFIX_ . 'order_slip` AS os ON o.`id_order` = os.`id_order` ';
+        $sql .= ' WHERE o.date_add BETWEEN ' . $data['date'];
         $sql .= $filterCoach;
         $sql .= $filterCodeAction;
         $sql .= $filterValid;
@@ -273,10 +280,11 @@ class GridClass extends Module
             $sql .= ' LIMIT ' . (int)$this->_start . ', ' . (int)$this->_limit;
         }
 
-
+//        ddd($this->query);
         $values = Db::getInstance()->executeS($sql);
 
         $this->_values = $values;
         $this->_totalCount = Db::getInstance()->getValue('SELECT FOUND_ROWS()');
     }
+
 }

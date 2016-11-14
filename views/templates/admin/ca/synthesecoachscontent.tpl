@@ -37,16 +37,6 @@
             </div>
         {/if}
         <div class="row group">
-            <div class="col-xs-12">CA Déduit Total (- {$caDeduitJours|escape:'htmlall':'UTF-8'} j.)
-                <span class="pull-right">{displayPrice price=$caDeduitTotal}</span></div>
-        </div>
-        {if !empty({$coach->lastname|escape:'htmlall':'UTF-8'})}
-            <div class="row">
-                <div class="col-xs-12">CA Déduit {$coach->lastname|escape:'htmlall':'UTF-8'} (- {$caDeduitJours|escape:'htmlall':'UTF-8'} j.)
-                    <span class="pull-right">{displayPrice price=$caDeduitCoach}</span></div>
-            </div>
-        {/if}
-        <div class="row group">
             <div class="col-xs-12">CA FID (Prospects déjà inscrit)
                 <span class="pull-right">{displayPrice price=$caFidTotal}</span></div>
         </div>
@@ -64,16 +54,6 @@
             <div class="row">
                 <div class="col-xs-12">CA Prospect {$coach->lastname|escape:'htmlall':'UTF-8'}
                     <span class="pull-right">{displayPrice price=($caTotalCoach - $caFidCoach)}</span></div>
-            </div>
-        {/if}
-        <div class="row group">
-            <div class="col-xs-12">Prime fichier total
-                <span class="pull-right">{displayPrice price=$primeFichierTotal}</span></div>
-        </div>
-        {if !empty({$coach->lastname|escape:'htmlall':'UTF-8'})}
-            <div class="row">
-                <div class="col-xs-12">Prime Fichier {$coach->lastname|escape:'htmlall':'UTF-8'}
-                    <span class="pull-right">{displayPrice price=$primeFichierCoach}</span></div>
             </div>
         {/if}
     </div>
