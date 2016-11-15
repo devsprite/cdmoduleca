@@ -26,6 +26,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * Class AjoutSomme
+ * Ajoute ou soustrait une somme à un coach, utilisé par l'import csv
+ */
 class AjoutSomme extends ObjectModel
 {
     public $id_ajout_somme;

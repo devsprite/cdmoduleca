@@ -30,6 +30,12 @@ require_once(dirname(__FILE__) . '/AppelClass.php');
 
 class CaTools
 {
+    /**
+     * Retourne les informations de l'employé ainsi que son groupe
+     * @param null $active
+     * @param null $id
+     * @return array
+     */
     public static function getEmployees($active = null, $id = null)
     {
         $sql = 'SELECT gl.`id_group`,e.`id_employee`, e.`firstname`, e.`lastname`
@@ -43,6 +49,7 @@ class CaTools
     }
 
     /**
+     * Retourne le chiffre d'affaire
      * @param int $idCoach
      * @param $idFilterCodeAction
      * @param $dateBetween
@@ -51,48 +58,55 @@ class CaTools
     public static function getCaCoachsTotal($idCoach = 0, $idFilterCodeAction, $dateBetween)
     {
         $filterCoach = ($idCoach != 0)
-            ? ' AND id_employee = ' . (int)$idCoach : '';
+            ? ' AND `id_employee` = ' . (int)$idCoach : '';
 
         $filterCodeAction = '';
         if ($idFilterCodeAction == 99) {
-            $filterCodeAction = ' AND o.id_code_action != ' . pSQL(CaTools::getCodeActionByName('ABO'));
+            $filterCodeAction = ' AND o.`id_code_action` != ' . pSQL(CaTools::getCodeActionByName('ABO'));
         } elseif ($idFilterCodeAction != 0) {
-            $filterCodeAction = ' AND o.id_code_action = ' . (int)$idFilterCodeAction;
+            $filterCodeAction = ' AND o.`id_code_action` = ' . (int)$idFilterCodeAction;
         }
 
         $sql = 'SELECT SQL_CALC_FOUND_ROWS 
-                if(SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) < 
-                0 , 0, SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2))) as total
-                FROM ' . _DB_PREFIX_ . 'orders AS o';
-        $sql .= ' WHERE date_add BETWEEN ';
+                if(SUM(ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2)) < 
+                0 , 0, SUM(ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2))) as total
+                FROM `' . _DB_PREFIX_ . 'orders` AS o';
+        $sql .= ' WHERE `date_add` BETWEEN ';
         $sql .= $dateBetween;
-        $sql .= ' AND valid = 1 ';
+        $sql .= ' AND `valid` = 1 ';
         $sql .= $filterCoach;
         $sql .= $filterCodeAction;
 
         return Db::getInstance()->getValue($sql);
     }
 
+    /**
+     * Somme des commande valide mais remboursé
+     * @param int $idCoach
+     * @param $idFilterCodeAction
+     * @param $dateBetween
+     * @return mixed
+     */
     public static function getCaCoachsRembourse($idCoach = 0, $idFilterCodeAction, $dateBetween)
     {
         $filterCoach = ($idCoach != 0)
-            ? ' AND id_employee = ' . (int)$idCoach : '';
+            ? ' AND `id_employee` = ' . (int)$idCoach : '';
 
         $filterCodeAction = '';
         if ($idFilterCodeAction == 99) {
-            $filterCodeAction = ' AND o.id_code_action != ' . pSQL(CaTools::getCodeActionByName('ABO'));
+            $filterCodeAction = ' AND o.`id_code_action` != ' . pSQL(CaTools::getCodeActionByName('ABO'));
         } elseif ($idFilterCodeAction != 0) {
-            $filterCodeAction = ' AND o.id_code_action = ' . (int)$idFilterCodeAction;
+            $filterCodeAction = ' AND o.`id_code_action` = ' . (int)$idFilterCodeAction;
         }
 
         $sql = 'SELECT SQL_CALC_FOUND_ROWS 
-                if(SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) < 
-                0 , 0, SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2))) as total
-                FROM ' . _DB_PREFIX_ . 'orders AS o';
-        $sql .= ' WHERE date_add BETWEEN ';
+                if(SUM(ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2)) < 
+                0 , 0, SUM(ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2))) as total
+                FROM `' . _DB_PREFIX_ . 'orders` AS o';
+        $sql .= ' WHERE `date_add` BETWEEN ';
         $sql .= $dateBetween;
-        $sql .= ' AND valid = 1 ';
-        $sql .= ' AND (current_state = 7)';
+        $sql .= ' AND `valid` = 1 ';
+        $sql .= ' AND (`current_state` = 7)';
         $sql .= $filterCoach;
         $sql .= $filterCodeAction;
 
@@ -101,23 +115,29 @@ class CaTools
 
     public static function getCodeActionByName($name)
     {
-        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE name = "' . pSQL($name) . '"';
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE `name` = "' . pSQL($name) . '"';
 
         return Db::getInstance()->getValue($sql);
     }
 
+    /**
+     * Chiffre d'affaire des client déjà inscrit
+     * @param int $idFilterCoach
+     * @param $dateBetween
+     * @return int|string
+     */
     public static function getCaDejaInscrit($idFilterCoach = 0, $dateBetween)
     {
         $filterCoach = ($idFilterCoach != 0)
-            ? ' AND id_employee = ' . (int)$idFilterCoach : '';
+            ? ' AND `id_employee` = ' . (int)$idFilterCoach : '';
 
-        $sql = 'SELECT ROUND(o.total_products - o.total_discounts_tax_excl,2) AS total,
-                IF((SELECT so.id_order FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.id_customer = o.id_customer 
-                AND so.id_order < o.id_order LIMIT 1) > 0, 1, 0) as notNew
-				FROM ' . _DB_PREFIX_ . 'orders AS o
-				WHERE valid = 1';
+        $sql = 'SELECT ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2) AS total,
+                IF((SELECT so.`id_order` FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.`id_customer` = o.`id_customer` 
+                AND so.`id_order` < o.`id_order` LIMIT 1) > 0, 1, 0) as notNew
+				FROM `' . _DB_PREFIX_ . 'orders` AS o
+				WHERE `valid` = 1';
         $sql .= $filterCoach;
-        $sql .= ' AND date_add BETWEEN ' . $dateBetween;
+        $sql .= ' AND `date_add` BETWEEN ' . $dateBetween;
         $caFID = Db::getInstance()->executeS($sql);
 
         $total = '';
@@ -128,50 +148,64 @@ class CaTools
         return $total;
     }
 
+    /**
+     * Somme des commandes avec le code action à déduire dans le la configuration du module
+     * @param int $idFilterCoach
+     * @param $dateBetween
+     * @return mixed
+     */
     public static function getCaDeduit($idFilterCoach = 0, $dateBetween)
     {
         $listStatuts = explode(',', Configuration::get('CDMODULECA_ORDERS_STATE'));
         $sqlStatuts = ' AND ( ';
         foreach ($listStatuts as $statut) {
-            $sqlStatuts .= ' current_state = ' . pSQL($statut) . ' OR ';
+            $sqlStatuts .= ' `current_state` = ' . pSQL($statut) . ' OR ';
         }
         $sqlStatuts = Tools::substr($sqlStatuts, 0, -3) . ')';
 
         $filterCoach = ($idFilterCoach != 0)
-            ? ' AND id_employee = ' . (int)$idFilterCoach : '';
+            ? ' AND `id_employee` = ' . (int)$idFilterCoach : '';
 
-        $sql = 'SELECT SUM(ROUND(o.total_products - o.total_discounts_tax_excl,2)) as total
-                FROM ' . _DB_PREFIX_ . 'orders AS o';
-        $sql .= ' WHERE date_add BETWEEN ' . $dateBetween;
+        $sql = 'SELECT SUM(ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2)) as total
+                FROM `' . _DB_PREFIX_ . 'orders` AS o';
+        $sql .= ' WHERE `date_add` BETWEEN ' . $dateBetween;
         $sql .= $filterCoach;
         $sql .= $sqlStatuts;
 
         return Db::getInstance()->getValue($sql);
     }
 
+    /**
+     * Nombre de commande par coach, code_action, status
+     * @param int $idCoach
+     * @param int $idCodeAction
+     * @param null $current_state
+     * @param $dateBetween
+     * @return mixed|string
+     */
     public static function getNumberCommande($idCoach = 0, $idCodeAction = 0, $current_state = null, $dateBetween)
     {
         $filterCoach = ($idCoach != 0)
-            ? ' AND id_employee = ' . (int)$idCoach : '';
+            ? ' AND `id_employee` = ' . (int)$idCoach : '';
 
         $filterCodeAction = ($idCodeAction != 0)
-            ? ' AND id_code_action = ' . (int)$idCodeAction : '';
+            ? ' AND `id_code_action` = ' . (int)$idCodeAction : '';
         $filter_current_state = '';
         if ($current_state) {
             $filter_current_state = ' AND ( ';
             foreach ($current_state as $value) {
-                $filter_current_state .= " o.current_state != '" . (int)$value . "' AND ";
+                $filter_current_state .= " o.`current_state` != '" . (int)$value . "' AND ";
             }
             $filter_current_state = Tools::substr($filter_current_state, 0, -4) . ' )';
         }
 
         $sql = 'SELECT SQL_CALC_FOUND_ROWS id_order
-                FROM ' . _DB_PREFIX_ . 'orders AS o
-                WHERE valid = 1 ';
+                FROM `' . _DB_PREFIX_ . 'orders` AS o
+                WHERE `valid` = 1 ';
         $sql .= $filterCoach;
         $sql .= $filterCodeAction;
         $sql .= $filter_current_state;
-        $sql .= ' AND date_add BETWEEN ' . $dateBetween;
+        $sql .= ' AND `date_add` BETWEEN ' . $dateBetween;
 
         Db::getInstance()->executeS($sql);
         $nbr = Db::getInstance()->getValue('SELECT FOUND_ROWS()');
@@ -180,16 +214,25 @@ class CaTools
         return $nbr;
     }
 
+    /**
+     * Retourne les informations du code action, name, groupement
+     * @param $id
+     * @return array
+     */
     public static function getCodeAction($id)
     {
-        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE id_code_action = ' . ((int)$id);
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE `id_code_action` = ' . ((int)$id);
 
         return Db::getInstance()->getRow($sql);
     }
 
+    /**
+     * Retourne tous les groupements des codes action
+     * @return array
+     */
     public static function getAllGroupeCodesAction()
     {
-        $sql = 'SELECT DISTINCT groupe FROM `' . _DB_PREFIX_ . 'code_action`
+        $sql = 'SELECT DISTINCT `groupe` FROM `' . _DB_PREFIX_ . 'code_action`
         ';
         $groupes = Db::getInstance()->executeS($sql);
 
@@ -201,51 +244,76 @@ class CaTools
         return $listGroupes;
     }
 
+    /**
+     * Retourne la ligne correpondante à l'id de la table ajout_somme
+     * @param $id
+     * @return array
+     */
     public static function getAjoutSommeById($id)
     {
-        $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'ajout_somme WHERE id_ajout_somme = ' . (int)$id;
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'ajout_somme` WHERE `id_ajout_somme` = ' . (int)$id;
 
         return Db::getInstance()->getRow($sql);
     }
 
+    /**
+     * Retourne les tuples en fonction de l'id employes et la l'intervalle de date
+     * @param $id_employee
+     * @param $dateBetween
+     * @return array
+     */
     public static function getAjoutSomme($id_employee, $dateBetween)
     {
-        $sql = 'SELECT id_ajout_somme, somme, id_order, commentaire, a.id_employee, date_ajout_somme, lastname
+        $sql = 'SELECT `id_ajout_somme`, `somme`, `id_order`, `commentaire`, a.`id_employee`, `date_ajout_somme`, `lastname`
                 FROM `' . _DB_PREFIX_ . 'ajout_somme` AS a
-                LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.id_employee = e.id_employee
-                WHERE date_ajout_somme BETWEEN ' . $dateBetween;
+                LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.`id_employee` = e.`id_employee`
+                WHERE `date_ajout_somme` BETWEEN ' . $dateBetween;
 
         if ($id_employee != 0) {
-            $sql .= ' AND a.id_employee = ' . (int)$id_employee;
+            $sql .= ' AND a.`id_employee` = ' . (int)$id_employee;
         }
 
         return Db::getInstance()->executeS($sql);
     }
 
+    /**
+     * @param $id
+     * @return array
+     */
     public static function getObjectifById($id)
     {
-        $sql = 'SELECT * FROM ' . _DB_PREFIX_ . 'objectif_coach WHERE id_objectif_coach = ' . (int)$id;
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'objectif_coach` WHERE `id_objectif_coach` = ' . (int)$id;
 
         return Db::getInstance()->getRow($sql);
     }
 
+    /**
+     * @param $id_employee
+     * @param $dateBetween
+     * @return array
+     */
     public static function getObjectifCoachs($id_employee, $dateBetween)
     {
-        $sql = 'SELECT id_objectif_coach, somme, commentaire, a.id_employee, date_start, date_end, lastname,
-                heure_absence, jour_absence, jour_ouvre
+        $sql = 'SELECT `id_objectif_coach`, `somme`, `commentaire`, a.`id_employee`, `date_start`, `date_end`, `lastname`,
+                `heure_absence`, `jour_absence`, `jour_ouvre`
                 FROM `' . _DB_PREFIX_ . 'objectif_coach` AS a
-                LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.id_employee = e.id_employee
-                WHERE date_start BETWEEN ' . $dateBetween;
+                LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.`id_employee` = e.`id_employee`
+                WHERE `date_start` BETWEEN ' . $dateBetween;
 
         if ($id_employee != 0) {
-            $sql .= ' AND a.id_employee = ' . (int)$id_employee;
+            $sql .= ' AND a.`id_employee` = ' . (int)$id_employee;
         }
 
-        $sql .= ' ORDER BY id_employee ASC, date_start ASC';
+        $sql .= ' ORDER BY `id_employee` ASC, `date_start` ASC';
 
         return Db::getInstance()->executeS($sql);
     }
 
+    /**
+     * Retourne les classes CSS en fonction du pourcentage de CA atteint par l'employé
+     * @param $objectifCoachs
+     * @return mixed
+     */
     public static function isObjectifAtteint($objectifCoachs)
     {
         if ($objectifCoachs) {
@@ -273,11 +341,21 @@ class CaTools
         return $objectifCoachs;
     }
 
+    /**
+     * Soustraction CA propsect FID du CA Total
+     * @param $data
+     * @return string
+     */
     public static function caProsp($data)
     {
         return ($data['caTotal']) ? $data['caTotal'] - $data['caDejaInscrit'] : '';
     }
 
+    /**
+     * Retourne le pourcentage du CA prospect
+     * @param $data
+     * @return string
+     */
     public static function pourcCaProspect($data)
     {
         if ($data['caTotal'] != 0) {
@@ -286,6 +364,11 @@ class CaTools
         return '';
     }
 
+    /**
+     * Pourcentage du CA des prospects FID
+     * @param $data
+     * @return string
+     */
     public static function pourcCaFID($data)
     {
         if ($data['caTotal'] != 0) {
@@ -302,24 +385,31 @@ class CaTools
         return '';
     }
 
+    /**
+     * Retourne le nombre de vente par coach, code_action et intervalle de date
+     * @param int $idFilterCoach
+     * @param null $code_action
+     * @param $dateBetween
+     * @return mixed|string
+     */
     public static function getNbrVentes($idFilterCoach = 0, $code_action = null, $dateBetween)
     {
         $filterCoach = ($idFilterCoach != 0)
-            ? ' AND id_employee = ' . (int)$idFilterCoach : '';
+            ? ' AND `id_employee` = ' . (int)$idFilterCoach : '';
 
         $sql_code_action = '';
         if ($code_action) {
             $code_action = CaTools::getCodeActionByName($code_action);
-            $sql_code_action = ' AND id_code_action = "' . (int)$code_action . '" ';
+            $sql_code_action = ' AND `id_code_action` = "' . (int)$code_action . '" ';
         }
 
 
         $sql = 'SELECT SQL_CALC_FOUND_ROWS id_order
-				FROM ' . _DB_PREFIX_ . 'orders AS o
-				WHERE valid = 1 ';
+				FROM `' . _DB_PREFIX_ . 'orders` AS o
+				WHERE `valid` = 1 ';
         $sql .= $sql_code_action;
         $sql .= $filterCoach;
-        $sql .= ' AND date_add BETWEEN ' . $dateBetween;
+        $sql .= ' AND `date_add` BETWEEN ' . $dateBetween;
         $nbrVenteFID = Db::getInstance()->executeS($sql);
 
 
@@ -328,22 +418,29 @@ class CaTools
         return ($nbrRows) ? $nbrRows : ''; // ($nbrVenteFID) ? $nbrVenteFID : '';
     }
 
+    /**
+     * Retourne la somme des commandes par parrainage
+     * @param int $idFilterCoach
+     * @param null $code_action
+     * @param $dateBetween
+     * @return mixed
+     */
     public static function getParrainage($idFilterCoach = 0, $code_action = null, $dateBetween)
     {
         $filterCoach = ($idFilterCoach != 0)
-            ? " AND e . id_employee = '" . (int)$idFilterCoach . "'" : '';
+            ? " AND e . `id_employee` = '" . (int)$idFilterCoach . "'" : '';
 
         $sql_code_action = '';
         if ($code_action) {
             $code_action = CaTools::getCodeActionByName($code_action);
-            $sql_code_action = " AND o . id_code_action = '" . (int)$code_action . "'";
+            $sql_code_action = " AND o.`id_code_action` = '" . (int)$code_action . "'";
         }
 
-        $sql = "SELECT SUM(ROUND(o . total_products - o . total_discounts_tax_excl, 2)) as total 
-                FROM " . _DB_PREFIX_ . "orders as o 
-                LEFT JOIN " . _DB_PREFIX_ . "customer as c ON o . id_customer = c . id_customer
-                LEFT JOIN " . _DB_PREFIX_ . "employee as e ON o . id_employee = e . id_employee";
-        $sql .= ' WHERE o.date_add BETWEEN ' . $dateBetween;
+        $sql = "SELECT SUM(ROUND(o.`total_products` - o.`total_discounts_tax_excl`, 2)) as total 
+                FROM `" . _DB_PREFIX_ . "orders` as o 
+                LEFT JOIN `" . _DB_PREFIX_ . "customer` as c ON o.`id_customer` = c.`id_customer`
+                LEFT JOIN `" . _DB_PREFIX_ . "employee` as e ON o.`id_employee` = e.`id_employee`";
+        $sql .= ' WHERE o.`date_add` BETWEEN ' . $dateBetween;
         $sql .= $filterCoach;
         $sql .= $sql_code_action;
 
@@ -352,6 +449,16 @@ class CaTools
         return $req;
     }
 
+    /**
+     * @param int $idFilterCoach Id employé
+     * @param null $code_action Id code action
+     * @param null $current_state Statut de la commande
+     * @param bool $totalMoney Somme totale des commande ou nombre total des commandes ?
+     * @param bool $valid Commande valide ou pas
+     * @param string $dateBetween Intervalle de date
+     * @param $lang
+     * @return mixed|string
+     */
     public static function getNbrGrVentes(
         $idFilterCoach = 0,
         $code_action = null,
@@ -363,35 +470,35 @@ class CaTools
     )
     {
         $filterCoach = ($idFilterCoach != 0)
-            ? " AND e . id_employee = '" . (int)$idFilterCoach . "'" : '';
+            ? " AND e.`id_employee` = '" . (int)$idFilterCoach . "'" : '';
 
         $sql_code_action = '';
         if ($code_action) {
             $code_action = CaTools::getCodeActionByName($code_action);
-            $sql_code_action = " AND o . id_code_action = '" . (int)$code_action . "'";
+            $sql_code_action = " AND o.`id_code_action` = '" . (int)$code_action . "'";
         }
 
         $filter_current_state = '';
         if ($current_state) {
             $filter_current_state = ' AND ( ';
             foreach ($current_state as $value) {
-                $filter_current_state .= " o . current_state = '" . (int)$value . "' OR ";
+                $filter_current_state .= " o.`current_state` = '" . (int)$value . "' OR ";
             }
             $filter_current_state = Tools::substr($filter_current_state, 0, -3) . ' )';
         }
 
         $sqlTotal = ($totalMoney)
-            ? "SELECT SUM(ROUND(o . total_products - o . total_discounts_tax_excl, 2)) as total "
-            : "SELECT SQL_CALC_FOUND_ROWS o . id_order ";
+            ? "SELECT SUM(ROUND(o.`total_products` - o.`total_discounts_tax_excl`, 2)) as total "
+            : "SELECT SQL_CALC_FOUND_ROWS o.`id_order` ";
 
         $sql = $sqlTotal . "
-            FROM " . _DB_PREFIX_ . "orders as o
-            LEFT JOIN " . _DB_PREFIX_ . "customer as c ON o . id_customer = c . id_customer
-            LEFT JOIN " . _DB_PREFIX_ . "customer_group as cg ON c . id_customer = cg . id_customer
-            LEFT JOIN " . _DB_PREFIX_ . "group_lang as gl ON cg . id_group = gl . id_group AND gl.id_lang = '" . (int)$lang . "'
-            LEFT JOIN " . _DB_PREFIX_ . "employee as e ON gl . id_employee = e . id_employee";
-        $sql .= ' WHERE o.date_add BETWEEN ' . $dateBetween;
-        $sql .= ($valid) ? ' AND o.valid = 1 ' : '';
+            FROM `" . _DB_PREFIX_ . "orders` as o
+            LEFT JOIN `" . _DB_PREFIX_ . "customer` as c ON o.`id_customer` = c.`id_customer`
+            LEFT JOIN `" . _DB_PREFIX_ . "customer_group` as cg ON c.`id_customer` = cg.`id_customer`
+            LEFT JOIN `" . _DB_PREFIX_ . "group_lang` as gl ON cg.`id_group` = gl.`id_group` AND gl.`id_lang` = '" . (int)$lang . "'
+            LEFT JOIN `" . _DB_PREFIX_ . "employee` as e ON gl.`id_employee` = e.`id_employee`";
+        $sql .= ' WHERE o.`date_add` BETWEEN ' . $dateBetween;
+        $sql .= ($valid) ? ' AND o.`valid` = 1 ' : '';
         $sql .= $filterCoach;
         $sql .= $sql_code_action;
         $sql .= $filter_current_state;
@@ -410,6 +517,12 @@ class CaTools
         return $req;
     }
 
+    /**
+     * Retourne la somme des ajustements affecté à un employé
+     * @param int $id_employee
+     * @param $getDateBetween
+     * @return mixed
+     */
     public static function getAjustement($id_employee = 0, $getDateBetween)
     {
         $filter = '';
@@ -426,6 +539,11 @@ class CaTools
         return $req;
     }
 
+    /**
+     * Renvoi le code html de l'ensemble des doublons
+     * @param $params
+     * @return string
+     */
     public static function doublons($params)
     {
         $retour = '';
@@ -437,6 +555,11 @@ class CaTools
         return $retour;
     }
 
+    /**
+     * Vérifie si l'email du client est unique, retourne le code html
+     * @param Customer $customer
+     * @return string
+     */
     private static function isEmailCustomerUnique(Customer $customer)
     {
         $sql = 'SELECT COUNT(`email`) AS total 
@@ -451,6 +574,12 @@ class CaTools
         return $retour;
     }
 
+    /**
+     * Vérifie si le téléphone fixe ou mobile du client est unique, retourne le code html
+     * @param Customer $customer
+     * @param $params
+     * @return string
+     */
     private static function isCustomerSameNumberPhone(Customer $customer, $params)
     {
         $address = ($customer->getAddresses($params['lang']));
@@ -488,6 +617,12 @@ class CaTools
         return $retour;
     }
 
+    /**
+     * Est-ce que le nom prenom d'un client est unique ? retourne le code html
+     * @param Customer $customer
+     * @param $params
+     * @return string
+     */
     private static function isCustomerHaveSameName(Customer $customer, $params)
     {
         $sql = 'SELECT COUNT(`id_customer`) FROM `' . _DB_PREFIX_ . 'customer` 
@@ -504,6 +639,11 @@ class CaTools
         return $retour;
     }
 
+    /**
+     * Retourne la somme des objectifs d'un employé dans l'intervalle de date donnée
+     * @param $id_employee
+     * @return array
+     */
     public static function getObjectifCoach($id_employee)
     {
         $sql = 'SELECT SUM(`somme`) AS somme, MIN(`date_start`) AS date_start, MAX(`date_end`) AS date_end,
@@ -518,6 +658,11 @@ class CaTools
         return $req;
     }
 
+    /**
+     * Retourne le nombre de jour ouvré dans le mois
+     * @param $dateBetween
+     * @return int
+     */
     public static function getNbOpenDays($dateBetween)
     {
 
@@ -569,6 +714,12 @@ class CaTools
         return $nb_days_open;
     }
 
+    /**
+     * Retourne la somme des heures et jours d'absence d'un employé
+     * @param int $id_employee
+     * @param $dateBetween
+     * @return array
+     */
     public static function getAbsenceEmployee($id_employee = 0, $dateBetween)
     {
         $filter = '';
@@ -586,6 +737,12 @@ class CaTools
         return $req;
     }
 
+    /**
+     * Calcule le montant de la prime fichier par employé
+     * @param int $id_employee
+     * @param $dateBetween
+     * @return float|string
+     */
     public static function primeFichier($id_employee = 0, $dateBetween)
     {
         $taux = Configuration::get('CDMODULECA_PRIME_FICHIER');
@@ -606,9 +763,14 @@ class CaTools
         return round($prime, 2);
     }
 
+    /**
+     * Crée ou met à jour le compteur d'appel
+     * @param $id
+     */
     public static function setCompteurAppels($id)
     {
         $compteur = AppelClass::getCompteur((int)$id, date('Y-m-d'));
+        // Si le compteur n'existe pas, on en créé un
         if (empty($compteur['compteur'])) {
             $appels = new AppelClass();
             $appels->compteur = 1;
@@ -616,6 +778,7 @@ class CaTools
             $appels->save();
             setcookie('appelKeyyo', '1', strtotime(date('Y-m-d 23:59:59')));
         } else {
+            // Mise à jour du compteur
             $compteur['compteur']++;
             Db::getInstance()->update(
                 'appel',
@@ -626,6 +789,12 @@ class CaTools
         }
     }
 
+    /**
+     * Fait la somme des avoirs
+     * @param $idCoach
+     * @param $dateBetween
+     * @return mixed
+     */
     public static function getCaCoachsAvoir($idCoach, $dateBetween)
     {
         $sql = 'SELECT SUM(amount) FROM `' . _DB_PREFIX_ . 'order_slip` AS os
@@ -638,6 +807,12 @@ class CaTools
         return $req;
     }
 
+    /**
+     * Fait la somme des jours ouvrés d'un employé
+     * @param $id_employee
+     * @param $dateBetween
+     * @return mixed
+     */
     private static function getJourOuvreEmploye($id_employee, $dateBetween)
     {
         $sql = 'SELECT SUM(`jour_ouvre`) FROM `' . _DB_PREFIX_ . 'objectif_coach` 

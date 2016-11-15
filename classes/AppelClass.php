@@ -26,6 +26,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * Class AppelClass
+ * Historique des appels via les liens Keyyo
+ */
 class AppelClass extends ObjectModel
 {
     public $id_appel;
