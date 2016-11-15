@@ -119,7 +119,14 @@
                             <span class="input-group-addon">€</span>
                         </div>
                     </div>
-                    <div class="col-lg-5">
+                    <div class="col-lg-1">
+                        <label for="as_order">id_order</label>
+                        <div class="input input-group">
+                            <input type="text" id="as_order" name="as_order" value="{if isset($smarty.post.as_order)
+                            }{$smarty.post.as_order}{/if}">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
                         <label for="as_commentaire">Commentaire</label>
                         <input type="text" id="as_commentaire" value="{if isset($smarty.post.as_commentaire)
                         }{$smarty.post.as_commentaire}{/if}" name="as_commentaire">

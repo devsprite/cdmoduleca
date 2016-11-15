@@ -32,7 +32,8 @@
         </div>
         {if !empty({$coach->lastname})}
             <div class="row">
-                <div class="col-xs-12">CA Code Action {$filterCodeAction['name']|escape:'htmlall':'UTF-8'} {$coach->lastname|escape:'htmlall':'UTF-8'}
+                <div class="col-xs-12">CA Code
+                    Action {$filterCodeAction['name']|escape:'htmlall':'UTF-8'} {$coach->lastname|escape:'htmlall':'UTF-8'}
                     <span class="pull-right">{displayPrice price=$caCoach}</span></div>
             </div>
         {/if}
@@ -80,9 +81,11 @@
                     <td>{$ajoutSomme['id_order']|escape:'htmlall':'UTF-8'}</td>
                     <td>
                         {if isset($coachs)}
-                            <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_as&id_as={$ajoutSomme['id_ajout_somme']|escape:'htmlall':'UTF-8'}">
-                                <i class="icon-edit text-success"></i>
-                            </a>
+                            {if !empty({$coach->lastname})}
+                                <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_as&id_as={$ajoutSomme['id_ajout_somme']|escape:'htmlall':'UTF-8'}">
+                                    <i class="icon-edit text-success"></i>
+                                </a>
+                            {/if}
                             <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&del_as&id_as={$ajoutSomme['id_ajout_somme']|escape:'htmlall':'UTF-8'}"
                                onclick="if(confirm('Etes-vous sur de vouloir supprimer ce cet ajout ?')) {} else return false">
                                 <i class="icon-cut text-danger"></i>
@@ -116,13 +119,16 @@
                         <td>{$objectif['date_end']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
                         <td><span class="pull-right">{displayPrice price=$objectif['somme']}</span></td>
                         <td><span class="pull-right">{displayPrice price=$objectif['caCoach']}</span></td>
-                        <td><span class="pull-right">{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'} %</span></td>
+                        <td><span class="pull-right">{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'} %</span>
+                        </td>
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                         <td>
                             {if isset($coachs)}
-                                <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}">
-                                    <i class="icon-edit text-success"></i>
-                                </a>
+                                {if !empty({$coach->lastname})}
+                                    <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}">
+                                        <i class="icon-edit text-success"></i>
+                                    </a>
+                                {/if}
                                 <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&del_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}"
                                    onclick="if(confirm('Etes-vous sur de vouloir supprimer cet objectif ?')) {} else return false">
                                     <i class="icon-cut text-danger"></i>
@@ -161,9 +167,11 @@
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                         <td>
                             {if isset($coachs)}
-                                <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}">
-                                    <i class="icon-edit text-success"></i>
-                                </a>
+                                {if !empty({$coach->lastname})}
+                                    <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}">
+                                        <i class="icon-edit text-success"></i>
+                                    </a>
+                                {/if}
                                 <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&del_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}"
                                    onclick="if(confirm('Etes-vous sur de vouloir supprimer cette ligne ?')) {} else return false">
                                     <i class="icon-cut text-danger"></i>

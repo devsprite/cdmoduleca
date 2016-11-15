@@ -41,21 +41,21 @@ class CdModuleCA extends ModuleGrid
     public $default_sort_direction;
     public $empty_message;
     public $paging_message;
-    public $viewAllCoachs;
-    public $idFilterCoach;
-    public $idFilterCodeAction;
+    public $viewAllCoachs; // Filtre l'affichage entre employé et manager
+    public $idFilterCoach; // Id du coach sélectionné dans Stats -> L&Sens
+    public $idFilterCodeAction; // Id du code action sélectionné dans Stats -> L&Sens
+    public $commandeValid; // Selecteur commande valide ou pas dans Stats -> L&Sens
     public $employees_actif;
-    public $commandeValid;
     public $lang;
     public $config = array(
         'CDMODULECA' => '1',
-        'CDMODULECA_ORDERS_STATE' => '7',
-        'CDMODULECA_ORDERS_STATE_JOURS' => '60',
-        'CDMODULECA_PRIME_FICHIER' => '0.5',
-        'CDMODULECA_PROSPECTS_JOUR' => '26',
-        'CDMODULECA_PROSPECTS_HEURE' => '4.33',
-        'CDMODULECA_NBR_JOUR_MAX_PROSPECTS' => '10',
-        'CDMODULECA_PROSPECTS_INDEX_DATE' => '2016-11-08 00:00:00'
+        'CDMODULECA_ORDERS_STATE' => '7', // Statut pris en compte pour la déduction du CA
+        'CDMODULECA_ORDERS_STATE_JOURS' => '60', // Nombre de jours avant la prise en compte de la commande
+        'CDMODULECA_PRIME_FICHIER' => '0.5', // Montant de la prime fichier
+        'CDMODULECA_PROSPECTS_JOUR' => '26', // Nombre de prospects par jour et par coach
+        'CDMODULECA_PROSPECTS_HEURE' => '4.33', // Nombre de prospects par heure et par coach
+        'CDMODULECA_NBR_JOUR_MAX_PROSPECTS' => '10', // Nombre de jour avant la date index (ancien prospects)
+        'CDMODULECA_PROSPECTS_INDEX_DATE' => '2016-11-08 00:00:00' // Date pour la prise en compte des nouveaux prospects
     );
 
     public function __construct()
@@ -71,7 +71,7 @@ class CdModuleCA extends ModuleGrid
 
         $this->displayName = $this->l('Module CA');
         $this->description = $this->l('Synthèse CA pour L et Sens');
-        $this->confirmUninstall = $this->l('Etes-vous sur ? Il y aura un override à mettre à jour - ( adminCustomerController) et le fichier view.tpl correspondant');
+        $this->confirmUninstall = $this->l('Etes-vous sur ? Prestashop risque de ne plus fonctionner tant que les overrides ne seront pas traités.');
         // Ajuste les permissions pour accéder au contenu de la page stat
         $this->viewAllCoachs = array(
             '1' => true,    // SuperAdmin
@@ -88,7 +88,6 @@ class CdModuleCA extends ModuleGrid
         $this->limit = 80;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->table_charset = 'utf8';
-
         $this->default_sort_column = 'id';
         $this->default_sort_direction = 'DESC';
         $this->employees_actif = 1;
@@ -213,6 +212,10 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    /**
+     * historique des appels passés via les liens Keyyo
+     * @return bool
+     */
     private function createTabsAppel()
     {
         $tab = new Tab();
@@ -239,6 +242,10 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    /**
+     * Lien prospects dans le menu Clients
+     * @return bool
+     */
     private function createTabsProspects()
     {
         $tab = new Tab();
@@ -265,6 +272,10 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    /**
+     * Compteur d'appels dans la barre du haut
+     * @return string
+     */
     public function hookDisplayBackOfficeTop()
     {
         $objectifCoach = array();
@@ -280,7 +291,10 @@ class CdModuleCA extends ModuleGrid
         return $this->display(__FILE__, 'compteur.tpl');
     }
 
-
+    /**
+     * Lien CA L&Sens dans le menu Stats
+     * @return bool
+     */
     private function createTabsStatsCA()
     {
         $tab = new Tab();
@@ -334,6 +348,10 @@ class CdModuleCA extends ModuleGrid
         return Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'prospect_attribue`');
     }
 
+    /**
+     * Table Historique des appels passé via les liens Keyyo
+     * @return bool
+     */
     private function createTableAppel()
     {
         $sql = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'appel` (
@@ -387,7 +405,8 @@ class CdModuleCA extends ModuleGrid
     }
 
     /**
-     * @return bool Table permettant l'ajout d'un objectif pour un employee
+     * Table permettant l'ajout d'un objectif, des absences, jour ouvré pour un employee
+     * @return bool
      */
     private function createTableObjectifCoach()
     {
@@ -419,7 +438,8 @@ class CdModuleCA extends ModuleGrid
     }
 
     /**
-     * @return bool Table permettant l'ajout ou la déduction d'une prime pour un employee
+     * Table permettant l'ajout ou la déduction d'une prime pour un employee, ou des impayés par import csv
+     * @return bool
      */
     private function createTableAjoutSomme()
     {
@@ -596,7 +616,7 @@ class CdModuleCA extends ModuleGrid
     }
 
     /**
-     * permet de lié une commande avec un code action et un employee
+     * Permet de lié une commande avec un code action et un employee avec les id correspondants
      * @param string $method
      * @return bool
      */
@@ -635,6 +655,10 @@ class CdModuleCA extends ModuleGrid
         return true;
     }
 
+    /**
+     * Configuration du module
+     * @return string
+     */
     public function getContent()
     {
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/bootstrap.min.css');
@@ -647,14 +671,14 @@ class CdModuleCA extends ModuleGrid
     private function postProcess()
     {
         $error = '';
-        // Mise à jour de la configuration des groupes lié au employés
+        // Mise à jour de la l'attribution des groupes lié aux employés
         if (Tools::isSubmit('submitUpdateGroups')) {
             $groups = $this->getGroupsParrain();
             foreach ($groups as $group) {
                 if (!Db::getInstance()->update(
                     'group_lang',
                     array('id_employee' => (int)(str_replace('gp_', '', Tools::getValue('gp_' . $group['id_group'])))),
-                    'id_lang = "' . $this->lang . '" AND id_group = ' . str_replace('gp_', '', $group['id_group'])
+                    'id_lang = "' . (int)$this->lang . '" AND id_group = ' . (int)str_replace('gp_', '', $group['id_group'])
                 )
                 ) {
                     $error .= $this->l('Erreur lors de la mise à jour des groupes');
@@ -666,8 +690,8 @@ class CdModuleCA extends ModuleGrid
             foreach ($codes_action as $code) {
                 if (Db::getInstance()->update(
                     'code_action',
-                    array('groupe' => str_replace('ca_', '', Tools::getValue('ca_' . $code['id_code_action']))),
-                    'id_code_action = ' . str_replace('ca_', '', $code['id_code_action'])
+                    array('groupe' => (int)str_replace('ca_', '', Tools::getValue('ca_' . $code['id_code_action']))),
+                    'id_code_action = ' . (int)str_replace('ca_', '', $code['id_code_action'])
                 )
                 ) {
                     $this->updateOrdersTableIdCodeAction();
@@ -682,7 +706,7 @@ class CdModuleCA extends ModuleGrid
             $statuts = array();
             foreach ($listStatuts as $statut) {
                 if (Tools::getValue('os_' . $statut['id_order_state'])) {
-                    $statuts[] = $statut['id_order_state'];
+                    $statuts[] = (int)$statut['id_order_state'];
                 }
             }
             $confStatus = implode(',', $statuts);
@@ -697,20 +721,21 @@ class CdModuleCA extends ModuleGrid
 
         if ($error) {
             $this->html .= $this->displayError($error);
-        } else {
-//            $this->html .= $this->displayConfirmation($this->l('Groupement des codes action mis à jour.'));
-
         }
     }
 
     private function displayForm()
     {
         $this->html .= $this->generateFormConstantes();
-        $this->html .= $this->generateFormCodeAction();
-//        $this->html .= $this->generateFormStatutsCommande();
         $this->html .= $this->generateFormGroupeParrain();
+        $this->html .= $this->generateFormCodeAction();
+//        $this->html .= $this->generateFormStatutsCommande(); // Désactivé car on importe un csv pour gérer les impayés
     }
 
+    /**
+     * Formulaire de configuration des valeurs fixe, prime fichier etc...
+     * @return string
+     */
     private function generateFormConstantes()
     {
         $inputs = array();
@@ -775,6 +800,10 @@ class CdModuleCA extends ModuleGrid
 
     }
 
+    /**
+     * Formulaire de groupement des codes action
+     * @return string
+     */
     private function generateFormCodeAction()
     {
         $codesAction = $this->getAllCodesAction();
@@ -821,6 +850,10 @@ class CdModuleCA extends ModuleGrid
 
     }
 
+    /**
+     * Formulaire de configuration des commande considéré comme impayées, à déduire du coach
+     * @return string
+     */
     private function generateFormStatutsCommande()
     {
         $listStatuts = OrderState::getOrderStates($this->lang);
@@ -883,6 +916,10 @@ class CdModuleCA extends ModuleGrid
         return $helper->generateForm(array($fields_form));
     }
 
+    /**
+     * Formulaire de liaison groupes employés
+     * @return string
+     */
     private function generateFormGroupeParrain()
     {
         $groupsParrain = $this->getGroupsParrain();
@@ -927,7 +964,7 @@ class CdModuleCA extends ModuleGrid
     }
 
     /**
-     * retourne la configuration des status lié au commandes
+     * retourne la configuration des statuts lié au commandes
      * @return array
      */
     private function getConfigStatusCommandes()
@@ -985,7 +1022,7 @@ class CdModuleCA extends ModuleGrid
      */
     public function getGroupsParrain()
     {
-        $sql = 'SELECT id_group, name, id_employee FROM `' . _DB_PREFIX_ . 'group_lang` WHERE id_lang = "'
+        $sql = 'SELECT `id_group`, `name`, `id_employee` FROM `' . _DB_PREFIX_ . 'group_lang` WHERE `id_lang` = "'
             . (int)$this->lang . '"';
         $groups = Db::getInstance()->executeS($sql);
 
@@ -1030,8 +1067,8 @@ class CdModuleCA extends ModuleGrid
 
         foreach ($listCoachs as $coach) {
             if (!empty($coach['id_employee'])) {
-                $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET id_employee = ' . (int)$coach['id_employee'] . '
-            WHERE coach = "' . pSQL($coach['coach']) . '"';
+                $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET `id_employee` = ' . (int)$coach['id_employee'] . '
+            WHERE `coach` = "' . pSQL($coach['coach']) . '"';
                 Db::getInstance()->execute($sql);
             }
         }
@@ -1045,15 +1082,15 @@ class CdModuleCA extends ModuleGrid
         $listCodesAction = $this->getAllCodesAction();
 
         foreach ($listCodesAction as $code) {
-            $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET id_code_action = ' . (int)$code['groupe'] . '
-            WHERE  code_action = "' . pSQL($code['name']) . '"';
+            $sql = 'UPDATE `' . _DB_PREFIX_ . 'orders` SET `id_code_action` = ' . (int)$code['groupe'] . '
+            WHERE  `code_action` = "' . pSQL($code['name']) . '"';
             Db::getInstance()->execute($sql);
         }
     }
 
     private function getAllCodesAction()
     {
-        $sql = 'SELECT id_code_action, name, description, groupe FROM `' . _DB_PREFIX_ . 'code_action`';
+        $sql = 'SELECT `id_code_action`, `name`, `description`, `groupe` FROM `' . _DB_PREFIX_ . 'code_action`';
         $req = Db::getInstance()->executeS($sql);
 
         return $req;
@@ -1061,7 +1098,7 @@ class CdModuleCA extends ModuleGrid
 
     public function getCodeActionByName($name)
     {
-        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE name = "' . pSQL($name) . '"';
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE `name` = "' . pSQL($name) . '"';
 
         return Db::getInstance()->getValue($sql);
     }
@@ -1073,19 +1110,22 @@ class CdModuleCA extends ModuleGrid
     public function hookActionValidateOrder($params)
     {
         $employee = (isset($this->context->employee->id)) ? $this->context->employee->id : false;
-        if ($employee) {
+        if ($employee != false) { // est-ce que la commande est faite par un employé ?
             $idOrder = Order::getOrderByCartId($this->context->cart->id);
+            // Récupération du coach et du code action envoyé par le formulaire de commande
             $coach = Tools::getValue('coach');
             $code_action = Tools::getValue('order_code_action');
 
             if (!empty($coach) && !empty($code_action)) {
+                // Correspondance entre le coach et le code action en id correspondant
                 $id_coach = $this->getIdCoach($coach);
                 $id_code_action = $this->getIdCodeAction($code_action);
 
+                // Si il y a les id, on met à jour la commande passé avec les id coach et code_action
                 if (!empty($id_coach) && !empty($id_code_action)) {
                     $req = 'UPDATE `' . _DB_PREFIX_ . 'orders`
-                    SET id_employee = ' . (int)$id_coach . ', id_code_action = ' . (int)$id_code_action . ' 
-                    WHERE id_order = ' . (int)$idOrder;
+                    SET `id_employee` = ' . (int)$id_coach . ', `id_code_action` = ' . (int)$id_code_action . ' 
+                    WHERE `id_order` = ' . (int)$idOrder;
 
                     Db::getInstance()->execute($req);
                 }
@@ -1096,7 +1136,7 @@ class CdModuleCA extends ModuleGrid
     }
 
     /**
-     * Affiche le tableau de stat principal
+     * Affiche le tableau de stat principal dans le menu Stats->L&Sens
      */
     protected function getData()
     {
@@ -1116,45 +1156,46 @@ class CdModuleCA extends ModuleGrid
 
         $filterCodeAction = '';
         if ($this->idFilterCodeAction == 99) {
-            $filterCodeAction = ' AND o.id_code_action != ' . CaTools::getCodeActionByName('ABO');
-            $filterCoach = ($this->idFilterCoach != 0) ? ' AND o.id_employee = ' . $this->idFilterCoach .' ':'';
+            $filterCodeAction = ' AND o.`id_code_action` != ' . (int)CaTools::getCodeActionByName('ABO');
+            // Affiche les commandes avec le groupe du coach uniquement si il n'y a pas d filtre code action
+            $filterCoach = ($this->idFilterCoach != 0) ? ' AND o.`id_employee` = ' . (int)$this->idFilterCoach .' ':'';
         } elseif ($this->idFilterCodeAction != 0) {
-            $filterCodeAction = ' AND o.id_code_action = ' . $this->idFilterCodeAction;
+            $filterCodeAction = ' AND o.`id_code_action` = ' . (int)$this->idFilterCodeAction;
         }
 
         $filterValid = '';
         if ($this->commandeValid == 0) {
-            $filterValid = ' AND o.valid = "0" ';
+            $filterValid = ' AND o.`valid` = "0" ';
         } elseif ($this->commandeValid == 1) {
-            $filterValid = ' AND o.valid = "1" ';
+            $filterValid = ' AND o.`valid` = "1" ';
         }
 
         $this->query = '
           SELECT SQL_CALC_FOUND_ROWS
-          DISTINCT o.id_order AS id,
-          amount as avoir,
-          gl.name AS groupe,
-          CONCAT ( ROUND(o.total_products - o.total_discounts_tax_excl,2), " €") AS hthp,
-          (SELECT e.lastname FROM ' . _DB_PREFIX_ . 'employee AS e WHERE o.id_employee = e.id_employee) AS id_employee,
-          (SELECT UCASE(c.lastname) FROM ' . _DB_PREFIX_ . 'customer AS c 
-          WHERE o.id_customer = c.id_customer) AS id_customer,
-          o.date_add,
-          o.date_upd,
-          IF((o.valid) > 0, "", "Non") AS valid,
-          (SELECT ca.name FROM ' . _DB_PREFIX_ . 'code_action AS ca 
-          WHERE o.id_code_action = ca.id_code_action) as CodeAction,
-          (SELECT osl.name FROM ' . _DB_PREFIX_ . 'order_state_lang AS osl 
-          WHERE id_lang = "' . $this->lang . '" AND osl.id_order_state = o.current_state ) as current_state ,
-          IF((SELECT so.id_order FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.id_customer = o.id_customer
-          AND so.id_order < o.id_order LIMIT 1) > 0, "", "Oui") as new
-				FROM ' . _DB_PREFIX_ . 'orders AS o ';
+          DISTINCT o.`id_order` AS id,
+          `amount` as avoir,
+          gl.`name` AS groupe,
+          CONCAT ( ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2), " €") AS hthp,
+          (SELECT e.`lastname` FROM `' . _DB_PREFIX_ . 'employee` AS e WHERE o.`id_employee` = e.`id_employee`) AS id_employee,
+          (SELECT UCASE(c.`lastname`) FROM `' . _DB_PREFIX_ . 'customer` AS c 
+          WHERE o.`id_customer` = c.`id_customer`) AS id_customer,
+          o.`date_add`,
+          o.`date_upd`,
+          IF((o.`valid`) > 0, "", "Non") AS valid,
+          (SELECT ca.`name` FROM `' . _DB_PREFIX_ . 'code_action` AS ca 
+          WHERE o.`id_code_action` = ca.`id_code_action`) as CodeAction,
+          (SELECT osl.`name` FROM `' . _DB_PREFIX_ . 'order_state_lang` AS osl 
+          WHERE `id_lang` = "' . $this->lang . '" AND osl.`id_order_state` = o.`current_state` ) as current_state ,
+          IF((SELECT so.`id_order` FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.`id_customer` = o.`id_customer`
+          AND so.`id_order` < o.`id_order` LIMIT 1) > 0, "", "Oui") as new
+				FROM `' . _DB_PREFIX_ . 'orders` AS o ';
         $this->query .= $filterGroupe;
         $this->query .= ' LEFT JOIN `' . _DB_PREFIX_ . 'order_slip` AS os ON o.`id_order` = os.`id_order` ';
-        $this->query .= ' WHERE o.date_add BETWEEN ' . $this->getDate();
+        $this->query .= ' WHERE o.`date_add` BETWEEN ' . $this->getDate();
         $this->query .= $filterCoach;
         $this->query .= $filterCodeAction;
         $this->query .= $filterValid;
-        $this->query .= ' GROUP BY o.id_order ';
+        $this->query .= ' GROUP BY o.`id_order` ';
 
 
         if (Validate::IsName($this->_sort)) {
@@ -1170,7 +1211,6 @@ class CdModuleCA extends ModuleGrid
             $this->query .= ' LIMIT ' . (int)$this->_start . ', ' . (int)$this->_limit;
         }
 
-//        ddd($this->query);
         $values = Db::getInstance()->executeS($this->query);
 
         $this->_values = $values;
@@ -1201,16 +1241,16 @@ class CdModuleCA extends ModuleGrid
     {
         $sql = 'SELECT `id_employee`, `firstname`, `lastname`
 			FROM `' . _DB_PREFIX_ . 'employee` ';
-        $sql .= ($active == 'on') ? 'WHERE active = 1 ' : '';
-        $sql .= ($id) ? ' WHERE id_employee = ' . (int)$id : '';
+        $sql .= ($active == 'on') ? 'WHERE `active` = 1 ' : '';
+        $sql .= ($id) ? ' WHERE `id_employee` = ' . (int)$id : '';
         $sql .= ' ORDER BY `id_employee` ASC';
         return Db::getInstance()->executeS($sql);
     }
 
     public function getGroupeEmployee($idFilterCoach)
     {
-        $sql = 'SELECT id_group FROM ' . _DB_PREFIX_ . 'group_lang 
-        WHERE id_lang = "' . (int)$this->lang . '" AND id_employee = ' . (int)$idFilterCoach;
+        $sql = 'SELECT `id_group` FROM `' . _DB_PREFIX_ . 'group_lang` 
+        WHERE `id_lang` = "' . (int)$this->lang . '" AND `id_employee` = ' . (int)$idFilterCoach;
         return Db::getInstance()->getValue($sql);
     }
 }
