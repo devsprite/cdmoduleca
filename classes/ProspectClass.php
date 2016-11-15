@@ -26,6 +26,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * Class ProspectClass
+ * Détails des prospects attribué à un coach et de l'état des contacts passé par le coach
+ */
 class ProspectClass extends ObjectModel
 {
     public $id_prospect;
@@ -64,6 +68,13 @@ class ProspectClass extends ObjectModel
                 'validate' => 'isDateFormat', 'required' => false, 'size' => 64),
         ));
 
+    /**
+     * Sélection aléatoire des ancien ou nouveau prospects avant ou aprés la date d'index
+     * @param $id_group
+     * @param int $limit
+     * @param $newProspects
+     * @return array
+     */
     public static function getAllProspectsGroup($id_group, $limit = 50, $newProspects )
     {
         // Nombre de jour max pour la selection des prospects
@@ -71,10 +82,10 @@ class ProspectClass extends ObjectModel
         $nbreJourMax = date('Y-m-d', strtotime($indexDate . ' -' . (int)Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS') . ' day'));
         $filter = '';
         if ($newProspects) {
-            $filter = ' AND cu.date_add > "' . pSQL($indexDate) . '"';
+            $filter = ' AND cu.`date_add` > "' . pSQL($indexDate) . '"';
         } else {
-            $filter = ' AND cu.date_add > "' . pSQL($nbreJourMax) . '"
-                        AND cu.date_add < "' . pSQL($indexDate) . '"';
+            $filter = ' AND cu.`date_add` > "' . pSQL($nbreJourMax) . '"
+                        AND cu.`date_add` < "' . pSQL($indexDate) . '"';
         }
 
         $sql = 'SELECT cu.`id_customer`, CONCAT(UPPER(cu.`lastname`)," ", LOWER(cu.`firstname`)) AS nom, cu.`date_add`,
@@ -93,9 +104,14 @@ class ProspectClass extends ObjectModel
         return $req;
     }
 
+    /**
+     * Retourne les prospects en fonction de l'id prospect attribué
+     * @param $id_prospect_attribue
+     * @return array
+     */
     public static function getProspectsByIdPa($id_prospect_attribue)
     {
-        $sql = 'SELECT p.* , pa.*, cu.firstname, cu.lastname, e.lastname as coach 
+        $sql = 'SELECT p.* , pa.*, cu.`firstname`, cu.`lastname`, e.`lastname` as coach 
                 FROM `' . _DB_PREFIX_ . 'prospect` AS p 
                 LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS pa 
                 ON p.`id_prospect_attribue` = pa.`id_prospect_attribue`
@@ -107,6 +123,10 @@ class ProspectClass extends ObjectModel
         return $req;
     }
 
+    /**
+     * Retourn l'id du dernier prospects (inutilisé)
+     * @return int
+     */
     public static function getLastCustomer()
     {
         $sql = 'SELECT MAX(`id_customer`) FROM `' . _DB_PREFIX_ . 'prospect`';
@@ -115,6 +135,10 @@ class ProspectClass extends ObjectModel
         return (int)$req;
     }
 
+    /**
+     * Prospect traite ou pas
+     * @return bool
+     */
     public static function toggleTraite()
     {
         $id = (int)Tools::getValue('id_customer');
@@ -137,6 +161,10 @@ class ProspectClass extends ObjectModel
         return true;
     }
 
+    /**
+     * Prospect injoignable ou pas
+     * @return bool
+     */
     public static function toggleInjoignable()
     {
         $id = (int)Tools::getValue('id_customer');
@@ -157,6 +185,10 @@ class ProspectClass extends ObjectModel
         return true;
     }
 
+    /**
+     * Enregistre un contact prospect fait par le coach, met à jour injoignable si tous les contacts sont fait
+     * @return bool
+     */
     public static function setContact()
     {
         $id = (int)Tools::getValue('id_customer');
@@ -209,6 +241,10 @@ class ProspectClass extends ObjectModel
         $prospect->update();
     }
 
+    /**
+     * Met à jour le contact répondeur, met à jour injoignable si tous les contacts sont fait
+     * @return bool
+     */
     public static function setRepondeur()
     {
         $id = (int)Tools::getValue('id_customer');
@@ -241,6 +277,11 @@ class ProspectClass extends ObjectModel
         $prospect->update();
     }
 
+    /**
+     * Retourne l'objet prospect par son id_customer
+     * @param $id
+     * @return ProspectClass
+     */
     private static function getProspectsByIdCu($id)
     {
         $sql = 'SELECT `id_prospect` FROM `' . _DB_PREFIX_ . 'prospect` WHERE `id_customer` = ' . (int)$id;
@@ -250,6 +291,11 @@ class ProspectClass extends ObjectModel
         return $p;
     }
 
+    /**
+     * Est-ce que le prospect existe par son id_customer
+     * @param $id
+     * @return mixed
+     */
     public static function isProspectExistByIdCustomer($id)
     {
         $sql = 'SELECT `id_prospect` FROM `' . _DB_PREFIX_ . 'prospect` WHERE `id_customer` = ' . (int)$id;
@@ -258,6 +304,10 @@ class ProspectClass extends ObjectModel
         return $req;
     }
 
+    /**
+     * Retourne les prospects n'ayant pas de coach affecté
+     * @return array
+     */
     public static function getProspectsIsole()
     {
         $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'prospect` 

@@ -26,6 +26,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * Table d'affectation du nombre de prospects par employé, fonctionne en liaison avec la table prospects
+ * pour avoir les prospects sélectionné
+ * Class ProspectAttribueClass
+ */
 class ProspectAttribueClass extends ObjectModel
 {
     public $id_prospect_attribue;
@@ -46,6 +51,13 @@ class ProspectAttribueClass extends ObjectModel
         )
     );
 
+    /**
+     * Retourne la liste des prospects par employé ou tous les employés si isAllow est vrai
+     * @param $getDateBetween
+     * @param $isAllow
+     * @param $id_employee
+     * @return array
+     */
     public static function getListProspects($getDateBetween, $isAllow, $id_employee)
     {
         $filter = '';
@@ -53,8 +65,8 @@ class ProspectAttribueClass extends ObjectModel
             $filter = ' AND pa.`id_employee` = ' . (int)$id_employee;
         }
 
-        $sql = 'SELECT pa.*, e.lastname, e.firstname FROM `' . _DB_PREFIX_ . 'prospect_attribue` AS pa
-                LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON pa.id_employee = e.id_employee
+        $sql = 'SELECT pa.*, e.`lastname`, e.`firstname` FROM `' . _DB_PREFIX_ . 'prospect_attribue` AS pa
+                LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON pa.`id_employee` = e.`id_employee`
                 WHERE `date_debut` BETWEEN ' . $getDateBetween;
         $sql .= $filter;
         $sql .= ' ORDER BY e.`id_employee` ASC, `date_debut` DESC';
@@ -63,6 +75,11 @@ class ProspectAttribueClass extends ObjectModel
         return $req;
     }
 
+    /**
+     * Est-ce que le tuple existe ?
+     * @param $id
+     * @return bool
+     */
     public static function isExist($id)
     {
         $sql = 'SELECT `id_prospect_attribue` FROM `' . _DB_PREFIX_ . 'prospect_attribue`
@@ -72,6 +89,12 @@ class ProspectAttribueClass extends ObjectModel
         return ($req) ? true : false;
     }
 
+    /**
+     * Nombre de prospects attribué par coach
+     * @param int $id_employee
+     * @param $getDateBetween
+     * @return mixed
+     */
     public static function getNbrProspectsAttriByCoach($id_employee = 0, $getDateBetween)
     {
         $filter = '';
