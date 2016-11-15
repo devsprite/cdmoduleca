@@ -32,6 +32,10 @@ require_once(dirname(__FILE__) . '/../../classes/CaTools.php');
 require_once(dirname(__FILE__) . '/../../classes/ProspectAttribueClass.php');
 require_once(dirname(__FILE__) . '/../../../../tools/tcpdf/tcpdf.php');
 
+/**
+ * Class AdminCaLetSensController
+ * Controller de la page stat L&Sens
+ */
 class AdminCaLetSensController extends ModuleAdminController
 {
     public $html = '';
@@ -91,9 +95,9 @@ class AdminCaLetSensController extends ModuleAdminController
             'allow' => $this->module->viewAllCoachs[$this->context->employee->id_profile]
         ));
 
-        $this->html .= $this->displayCalendar();
+        $this->html .= $this->displayCalendar(); // choix de la date
         $this->html .= $this->syntheseCoachs();
-        $this->html .= $g->engine($engine_params);
+        $this->html .= $g->engine($engine_params); // liste des commandes (utilise le getData de cdmoduleca.php) du bas de la page
 
 
         $nameFile = $this->nameFile();

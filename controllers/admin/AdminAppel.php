@@ -28,6 +28,10 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(dirname(__FILE__) . '/../../classes/AppelClass.php');
 
+/**
+ * Class AdminAppelController
+ * Controller historique des appels
+ */
 class AdminAppelController extends ModuleAdminController
 {
     public function __construct()
