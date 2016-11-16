@@ -66,6 +66,7 @@ class AdminCaLetSensController extends ModuleAdminController
     public function initContent()
     {
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/statscdmoduleca.css');
+        $this->context->controller->addJS(_PS_MODULE_DIR_ . 'cdmoduleca/views/js/statscdmoduleca.js');
         $engine_params = array(
             'id' => 'id_order',
             'title' => $this->module->displayName,

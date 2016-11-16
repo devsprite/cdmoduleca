@@ -86,174 +86,206 @@
             </div>
         </form>
     </div>
-    <hr>
+    <button id="toggle_ca" class="btn btn-success"><i class="icon-chevron-down"></i> Toggle</button>
     {if isset($coachs) && $filterActif != 0}
-        <div class="col-xs-12 hidden-print">
-            <br>
-            <h2>Ajustement</h2>
-            <form id="form_as_date" action="{$linkFilter}" method="post">
-                <div class="form-group">
-                    <div class="col-lg-1">
-                        <label for="as_date">Date</label>
-                        <input type="text" name="as_date" id="as_date" value="{if isset($smarty.post.as_date)
-                        }{$smarty.post.as_date|date_format:'%Y-%m-%d'}{else}{$smarty.now|date_format:'%Y-%m-%d'}{/if}"
-                               class="datepicker  form-control">
-                        <script type="text/javascript">
-                            {literal}
-                            $(document).ready(function () {
-                                if ($("form#form_as_date .datepicker").length > 0)
-                                    $("form#form_as_date .datepicker").datepicker({
-                                        prevText: '',
-                                        nextText: '',
-                                        dateFormat: 'yy-mm-dd'
-                                    });
-                            });
-                            {/literal}
-                        </script>
+        <div class="toggle">
+            <div class="content_ca">
+                <div class="row panel">
+                    <div class="col-lg-2">
+                        <a class="btn btn-default export-csv" href="{$LinkFile}&export_csv=1">
+                            <i class="icon-cloud-upload"></i> CSV</a>
+                        <a class="btn btn-default export-csv" href="{$LinkFile}&export_pdf=1">
+                            <i class="icon-cloud-upload"></i> PDF</a>
                     </div>
-                    <div class="col-lg-1">
-                        <label for="as_somme">Somme</label>
-                        <div class="input input-group">
-                            <input type="text" id="as_somme" name="as_somme" value="{if isset($smarty.post.as_somme)
-                            }{$smarty.post.as_somme}{/if}">
-                            <span class="input-group-addon">€</span>
-                        </div>
-                    </div>
-                    <div class="col-lg-1">
-                        <label for="as_order">id_order</label>
-                        <div class="input input-group">
-                            <input type="text" id="as_order" name="as_order" value="{if isset($smarty.post.as_order)
-                            }{$smarty.post.as_order}{/if}">
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <label for="as_commentaire">Commentaire</label>
-                        <input type="text" id="as_commentaire" value="{if isset($smarty.post.as_commentaire)
-                        }{$smarty.post.as_commentaire}{/if}" name="as_commentaire">
-                    </div>
-                    <div class="col-lg-12">
-                        {if isset($smarty.post.as_id)}
-                            <div class="col-lg-1">
-                                <br>
-                                <a class="btn btn-primary" href="{$link->getAdminLink('AdminCaLetSens')}">Annulé
-                                </a>
-                            </div>
-                        {/if}
-                        <div class="col-lg-1">
-                            <br>
-                            <button class="btn btn-success" type="submit" id="as_submit" name="as_submit">Enregistrer
-                            </button>
-                        </div>
-                        <input type="hidden" id="as_id_employee" name="as_id_employee"
-                               value="{if isset($smarty.post.as_id_employee)
-                               }{$smarty.post.as_id_employee}{else}{$filterActif}{/if}">
-                        <input type="hidden" id="as_id" name="as_id"
-                               value="{if isset($smarty.post.as_id)
-                               }{$smarty.post.as_id}{/if}">
 
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="col-xs-12 hidden-print">
-            <br>
-            <h2>Coach</h2>
-            <form id="form_oc_objectif" action="{$linkFilter}" method="post">
-                <div class="form-group">
-                    <div class="col-lg-1">
-                        <label for="oc_date_start">Date début</label>
-                        <input type="text" name="oc_date_start" id="oc_date_start"
-                               value="{if isset($smarty.post.oc_date_start)
-                               }{$smarty.post.oc_date_start|date_format:'%Y-%m-%d'}{else}{$smarty.now|date_format:'%Y-%m-%d'}{/if}"
-                               class="datepicker form-control">
-                    </div>
-                    <div class="col-lg-1">
-                        <label for="oc_date_end">Date fin</label>
-                        <input type="text" name="oc_date_end" id="oc_date_end"
-                               value="{if isset($smarty.post.oc_date_end)
-                               }{$smarty.post.oc_date_end|date_format:'%Y-%m-%d'}{else}{$smarty.now|date_format:'%Y-%m-%d'}{/if}"
-                               class="datepicker form-control">
-                    </div>
-                    <script type="text/javascript">
-                        {literal}
-                        $(document).ready(function () {
-                            if ($("#oc_date_start").length > 0)
-                                $("#oc_date_start").datepicker({
-                                    prevText: '',
-                                    nextText: '',
-                                    dateFormat: 'yy-mm-dd'
-                                });
-                            if ($("#oc_date_end").length > 0)
-                                $("#oc_date_end").datepicker({
-                                    prevText: '',
-                                    nextText: '',
-                                    dateFormat: 'yy-mm-dd'
-                                });
-                        });
-                        {/literal}
-                    </script>
-                    <div class="col-lg-1">
-                        <label for="oc_somme">Objectif</label>
-                        <div class="input input-group">
-                            <input type="text" id="oc_somme" name="oc_somme" value="{if isset($smarty.post.oc_somme)
-                            }{$smarty.post.oc_somme}{/if}">
-                            <span class="input-group-addon">€</span>
-                        </div>
-                    </div>
-                    <div class="col-lg-1">
-                        <label for="oc_somme">Heure d'absence</label>
-                        <div class="input input-group">
-                            <input type="text" id="oc_heure" name="oc_heure" value="{if isset($smarty.post.oc_heure)
-                            }{$smarty.post.oc_heure}{/if}">
-                            <span class="input-group-addon">Heure</span>
-                        </div>
-                    </div>
-                    <div class="col-lg-1">
-                        <label for="oc_somme">Jour d'absence</label>
-                        <div class="input input-group">
-                            <input type="text" id="oc_jour" name="oc_jour" value="{if isset($smarty.post.oc_jour)
-                            }{$smarty.post.oc_jour}{/if}">
-                            <span class="input-group-addon">Jour</span>
-                        </div>
-                    </div>
-                    <div class="col-lg-1">
-                        <label for="oc_somme">Nbre de jours ouvrés</label>
-                        <div class="input input-group">
-                            <input type="text" id="oc_jour_ouvre" name="oc_jour_ouvre"
-                                   value="{if isset($smarty.post.oc_jour_ouvre)
-                                   }{$smarty.post.oc_jour_ouvre}{/if}">
-                            <span class="input-group-addon">Jour</span>
-                        </div>
-                    </div>
-                    <div class="col-lg-12">
-                        <div class="col-lg-7">
-                            <label for="oc_commentaire">Commentaire</label>
-                            <input type="text" id="oc_commentaire" value="{if isset($smarty.post.oc_commentaire)
-                            }{$smarty.post.oc_commentaire}{/if}" name="oc_commentaire">
-                        </div>
-                    </div>
-                    <div class="col-lg-12">
-                        {if isset($smarty.post.oc_id)}
-                            <div class="col-lg-1">
-                                <br>
-                                <a class="btn btn-primary" href="{$link->getAdminLink('AdminCaLetSens')}">Annulé
-                                </a>
+                    {if isset($allow)}
+                        <form enctype="multipart/form-data" action="{$LinkFile}" method="post">
+                            <div class="col-lg-2">
+                                <input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
+                                <input type="file" name="uploadFile" class="btn btn-default">
                             </div>
-                        {/if}
-                        <div class="col-lg-1">
-                            <br>
-                            <button class="btn btn-success" type="submit" id="oc_submit" name="oc_submit">Enregistrer
-                            </button>
-                            <input type="hidden" id="oc_id_employee" name="oc_id_employee"
-                                   value="{if isset($smarty.post.oc_id_employee)
-                                   }{$smarty.post.oc_id_employee}{else}{$filterActif}{/if}">
-                            <input type="hidden" id="oc_id" name="oc_id"
-                                   value="{if isset($smarty.post.oc_id)
-                                   }{$smarty.post.oc_id}{/if}">
-                        </div>
-                    </div>
+                            <div class="col-lg-1">
+                                <button class="btn btn-default" type="submit" name="submitUpload">
+                                    <i class="icon-cloud-upload"></i> Envoyer</button>
+                            </div>
+                        </form>
+                    {/if}
                 </div>
-            </form>
+                <div class="col-xs-12 hidden-print">
+                    <br>
+                    <h2>Ajustement</h2>
+                    <form id="form_as_date" action="{$linkFilter}" method="post">
+                        <div class="form-group">
+                            <div class="col-lg-1">
+                                <label for="as_date">Date</label>
+                                <input type="text" name="as_date" id="as_date" value="{if isset($smarty.post.as_date)
+                                }{$smarty.post.as_date|date_format:'%Y-%m-%d'}{else}{$smarty.now|date_format:'%Y-%m-%d'}{/if}"
+                                       class="datepicker  form-control">
+                                <script type="text/javascript">
+                                    {literal}
+                                    $(document).ready(function () {
+                                        if ($("form#form_as_date .datepicker").length > 0)
+                                            $("form#form_as_date .datepicker").datepicker({
+                                                prevText: '',
+                                                nextText: '',
+                                                dateFormat: 'yy-mm-dd'
+                                            });
+                                    });
+                                    {/literal}
+                                </script>
+                            </div>
+                            <div class="col-lg-1">
+                                <label for="as_somme">Somme</label>
+                                <div class="input input-group">
+                                    <input type="text" id="as_somme" name="as_somme"
+                                           value="{if isset($smarty.post.as_somme)
+                                           }{$smarty.post.as_somme}{/if}">
+                                    <span class="input-group-addon">€</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-1">
+                                <label for="as_order">id_order</label>
+                                <div class="input input-group">
+                                    <input type="text" id="as_order" name="as_order"
+                                           value="{if isset($smarty.post.as_order)
+                                           }{$smarty.post.as_order}{/if}">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <label for="as_commentaire">Commentaire</label>
+                                <input type="text" id="as_commentaire" value="{if isset($smarty.post.as_commentaire)
+                                }{$smarty.post.as_commentaire}{/if}" name="as_commentaire">
+                            </div>
+                            <div class="col-lg-12">
+                                {if isset($smarty.post.as_id)}
+                                    <div class="col-lg-1">
+                                        <br>
+                                        <a class="btn btn-primary" href="{$link->getAdminLink('AdminCaLetSens')}">Annulé
+                                        </a>
+                                    </div>
+                                {/if}
+                                <div class="col-lg-1">
+                                    <br>
+                                    <button class="btn btn-success" type="submit" id="as_submit" name="as_submit">
+                                        Enregistrer
+                                    </button>
+                                </div>
+                                <input type="hidden" id="as_id_employee" name="as_id_employee"
+                                       value="{if isset($smarty.post.as_id_employee)
+                                       }{$smarty.post.as_id_employee}{else}{$filterActif}{/if}">
+                                <input type="hidden" id="as_id" name="as_id"
+                                       value="{if isset($smarty.post.as_id)
+                                       }{$smarty.post.as_id}{/if}">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-xs-12 hidden-print">
+                    <br>
+                    <h2>Coach</h2>
+                    <form id="form_oc_objectif" action="{$linkFilter}" method="post">
+                        <div class="form-group">
+                            <div class="col-lg-1">
+                                <label for="oc_date_start">Date début</label>
+                                <input type="text" name="oc_date_start" id="oc_date_start"
+                                       value="{if isset($smarty.post.oc_date_start)
+                                       }{$smarty.post.oc_date_start|date_format:'%Y-%m-%d'}{else}{$smarty.now|date_format:'%Y-%m-%d'}{/if}"
+                                       class="datepicker form-control">
+                            </div>
+                            <div class="col-lg-1">
+                                <label for="oc_date_end">Date fin</label>
+                                <input type="text" name="oc_date_end" id="oc_date_end"
+                                       value="{if isset($smarty.post.oc_date_end)
+                                       }{$smarty.post.oc_date_end|date_format:'%Y-%m-%d'}{else}{$smarty.now|date_format:'%Y-%m-%d'}{/if}"
+                                       class="datepicker form-control">
+                            </div>
+                            <script type="text/javascript">
+                                {literal}
+                                $(document).ready(function () {
+                                    if ($("#oc_date_start").length > 0)
+                                        $("#oc_date_start").datepicker({
+                                            prevText: '',
+                                            nextText: '',
+                                            dateFormat: 'yy-mm-dd'
+                                        });
+                                    if ($("#oc_date_end").length > 0)
+                                        $("#oc_date_end").datepicker({
+                                            prevText: '',
+                                            nextText: '',
+                                            dateFormat: 'yy-mm-dd'
+                                        });
+                                });
+                                {/literal}
+                            </script>
+                            <div class="col-lg-1">
+                                <label for="oc_somme">Objectif</label>
+                                <div class="input input-group">
+                                    <input type="text" id="oc_somme" name="oc_somme"
+                                           value="{if isset($smarty.post.oc_somme)
+                                           }{$smarty.post.oc_somme}{/if}">
+                                    <span class="input-group-addon">€</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-1">
+                                <label for="oc_somme">Heure d'absence</label>
+                                <div class="input input-group">
+                                    <input type="text" id="oc_heure" name="oc_heure"
+                                           value="{if isset($smarty.post.oc_heure)
+                                           }{$smarty.post.oc_heure}{/if}">
+                                    <span class="input-group-addon">Heure</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-1">
+                                <label for="oc_somme">Jour d'absence</label>
+                                <div class="input input-group">
+                                    <input type="text" id="oc_jour" name="oc_jour"
+                                           value="{if isset($smarty.post.oc_jour)
+                                           }{$smarty.post.oc_jour}{/if}">
+                                    <span class="input-group-addon">Jour</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-1">
+                                <label for="oc_somme">Nbre de jours ouvrés</label>
+                                <div class="input input-group">
+                                    <input type="text" id="oc_jour_ouvre" name="oc_jour_ouvre"
+                                           value="{if isset($smarty.post.oc_jour_ouvre)
+                                           }{$smarty.post.oc_jour_ouvre}{/if}">
+                                    <span class="input-group-addon">Jour</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="col-lg-7">
+                                    <label for="oc_commentaire">Commentaire</label>
+                                    <input type="text" id="oc_commentaire" value="{if isset($smarty.post.oc_commentaire)
+                                    }{$smarty.post.oc_commentaire}{/if}" name="oc_commentaire">
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                {if isset($smarty.post.oc_id)}
+                                    <div class="col-lg-1">
+                                        <br>
+                                        <a class="btn btn-primary" href="{$link->getAdminLink('AdminCaLetSens')}">Annulé
+                                        </a>
+                                    </div>
+                                {/if}
+                                <div class="col-lg-1">
+                                    <br>
+                                    <button class="btn btn-success" type="submit" id="oc_submit" name="oc_submit">
+                                        Enregistrer
+                                    </button>
+                                    <input type="hidden" id="oc_id_employee" name="oc_id_employee"
+                                           value="{if isset($smarty.post.oc_id_employee)
+                                           }{$smarty.post.oc_id_employee}{else}{$filterActif}{/if}">
+                                    <input type="hidden" id="oc_id" name="oc_id"
+                                           value="{if isset($smarty.post.oc_id)
+                                           }{$smarty.post.oc_id}{/if}">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     {/if}
 </div>

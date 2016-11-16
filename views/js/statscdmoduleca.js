@@ -1,4 +1,4 @@
-{**
+/**
  * 2007-2016 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -21,16 +21,12 @@
  * @copyright 2007-2016 PrestaShop SA / 2011-2016 Dominique
  * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  * International Registred Trademark & Property of PrestaShop SA
- *}
+ */
 
-{if $confirmation}
-    <p class="alert alert-success">{$confirmation|escape:'htmlall':'UTF-8'}</p>
-{/if}
+$( document ).ready(function() {
+    $( "#toggle_ca" ).click(function() {
+        $( ".content_ca" ).toggle( "slow", function() {
+        });
+    });
 
-<div class="panel">
-    <div class="panel-heading">
-        {l s='Synthèse Coachs' mod='cdmoduleca'}
-
-    </div>
-    <div class="row">
-
+});

@@ -13,3 +13,7 @@
 #statsContainer {
     width: 100%;
 }
+
+.content_ca {
+    display: none;
+}
