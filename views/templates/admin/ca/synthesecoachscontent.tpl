@@ -26,44 +26,147 @@
 <hr>
 <div class="row synthesecontent">
     <div class="col-xs-3">
+        {* Tous les coachs *}
         {if isset($coachs) && $filterActif == 0}
-        <div class="row group">
-            <div class="col-xs-12">CA Code Action {$filterCodeAction['name']|escape:'htmlall':'UTF-8'}
-                <span class="pull-right">{displayPrice price=$caCoachsTotal}</span></div>
-        </div>
-        {/if}
-        {if !empty({$coach->lastname})}
-            <div class="row">
-                <div class="col-xs-12">CA Code
-                    Action {$filterCodeAction['name']|escape:'htmlall':'UTF-8'} {$coach->lastname|escape:'htmlall':'UTF-8'}
-                    <span class="pull-right">{displayPrice price=$caCoach}</span></div>
+            <div class="row group">
+                <div class="col-xs-12">CA TOTAL FINAL
+                    <span class="pull-right"></span>
+                </div>
             </div>
+            <div class="row group">
+                <div class="col-xs-12">CA Code Action Tous les codes
+                    <span class="pull-right"></span>
+                </div>
+            </div>
+            <div class="row group">
+                <div class="col-xs-12">CA Fidélisation (FID)
+                    <span class="pull-right"></span>
+                </div>
+            </div>
+            <div class="row group">
+                <div class="col-xs-12">CA Prospection
+                    <span class="pull-right"></span>
+                </div>
+            </div>
+            <div class="row group">
+                <div class="col-xs-12">CA Déduit Total (Retours + Impayés)
+                    <span class="pull-right"></span>
+                </div>
+            </div>
+            <div class="row group">
+                <div class="col-xs-12">Prime CA
+                    <span class="pull-right"></span>
+                </div>
+            </div>
+            <div class="row group">
+                <div class="col-xs-12">Prime Abonnement
+                    <span class="pull-right"></span>
+                </div>
+            </div>
+            <div class="row group">
+                <div class="col-xs-12">Prime Fichier
+                    <span class="pull-right"></span>
+                </div>
+            </div>
+            <div class="row group">
+                <div class="col-xs-12">Prime Parrainage
+                    <span class="pull-right"></span>
+                </div>
+            </div>
+        {/if}
+        {* Coachs *}
+        {if !empty({$coach->lastname})}
+            {foreach item=employe from=$datasEmployees}
+                <div class="row group">
+                    <div class="col-xs-12">CA TOTAL FINAL
+                        <span class="pull-right">{displayPrice price=$employe['caTotal']}</span>
+                    </div>
+                </div>
+                <div class="row group">
+                    <div class="col-xs-12">CA Code Action Tous les codes
+                        <span class="pull-right"></span>
+                    </div>
+                </div>
+                <div class="row group">
+                    <div class="col-xs-12">CA Fidélisation (FID)
+                        <span class="pull-right">{displayPrice price=$employe['caFidTotal']}</span>
+                    </div>
+                </div>
+                <div class="row group">
+                    <div class="col-xs-12">CA Prospection
+                        <span class="pull-right">{displayPrice price=$employe['CaProsp']}</span>
+                    </div>
+                </div>
+                <div class="row group">
+                    <div class="col-xs-12">CA Déduit Total (Retours + Impayés)
+                        <span class="pull-right">{displayPrice price=$employe['caAjuste']}</span>
+                    </div>
+                </div>
+                <div class="row group">
+                    <div class="col-xs-12">Prime CA
+                        <span class="pull-right"></span>
+                    </div>
+                </div>
+                <div class="row group">
+                    <div class="col-xs-12">Prime Abonnement
+                        <span class="pull-right">{displayPrice price=$employe['primeVenteGrAbo']}</span>
+                    </div>
+                </div>
+                <div class="row group">
+                    <div class="col-xs-12">Prime Fichier
+                        <span class="pull-right">{displayPrice price=$employe['primeFichierCoach']}</span>
+                    </div>
+                </div>
+                <div class="row group">
+                    <div class="col-xs-12">Prime Parrainage
+                        <span class="pull-right">{displayPrice price=$employe['primeParrainage']}</span>
+                    </div>
+                </div>
+            {/foreach}
         {/if}
 
-        {if isset($coachs) && $filterActif == 0}
-        <div class="row group">
-            <div class="col-xs-12">CA FID (Prospects déjà inscrit)
-                <span class="pull-right">{displayPrice price=$caFidTotal}</span></div>
-        </div>
-        {/if}
-        {if !empty({$coach->lastname})}
-            <div class="row">
-                <div class="col-xs-12">CA FID (Prospects déjà inscrit {$coach->lastname|escape:'htmlall':'UTF-8'})
-                    <span class="pull-right">{displayPrice price=$caFidCoach}</span></div>
-            </div>
-        {/if}
-        {if isset($coachs) && $filterActif == 0}
-        <div class="row group">
-            <div class="col-xs-12">CA Prospect Total
-                <span class="pull-right">{displayPrice price=($caTotal - $caFidTotal)}</span></div>
-        </div>
-        {/if}
-        {if !empty({$coach->lastname|escape:'htmlall':'UTF-8'})}
-            <div class="row">
-                <div class="col-xs-12">CA Prospect {$coach->lastname|escape:'htmlall':'UTF-8'}
-                    <span class="pull-right">{displayPrice price=($caTotalCoach - $caFidCoach)}</span></div>
-            </div>
-        {/if}
+
+
+
+
+        {*{if isset($coachs) && $filterActif == 0}*}
+        {*<div class="row group">*}
+        {*<div class="col-xs-12">CA Code Action {$filterCodeAction['name']|escape:'htmlall':'UTF-8'}*}
+        {*<span class="pull-right">{displayPrice price=$caCoachsTotal}</span></div>*}
+        {*</div>*}
+        {*{/if}*}
+        {*{if !empty({$coach->lastname})}*}
+        {*<div class="row">*}
+        {*<div class="col-xs-12">CA Code*}
+        {*Action {$filterCodeAction['name']|escape:'htmlall':'UTF-8'} {$coach->lastname|escape:'htmlall':'UTF-8'}*}
+        {*<span class="pull-right">{displayPrice price=$caCoach}</span></div>*}
+        {*</div>*}
+        {*{/if}*}
+
+        {*{if isset($coachs) && $filterActif == 0}*}
+        {*<div class="row group">*}
+        {*<div class="col-xs-12">CA FID (Prospects déjà inscrit)*}
+        {*<span class="pull-right">{displayPrice price=$caFidTotal}</span></div>*}
+        {*</div>*}
+        {*{/if}*}
+        {*{if !empty({$coach->lastname})}*}
+        {*<div class="row">*}
+        {*<div class="col-xs-12">CA FID (Prospects déjà inscrit {$coach->lastname|escape:'htmlall':'UTF-8'})*}
+        {*<span class="pull-right">{displayPrice price=$caFidCoach}</span></div>*}
+        {*</div>*}
+        {*{/if}*}
+        {*{if isset($coachs) && $filterActif == 0}*}
+        {*<div class="row group">*}
+        {*<div class="col-xs-12">CA Prospect Total*}
+        {*<span class="pull-right">{displayPrice price=($caTotal - $caFidTotal)}</span></div>*}
+        {*</div>*}
+        {*{/if}*}
+        {*{if !empty({$coach->lastname|escape:'htmlall':'UTF-8'})}*}
+        {*<div class="row">*}
+        {*<div class="col-xs-12">CA Prospect {$coach->lastname|escape:'htmlall':'UTF-8'}*}
+        {*<span class="pull-right">{displayPrice price=($caTotalCoach - $caFidCoach)}</span></div>*}
+        {*</div>*}
+        {*{/if}*}
     </div>
     <div class="col-xs-push-1 col-xs-8">
         <h2>Ajustements</h2>

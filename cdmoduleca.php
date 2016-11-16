@@ -52,6 +52,7 @@ class CdModuleCA extends ModuleGrid
         'CDMODULECA_ORDERS_STATE' => '7', // Statut pris en compte pour la déduction du CA
         'CDMODULECA_ORDERS_STATE_JOURS' => '60', // Nombre de jours avant la prise en compte de la commande
         'CDMODULECA_PRIME_FICHIER' => '0.5', // Montant de la prime fichier
+        'CDMODULECA_PRIME_PARRAINAGE' => '5', // Montant de la prime fichier
         'CDMODULECA_PROSPECTS_JOUR' => '26', // Nombre de prospects par jour et par coach
         'CDMODULECA_PROSPECTS_HEURE' => '4.33', // Nombre de prospects par heure et par coach
         'CDMODULECA_NBR_JOUR_MAX_PROSPECTS' => '10', // Nombre de jour avant la date index (ancien prospects)
@@ -440,6 +441,7 @@ class CdModuleCA extends ModuleGrid
         `id_ajout_somme` INT (12) NOT NULL AUTO_INCREMENT,
         `id_employee` INT (12),
         `id_order` INT (12),
+        `impaye` INT (12),
         `somme` DECIMAL (8,2) NULL,
         `commentaire` TEXT NULL,
         `date_add` DATETIME NOT NULL,
@@ -710,6 +712,7 @@ class CdModuleCA extends ModuleGrid
             Configuration::updateValue('CDMODULECA_PROSPECTS_JOUR', (float)(Tools::getValue('co_prospects_jour')));
             Configuration::updateValue('CDMODULECA_PROSPECTS_HEURE', (float)(Tools::getValue('co_prospects_heure')));
             Configuration::updateValue('CDMODULECA_NBR_JOUR_MAX_PROSPECTS', (int)(Tools::getValue('co_prospects_jour_max')));
+            Configuration::updateValue('CDMODULECA_PRIME_PARRAINAGE', (float)(Tools::getValue('co_prime_parrainage')));
         }
 
         if ($error) {
@@ -737,6 +740,14 @@ class CdModuleCA extends ModuleGrid
             'label' => 'Prime fichier',
             'name' => 'co_prime_fichier',
             'desc' => 'Montant de la prime fichier',
+            'class' => 'input fixed-width-md',
+            'suffix' => '€'
+        );
+        $inputs[] = array(
+            'type' => 'text',
+            'label' => 'Prime parraingage',
+            'name' => 'co_prime_parrainage',
+            'desc' => 'Montant de la prime parrainage',
             'class' => 'input fixed-width-md',
             'suffix' => '€'
         );
@@ -1029,6 +1040,7 @@ class CdModuleCA extends ModuleGrid
             'co_prospects_jour' => Configuration::get('CDMODULECA_PROSPECTS_JOUR'),
             'co_prospects_heure' => Configuration::get('CDMODULECA_PROSPECTS_HEURE'),
             'co_prospects_jour_max' => Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS'),
+            'co_prime_parrainage' => Configuration::get('CDMODULECA_PRIME_PARRAINAGE')
         );
 
         return $values;

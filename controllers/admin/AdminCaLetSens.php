@@ -116,10 +116,11 @@ class AdminCaLetSensController extends ModuleAdminController
 
     protected function syntheseCoachs()
     {
+        $this->syntheseCoachsTable();
         $html = $this->smarty->fetch($this->path_tpl . 'synthesecoachsheader.tpl');
         $html .= $this->syntheseCoachsFilter();
         $html .= $this->syntheseCoachsContent();
-        $html .= $this->syntheseCoachsTable();
+        $html .= $this->smarty->fetch($this->path_tpl . 'synthesecoachstable.tpl');
         $html .= $this->smarty->fetch($this->path_tpl . 'synthesecoachsfooter.tpl');
         return $html;
     }
@@ -385,6 +386,9 @@ class AdminCaLetSensController extends ModuleAdminController
                     $this->module->lang
                 );
 
+            $datasEmployees[$employee['id_employee']]['primeParrainage'] =
+                $this->primeParrainage($datasEmployees[$employee['id_employee']]['nbrVenteGrPar']);
+
             $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] =
                 CaTools::getParrainage(
                     $employee['id_employee'],
@@ -409,8 +413,6 @@ class AdminCaLetSensController extends ModuleAdminController
             'datasEmployees' => $datasEmployees,
             'dateRequete' => $this->getDateBetween()
         ));
-
-        return $this->smarty->fetch($this->path_tpl . 'synthesecoachstable.tpl');
     }
 
     private function syntheseCoachsFilter()
@@ -987,6 +989,15 @@ class AdminCaLetSensController extends ModuleAdminController
         setlocale(LC_ALL, "fr_FR.utf8");
 
         return utf8_decode($name);
+    }
+
+    private function primeParrainage($nbrVenteGrPar)
+    {
+        if (!empty($nbrVenteGrPar)) {
+            $prime = Configuration::get('CDMODULECA_PRIME_PARRAINAGE');
+            return $prime * $nbrVenteGrPar;
+        }
+        return '';
     }
 }
 
