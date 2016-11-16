@@ -86,7 +86,7 @@
             </div>
         </form>
     </div>
-    <button id="toggle_ca" class="btn btn-success"><i class="icon-chevron-down"></i> Toggle</button>
+    <button id="toggle_ca" class="btn btn-success"><i class="icon-chevron-down"></i> </button>
     {if isset($coachs) && $filterActif != 0}
         <div class="toggle">
             <div class="content_ca">
