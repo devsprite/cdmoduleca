@@ -250,11 +250,11 @@ class AdminProspectsController extends ModuleAdminController
 
     private function attribuProspects(ProspectAttribueClass $ap, $id_group)
     {
-        $newProspects = true;
-        $nbr_prospects_disponible = $this->getNbrNouveauProspects();
+        $newProspects = false;
+        $nbr_prospects_disponible = $this->getNbrAncienProspects();
         if ($nbr_prospects_disponible <= 0 ) {
-            $nbr_prospects_disponible = $this->getNbrAncienProspects();
-            $newProspects = false;
+            $nbr_prospects_disponible = $this->getNbrNouveauProspects();
+            $newProspects = true;
         }
         if ($nbr_prospects_disponible >= $ap->nbr_prospect_attribue) {
             $ap->add();
