@@ -444,6 +444,7 @@ class CdModuleCA extends ModuleGrid
         `impaye` INT (12),
         `somme` DECIMAL (8,2) NULL,
         `commentaire` TEXT NULL,
+        `date_ajout_somme` DATETIME NOT NULL,
         `date_add` DATETIME NOT NULL,
         `date_upd` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (`id_ajout_somme`))
