@@ -26,10 +26,12 @@
 <hr>
 <div class="row synthesecontent">
     <div class="col-xs-3">
+        {if isset($coachs) && $filterActif == 0}
         <div class="row group">
             <div class="col-xs-12">CA Code Action {$filterCodeAction['name']|escape:'htmlall':'UTF-8'}
                 <span class="pull-right">{displayPrice price=$caCoachsTotal}</span></div>
         </div>
+        {/if}
         {if !empty({$coach->lastname})}
             <div class="row">
                 <div class="col-xs-12">CA Code
@@ -37,20 +39,25 @@
                     <span class="pull-right">{displayPrice price=$caCoach}</span></div>
             </div>
         {/if}
+
+        {if isset($coachs) && $filterActif == 0}
         <div class="row group">
             <div class="col-xs-12">CA FID (Prospects déjà inscrit)
                 <span class="pull-right">{displayPrice price=$caFidTotal}</span></div>
         </div>
+        {/if}
         {if !empty({$coach->lastname})}
             <div class="row">
                 <div class="col-xs-12">CA FID (Prospects déjà inscrit {$coach->lastname|escape:'htmlall':'UTF-8'})
                     <span class="pull-right">{displayPrice price=$caFidCoach}</span></div>
             </div>
         {/if}
+        {if isset($coachs) && $filterActif == 0}
         <div class="row group">
             <div class="col-xs-12">CA Prospect Total
                 <span class="pull-right">{displayPrice price=($caTotal - $caFidTotal)}</span></div>
         </div>
+        {/if}
         {if !empty({$coach->lastname|escape:'htmlall':'UTF-8'})}
             <div class="row">
                 <div class="col-xs-12">CA Prospect {$coach->lastname|escape:'htmlall':'UTF-8'}
@@ -140,15 +147,15 @@
             {/foreach}
             </tbody>
         </table>
-        <h2>Horaire Coach</h2>
+        <h2>Temps de travail Coach</h2>
         <table class="table table-hover">
             <thead>
             <tr>
                 <th style="width: 15%">Nom</th>
                 <th style="width: 10%">Date début</th>
                 <th style="width: 10%">Date fin</th>
-                <th style="width: 10%">Heure</th>
-                <th style="width: 10%">Jour absence</th>
+                <th style="width: 10%">Heure d'absence</th>
+                <th style="width: 10%">Jour de congé</th>
                 <th style="width: 10%">Jours ouvrés</th>
                 <th style="width: 30%">Commentaire</th>
                 <th style="width: 5%"></th>

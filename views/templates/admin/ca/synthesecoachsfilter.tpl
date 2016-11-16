@@ -86,8 +86,7 @@
             </div>
         </form>
     </div>
-    <button id="toggle_ca" class="btn btn-success"><i class="icon-chevron-down"></i> </button>
-    {if isset($coachs) && $filterActif != 0}
+        <button id="toggle_ca" class="btn btn-success"><i class="icon-chevron-down"></i> </button>
         <div class="toggle">
             <div class="content_ca">
                 <div class="row panel">
@@ -97,7 +96,7 @@
                         <a class="btn btn-default export-csv" href="{$LinkFile}&export_pdf=1">
                             <i class="icon-cloud-upload"></i> PDF</a>
                     </div>
-
+                    {if isset($coachs) && $filterActif != 0}
                     {if isset($allow)}
                         <form enctype="multipart/form-data" action="{$LinkFile}" method="post">
                             <div class="col-lg-2">
@@ -110,7 +109,10 @@
                             </div>
                         </form>
                     {/if}
+                    {/if}
                 </div>
+
+                {if isset($coachs) && $filterActif != 0}
                 <div class="col-xs-12 hidden-print">
                     <br>
                     <h2>Ajustement</h2>

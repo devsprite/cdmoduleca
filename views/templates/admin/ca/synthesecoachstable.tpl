@@ -29,21 +29,18 @@
     <thead>
     <tr style="width: 100%">
         <th style="width: 8%">Nom</th>
-        <th style="width: 8%;text-align: right">CA TOTAL</th>
-        <th style="width: 7%;text-align: right">Ajustement</th>
-        <th style="width: 7%;text-align: right">CA Ajusté</th>
-        <th style="width: 5%;text-align: center">Nbre de ventes TOTAL</th>
-        <th style="width: 5%;text-align: center">Nbre de prospects</th>
-        <th style="width: 5%;text-align: center">Prime Fichier</th>
-        <th style="width: 5%;text-align: right">Panier Moyen</th>
-        <th style="width: 5%;text-align: center">CA/Contact</th>
-        <th style="width: 5%;text-align: right">% Taux de transfo. prospect</th>
-        <th style="width: 5%;text-align: right">CA prospect</th>
-        <th style="width: 5%;text-align: center">% CA prospect</th>
+        <th style="width: 8%;text-align: right">CA TOTAL FINAL</th>
+        <th style="width: 5%;text-align: center">CA/Contact Prospect</th>
+        <th style="width: 5%;text-align: right">% de Transfo Prospect</th>
+        <th style="width: 5%;text-align: center">Nbre de Fichiers</th>
+        <th style="width: 5%;text-align: center">Nbre de Ventes TOTAL</th>
+        <th style="width: 5%;text-align: right">CA Prospection</th>
+        <th style="width: 5%;text-align: center">% CA Prospect</th>
         <th style="width: 5%;text-align: right">CA FID</th>
         <th style="width: 5%;text-align: center">% CA FID</th>
-        <th style="width: 5%;text-align: right">CA Remb/Avoir</th>
-        <th style="width: 5%;text-align: center">% CA Remb/Avoir</th>
+        <th style="width: 5%;text-align: right">Panier Moyen</th>
+        <th style="width: 5%;text-align: right">CA Retour</th>
+        <th style="width: 5%;text-align: center">% CA Retour</th>
         <th style="width: 5%;text-align: right">CA Impayé</th>
         <th style="width: 5%;text-align: center">% Impayé</th>
     </tr>
@@ -53,18 +50,15 @@
     <tr>
         <td>{$coach['lastname']|escape:'htmlall':'UTF-8'} ({$coach['firstname']|substr:0:1|escape:'htmlall':'UTF-8'}.)</td>
         <td class="text-right">{displayPrice price=$coach['caTotal']}</td>
-        <td class="text-right">{displayPrice price=$coach['ajustement']}</td>
-        <td class="text-right">{displayPrice price=$coach['caAjuste']}</td>
-        <td class="text-center">{$coach['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
-        <td class="text-center">{$coach['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
-        <td class="text-right">{displayPrice price=$coach['primeFichierCoach']}</td>
-        <td class="text-right">{displayPrice price=$coach['panierMoyen']}</td>
         <td class="text-center">{$coach['CaContact']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-right">{$coach['tauxTransfo']|escape:'htmlall':'UTF-8'}</td>
+        <td class="text-center">{$coach['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
+        <td class="text-center">{$coach['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-right">{displayPrice price=$coach['CaProsp']}</td>
         <td class="text-right">{$coach['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-right">{displayPrice price=$coach['caDejaInscrit']}</td>
         <td class="text-right">{$coach['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
+        <td class="text-right">{displayPrice price=$coach['panierMoyen']}</td>
         <td class="text-right">{displayPrice price=$coach['caRembAvoir']}
         <td class="text-right">{$coach['pourCaRembAvoir']|escape:'htmlall':'UTF-8'}</td>
         <td></td>
@@ -79,23 +73,26 @@
     <thead>
     <tr style="width: 100%">
         <th style="width: 10%">Nom</th>
-        <th style="width: 10%;text-align: right">Prime Abo = 10%</th>
+        <th style="width: 10%;text-align: right">CA Total Abo</th>
         <th style="width: 10%;text-align: center">Nbre d'abos</th>
         <th style="width: 10%;text-align: center">Nbre de désabo</th>
         <th style="width: 10%;text-align: right">% de désabo</th>
         <th style="width: 10%;text-align: right">CA Parrainage</th>
-        <th style="width: 40%;text-align: left">% CA Parrainage</th>
+        <th style="width: 10%;text-align: center">Nbre de Parrainage</th>
+        <th style="width: 30%;text-align: left">% de Parrainage</th>
+
     </tr>
     </thead>
     <tbody>
     {foreach item=coach from=$datasEmployees}
         <tr>
             <td>{$coach['lastname']|escape:'htmlall':'UTF-8'} ({$coach['firstname']|escape:'htmlall':'UTF-8'})</td>
-            <td class="text-right">{displayPrice price=$coach['primeVenteGrAbo']}</td>
+            <td class="text-right">{displayPrice price=$coach['totalVenteGrAbo']}</td>
             <td class="text-center">{$coach['nbrVenteGrAbo']|escape:'htmlall':'UTF-8'}</td>
             <td class="text-center">{$coach['nbrVenteGrDesaAbo']|escape:'htmlall':'UTF-8'}</td>
             <td class="text-right">{$coach['pourcenDesabo']|escape:'htmlall':'UTF-8'}</td>
             <td class="text-right">{displayPrice price=$coach['totalVenteGrPar']}</td>
+            <td class="text-center">{$coach['nbrVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
             <td class="text-left">{$coach['pourVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
             <td></td>
         </tr>

@@ -58,11 +58,13 @@
                 <tr>
                     <td></td>
                 </tr>
+                {if isset($coachs) && $filterActif == 0}
                 <tr style="line-height: 1.5pt;">
                     <td>
                         <span>Tous les coachs : {displayPrice price=$caCoachsTotal}</span>
                     </td>
                 </tr>
+                {/if}
                 {if $coach->lastname}
                     <tr style="line-height: 1.5pt;">
                         <td>
@@ -73,11 +75,13 @@
                         <td></td>
                     </tr>
                 {/if}
+                {if isset($coachs) && $filterActif == 0}
                 <tr style="line-height: 1.5pt;">
                     <td>
                         <span>CA Déduit Total (- {$caDeduitJours|escape:'htmlall':'UTF-8'} j.) : {displayPrice price=$caDeduitTotal}</span>
                     </td>
                 </tr>
+                {/if}
                 {if $coach->lastname}
                     <tr style="line-height: 1.5pt;">
                         <td>
@@ -89,11 +93,13 @@
                         <td></td>
                     </tr>
                 {/if}
+                {if isset($coachs) && $filterActif == 0}
                 <tr style="line-height: 1.5pt;">
                     <td>
                         <span>CA FID Total : {displayPrice price=$caFidTotal}</span>
                     </td>
                 </tr>
+                {/if}
                 {if $coach->lastname}
                     <tr style="line-height: 1.5pt;">
                         <td>
@@ -104,11 +110,13 @@
                         <td></td>
                     </tr>
                 {/if}
+                {if isset($coachs) && $filterActif == 0}
                 <tr style="line-height: 1.5pt;">
                     <td>
                         <span>CA Prospects Total : {displayPrice price=($caCoachsTotal - $caFidTotal)}</span>
                     </td>
                 </tr>
+                {/if}
                 {if $coach->lastname}
                     <tr style="line-height: 1.5pt;">
                         <td>
@@ -206,7 +214,7 @@
 <table style="100%">
     <tr>
         <td>
-            <span style="font-size: 18pt;color: #448B01;">Horaire Coachs</span>
+            <span style="font-size: 18pt;color: #448B01;">Temps de travail Coachs</span>
         </td>
     </tr>
     <tr>
@@ -221,7 +229,7 @@
                     <th style="width: 10%">Date début</th>
                     <th style="width: 10%">Date fin</th>
                     <th style="width: 10%;text-align: right">Heure d'absence</th>
-                    <th style="width: 10%;text-align: center">Jour d'absence</th>
+                    <th style="width: 10%;text-align: center">Jour de congé</th>
                     <th style="width: 10%;text-align: center">Jours ouvrés</th>
                     <th style="width: 40%">Commentaire</th>
                 </tr>

@@ -39,49 +39,42 @@
             <table style="100%; font-size: 8pt;border-bottom:1px solid #448B01;">
                 <thead>
                 <tr style="width: 100%;background-color: #DDDDDD">
-                    <th style="width: 8%">Nom</th>
-                    <th style="width: 8%;text-align: right">CA TOTAL</th>
-                    <th style="width: 7%;text-align: right">Ajustement</th>
-                    <th style="width: 7%;text-align: right">CA Ajusté</th>
-                    <th style="width: 4%;text-align: center">Nbre de ventes TOTAL</th>
-                    <th style="width: 4%;text-align: center">Nbre de prospects</th>
-                    <th style="width: 5%;text-align: center">Prime Fichier</th>
-                    <th style="width: 5%;text-align: right">Panier Moyen</th>
-                    <th style="width: 5%;text-align: center">CA/Contact</th>
-                    <th style="width: 5%;text-align: right">% Taux de transfo. prospect</th>
-                    <th style="width: 6%;text-align: right">CA prospect</th>
-                    <th style="width: 5%;text-align: center">% CA prospect</th>
-                    <th style="width: 6%;text-align: right">CA FID</th>
+                    <th style="width: 9%">Nom</th>
+                    <th style="width: 9%;text-align: center">CA TOTAL FINAL</th>
+                    <th style="width: 7%;text-align: center">CA/Contact Prospect</th>
+                    <th style="width: 7%;text-align: center">% de Transfo Prospect</th>
+                    <th style="width: 5%;text-align: center">Nbre de Fichiers</th>
+                    <th style="width: 5%;text-align: center">Nbre de Ventes TOTAL</th>
+                    <th style="width: 7%;text-align: center">CA Prospection</th>
+                    <th style="width: 5%;text-align: center">% CA Prospect</th>
+                    <th style="width: 7%;text-align: center">CA FID</th>
                     <th style="width: 5%;text-align: center">% CA FID</th>
-                    <th style="width: 5%;text-align: right">CA Remb/Avoir</th>
-                    <th style="width: 5%;text-align: center">% CA Remb/Avoir</th>
-                    <th style="width: 5%;text-align: right">CA Impayé</th>
-                    <th style="width: 5%;text-align: center">% Impayé</th>
+                    <th style="width: 7%;text-align: center">Panier Moyen</th>
+                    <th style="width: 7%;text-align: center">CA Retour</th>
+                    <th style="width: 6%;text-align: center">% CA Retour</th>
+                    <th style="width: 6%;text-align: center">CA Impayé</th>
+                    <th style="width: 6%;text-align: center">% Impayé</th>
                 </tr>
                 </thead>
                 <tbody>
                 {foreach item=coach from=$datasEmployees}
                     <tr>
-                        <td style="">{$coach['lastname']|escape:'htmlall':'UTF-8'}
-                            ({$coach['firstname']|escape:'htmlall':'UTF-8'})
-                        </td>
-                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['caTotal']}</td>
-                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['ajustement']}</td>
-                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['caAjuste']}</td>
-                        <td style="text-align: center; background-color: #FFFFFF">{$coach['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: left; background-color: #DDDDDD">{$coach['lastname']|escape:'htmlall':'UTF-8'}
+                            ({$coach['firstname']|substr:0:1|escape:'htmlall':'UTF-8'}.)</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['caTotal']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{$coach['CaContact']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{$coach['tauxTransfo']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{$coach['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
-                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['primeFichierCoach']}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{$coach['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['CaProsp']}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{$coach['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['caDejaInscrit']}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{$coach['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['panierMoyen']}</td>
-                        <td style="text-align: center; background-color: #FFFFFF">{$coach['CaContact']|escape:'htmlall':'UTF-8'}</td>
-                        <td style="text-align: center; background-color: #DDDDDD">{$coach['tauxTransfo']|escape:'htmlall':'UTF-8'}</td>
-                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['CaProsp']}</td>
-                        <td style="text-align: center; background-color: #DDDDDD">{$coach['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>
-                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['caDejaInscrit']}</td>
-                        <td style="text-align: center; background-color: #DDDDDD">{$coach['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['caRembAvoir']}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{$coach['pourCaRembAvoir']|escape:'htmlall':'UTF-8'}</td>
-                        <td style="background-color: #FFFFFF"></td>
-                        <td style="background-color: #DDDDDD"></td>
+                        <td style="text-align: center; background-color: #FFFFFF"></td>
+                        <td style="text-align: center; background-color: #DDDDDD"></td>
                     </tr>
                 {/foreach}
                 </tbody>

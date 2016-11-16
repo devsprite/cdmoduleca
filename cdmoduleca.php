@@ -153,13 +153,6 @@ class CdModuleCA extends ModuleGrid
                 'dataIndex' => 'date_add',
                 'align' => 'center'
             ),
-            array(
-                'id' => 'date_upd',
-                'header' => $this->l('Mise à jour'),
-                'dataIndex' => 'date_upd',
-                'align' => 'center'
-            ),
-
         );
     }
 

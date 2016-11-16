@@ -253,7 +253,6 @@ class GridClass extends Module
           (SELECT UCASE(c.`lastname`) FROM `' . _DB_PREFIX_ . 'customer` AS c 
           WHERE o.`id_customer` = c.`id_customer`) AS id_customer,
           o.`date_add`,
-          o.`date_upd`,
           IF((o.`valid`) > 0, "", "Non") AS valid,
           (SELECT ca.`name` FROM `' . _DB_PREFIX_ . 'code_action` AS ca 
           WHERE o.`id_code_action` = ca.`id_code_action`) as CodeAction,
