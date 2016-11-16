@@ -746,7 +746,7 @@ class CdModuleCA extends ModuleGrid
         );
         $inputs[] = array(
             'type' => 'text',
-            'label' => 'Prime parraingage',
+            'label' => 'Prime parrainage',
             'name' => 'co_prime_parrainage',
             'desc' => 'Montant de la prime parrainage',
             'class' => 'input fixed-width-md',
