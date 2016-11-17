@@ -218,13 +218,11 @@ class AdminCaLetSensController extends ModuleAdminController
                 ($datasEmployees[$employee['id_employee']]['caTotal'])
                     ? ($datasEmployees[$employee['id_employee']]['caTotal']
                         + $datasEmployees[$employee['id_employee']]['ajustement'])
-                    - $datasEmployees[$employee['id_employee']]['caRembourse']
-                    - $datasEmployees[$employee['id_employee']]['caAvoir'] : '';
+                    - $datasEmployees[$employee['id_employee']]['caRembourse'] : '';
 
             $datasEmployees[$employee['id_employee']]['caRembAvoir'] =
                 ($datasEmployees[$employee['id_employee']]['caTotal'])
-                    ? $datasEmployees[$employee['id_employee']]['caRembourse']
-                    + $datasEmployees[$employee['id_employee']]['caAvoir'] : '';
+                    ? $datasEmployees[$employee['id_employee']]['caRembourse'] : '';
 
             $pourCaRembAvoir = ($caTotal != 0) ? round((($datasEmployees[$employee['id_employee']]['caRembAvoir'] * 100)
                 / $caTotal), 2) : '';
