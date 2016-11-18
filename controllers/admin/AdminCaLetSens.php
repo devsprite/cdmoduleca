@@ -536,25 +536,42 @@ class AdminCaLetSensController extends ModuleAdminController
     private function importfile($datas)
     {
         $isOk = true;
-        if ($datas[0][0] == 'id_employe' &&
-            $datas[0][1] == 'id_order' &&
-            $datas[0][2] == 'date' &&
-            $datas[0][3] == 'somme' &&
-            $datas[0][4] == 'commentaire'
+        if ($datas[0][0] == 'Date valeur' &&
+            $datas[0][1] == 'libellé' &&
+            $datas[0][2] == 'Nom' &&
+            $datas[0][4] == 'CMD' &&
+            $datas[0][5] == 'Coach' &&
+            $datas[0][6] == 'Reste à payer'
         ) {
             array_shift($datas);
 
             foreach ($datas as $data) {
-                $aj = new AjoutSomme();
-                $aj->id_employee = (int)$data[0];
-                $aj->id_order = (int)$data[1];
-                $aj->date_ajout_somme = date('Y-m-d 00:00:00', strtotime($data[2]));
-                $aj->somme = (int)$data[3];
-                $aj->commentaire = pSQL($data[4]);
-                $aj->impaye = 1;
-
-                if (!$aj->save()) {
+                $data[0] = CaTools::convertDate($data[0]);
+                if (!Validate::isDateFormat($data[0])) {
                     $isOk = false;
+                }
+
+                $reqEmploye = new DbQuery();
+                $reqEmploye->select('DISTINCT id_employee')
+                    ->from('employee')
+                    ->where('lastname = "' . pSQL($data[5]) . '"');
+
+                $listCoachs = Db::getInstance()->executeS($reqEmploye);
+                if (count($listCoachs) != 1) {
+                    $isOk = false;
+                };
+
+                if ($isOk) {
+                    $aj = new AjoutSomme();
+                    $aj->date_ajout_somme = $data[0];
+                    $aj->commentaire = pSQL($data[1] . '-' . $data[3] . ' - ' . $data[2] . ' - ' . $data['5']);
+                    $aj->id_order = (int)$data[4];
+                    $aj->id_employee = (int)$listCoachs[0]['id_employee'];
+                    $aj->somme = (float)$data[6];
+                    $aj->impaye = 1;
+                    if (!$aj->save()) {
+                        $isOk = false;
+                    }
                 }
             }
 

@@ -823,4 +823,15 @@ class CaTools
 
         return $req;
     }
+
+    /**
+     * Convertir la date en français au format anglais
+     * @param $date_ajout
+     * @return string
+     */
+    public static function convertDate($date_ajout)
+    {
+        $tabDate = explode('/', $date_ajout);
+        return date('Y-m-d', strtotime((int)$tabDate[2] . '-' . (int)$tabDate['1'] . '-' . (int)$tabDate[0]));
+    }
 }
