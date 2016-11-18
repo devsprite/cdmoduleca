@@ -404,6 +404,11 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['primeFichierCoach'] =
                 CaTools::primeFichier($employee['id_employee'], $this->getDateBetween());
+            $nbrjourOuvre = CaTools::getJourOuvreEmploye($employee['id_employee'], $this->getDateBetween());
+
+            $datasEmployees[$employee['id_employee']]['nbrJourOuvre'] = (empty($nbrjourOuvre))
+                ? CaTools::getNbOpenDays($this->getDateBetween())
+                : $nbrjourOuvre;
         }
 
 
@@ -503,7 +508,7 @@ class AdminCaLetSensController extends ModuleAdminController
                                     $this->errors[] = Tools::displayError('La taille du fichier est trop grande.');
                                 }
                                 if (!$this->errors) {
-                                    if (($handle = fopen($file['save_path'] , "r")) !== FALSE) {
+                                    if (($handle = fopen($file['save_path'], "r")) !== FALSE) {
                                         $datas = array();
                                         while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
                                             $datas[] = $data;
@@ -535,7 +540,8 @@ class AdminCaLetSensController extends ModuleAdminController
             $datas[0][1] == 'id_order' &&
             $datas[0][2] == 'date' &&
             $datas[0][3] == 'somme' &&
-            $datas[0][4] == 'commentaire') {
+            $datas[0][4] == 'commentaire'
+        ) {
             array_shift($datas);
 
             foreach ($datas as $data) {
@@ -553,7 +559,7 @@ class AdminCaLetSensController extends ModuleAdminController
             }
 
 
-        }else{
+        } else {
             $isOk = false;
         }
 

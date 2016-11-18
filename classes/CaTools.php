@@ -813,7 +813,7 @@ class CaTools
      * @param $dateBetween
      * @return mixed
      */
-    private static function getJourOuvreEmploye($id_employee, $dateBetween)
+    public static function getJourOuvreEmploye($id_employee, $dateBetween)
     {
         $sql = 'SELECT SUM(`jour_ouvre`) FROM `' . _DB_PREFIX_ . 'objectif_coach` 
                 WHERE `id_employee` = ' . (int)$id_employee . ' 
