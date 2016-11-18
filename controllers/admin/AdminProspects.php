@@ -398,11 +398,12 @@ class AdminProspectsController extends ModuleAdminController
     public function getNbrNouveauProspects()
     {
         $indexDate = Configuration::get('CDMODULECA_PROSPECTS_INDEX_DATE');
-        $sql = 'SELECT COUNT(c.`id_customer`) AS total
+        $sql = 'SELECT COUNT(DISTINCT c.`id_customer`) AS total
                 FROM `' . _DB_PREFIX_ . 'customer` as c 
                 LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON c.`id_customer` = cg.`id_customer`
                 WHERE c.`date_add` > "' . pSQL($indexDate) . '"
-                AND cg.`id_group` = 1
+                AND c.`id_default_group` = 1
+                AND c.`active` = 0
                 AND c.`deleted` = 0';
 
         $req = Db::getInstance()->getValue($sql);
@@ -414,12 +415,13 @@ class AdminProspectsController extends ModuleAdminController
         $indexDate = Configuration::get('CDMODULECA_PROSPECTS_INDEX_DATE');
         $indexDateMax = date('Y-m-d 00:00:00', strtotime($indexDate . ' -' . Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS') . ' day'));
 
-        $sql = 'SELECT COUNT(c.`id_customer`) AS total
+        $sql = 'SELECT COUNT(DISTINCT c.`id_customer`) AS total
                 FROM `' . _DB_PREFIX_ . 'customer` as c 
                 LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON c.`id_customer` = cg.`id_customer`
                 WHERE c.`date_add` < "' . pSQL($indexDate) . '"
                 AND c.`date_add` > "' . pSQL($indexDateMax) . '"
-                AND cg.`id_group` = 1
+                AND c.`id_default_group` = 1
+                AND c.`active` = 0
                 AND c.`deleted` = 0';
 
         $req = Db::getInstance()->getValue($sql);

@@ -150,16 +150,18 @@
                     <th style="width: 10%">Nom</th>
                     <th style="width: 10%">Date</th>
                     <th style="width: 10%; text-align: right">Somme</th>
-                    <th style="width: 70%">Commentaire</th>
+                    <th style="width: 60%">Commentaire</th>
+                    <th style="width: 10%">Numéro de commande</th>
                 </tr>
                 </thead>
                 <tbody>
                 {foreach item=ajoutSomme from=$ajoutSommes}
                     <tr>
                         <td>{$ajoutSomme['lastname']|escape:'htmlall':'UTF-8'}</td>
-                        <td>{$ajoutSomme['date_add']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
+                        <td>{$ajoutSomme['date_ajout_somme']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: right">{displayPrice price=$ajoutSomme['somme']}</td>
                         <td>{$ajoutSomme['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
+                        <td>{$ajoutSomme['id_order']|escape:'htmlall':'UTF-8'}</td>
                     </tr>
                 {/foreach}
                 </tbody>

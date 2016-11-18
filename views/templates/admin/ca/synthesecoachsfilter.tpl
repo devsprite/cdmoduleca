@@ -99,7 +99,7 @@
                     {if isset($coachs) && $filterActif != 0}
                     {if isset($allow)}
                         <form enctype="multipart/form-data" action="{$LinkFile}" method="post">
-                            <div class="col-lg-2">
+                            <div class="col-lg-3">
                                 <input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
                                 <input type="file" name="uploadFile" class="btn btn-default">
                             </div>
@@ -146,7 +146,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-1">
-                                <label for="as_order">id_order</label>
+                                <label for="as_order">Numéro commande</label>
                                 <div class="input input-group">
                                     <input type="text" id="as_order" name="as_order"
                                            value="{if isset($smarty.post.as_order)
@@ -239,7 +239,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-1">
-                                <label for="oc_somme">Jour d'absence</label>
+                                <label for="oc_somme">Jour de congé</label>
                                 <div class="input input-group">
                                     <input type="text" id="oc_jour" name="oc_jour"
                                            value="{if isset($smarty.post.oc_jour)

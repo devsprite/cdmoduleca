@@ -94,7 +94,8 @@ class ProspectClass extends ObjectModel
           FROM `' . _DB_PREFIX_ . 'customer` AS cu
           LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON cu.`id_customer` = cg.`id_customer`
           LEFT JOIN `' . _DB_PREFIX_ . 'prospect` AS p ON cg.`id_customer` = p.`id_customer`
-          WHERE cg.`id_group` = "' . (int)$id_group . '" ';
+          WHERE cu.`id_default_group` = "' . (int)$id_group . '" 
+          AND cu.`active` = 0 ';
         $sql .= $filter;
         $sql .= 'AND cu.`deleted` = 0';
         $sql .= ' ORDER BY RAND()';

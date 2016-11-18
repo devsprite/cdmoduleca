@@ -177,7 +177,7 @@
                 <th style="width: 10%">Date</th>
                 <th style="width: 10%"><span class="pull-right">Somme</span></th>
                 <th style="width: 50%">Commentaire</th>
-                <th style="width: 10%">id_order</th>
+                <th style="width: 10%">Numéro de commande</th>
                 <th style="width: 5%"></th>
             </tr>
             </thead>

@@ -203,7 +203,8 @@ class AdminCustomersController extends AdminCustomersControllerCore
 			'date_add' => array(
 				'title' => $this->l('Registration'),
 				'type' => 'date',
-				'align' => 'text-right'
+				'align' => 'text-right',
+                'filter_key' => 'a!date_add'
 			),
 //			'connect' => array(
 //				'title' => $this->l('Last visit'),

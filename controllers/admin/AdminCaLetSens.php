@@ -545,6 +545,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $aj->date_ajout_somme = date('Y-m-d 00:00:00', strtotime($data[2]));
                 $aj->somme = (int)$data[3];
                 $aj->commentaire = pSQL($data[4]);
+                $aj->impaye = 1;
 
                 if (!$aj->save()) {
                     $isOk = false;
@@ -597,12 +598,16 @@ class AdminCaLetSensController extends ModuleAdminController
             if (Tools::isSubmit('as_submit')) {
                 $data = array(
                     'id_employee' => (int)Tools::getValue('as_id_employee'),
+                    'id_order' => (int)Tools::getValue('as_order'),
                     'somme' => Tools::getValue('as_somme'),
                     'commentaire' => pSQL(Tools::getValue('as_commentaire')),
                     'date_ajout_somme' => Tools::getValue('as_date')
                 );
                 if (!Validate::isInt($data['id_employee'])) {
                     $this->errors[] = 'L\'id de l\'employee n\'est pas valide';
+                }
+                if (!Validate::isInt($data['id_order'])) {
+                    $this->errors[] = 'L\'id de la commande n\'est pas valide';
                 }
                 if (!Validate::isFloat(str_replace(',', '.', $data['somme']))) {
                     $this->errors[] = 'La somme n\'est pas valide';
@@ -637,6 +642,7 @@ class AdminCaLetSensController extends ModuleAdminController
                         $this->confirmation = $this->l('Enregistrement éffectué.');
                         unset($_POST['as_id_employee']);
                         unset($_POST['as_somme']);
+                        unset($_POST['as_order']);
                         unset($_POST['as_commentaire']);
                         unset($_POST['as_date']);
                         unset($_POST['as_id']);
@@ -654,6 +660,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $as = CaTools::getAjoutSommeById((int)Tools::getValue('id_as'));
                 $_POST['as_id_employee'] = $as['id_employee'];
                 $_POST['as_somme'] = $as['somme'];
+                $_POST['as_order'] = $as['id_order'];
                 $_POST['as_commentaire'] = $as['commentaire'];
                 $_POST['as_date'] = $as['date_ajout_somme'];
                 $_POST['as_id'] = $as['id_ajout_somme'];
@@ -948,8 +955,9 @@ class AdminCaLetSensController extends ModuleAdminController
         $pdf->AddPage();
         $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/main_table_coachs.tpl');
         $pdf->writeHTML($html_content);
-
-        $pdf->AddPage();
+        if ($this->idFilterCoach == 0) {
+            $pdf->AddPage();
+        }
         $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/main_table_groupes.tpl');
         $pdf->writeHTML($html_content);
         // ---------------------------------------------------------

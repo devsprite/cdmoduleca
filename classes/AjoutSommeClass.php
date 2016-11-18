@@ -35,6 +35,7 @@ class AjoutSomme extends ObjectModel
     public $id_ajout_somme;
     public $id_employee;
     public $id_order;
+    public $impaye;
     public $somme;
     public $commentaire;
     public $date_ajout_somme;
@@ -46,6 +47,7 @@ class AjoutSomme extends ObjectModel
         'fields' => array(
             'id_employee' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId', 'required' => true),
             'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId'),
+            'impaye' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId'),
             'somme' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat', 'required' => true),
             'commentaire' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_ajout_somme' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
