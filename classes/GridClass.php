@@ -170,7 +170,7 @@ class GridClass extends Module
         if (isset($datas['option'])) {
             $this->setOption($datas['option'], $layers);
         }
-
+        $this->_csv = chr(239) . chr(187) . chr(191) ;
         if (count($datas['columns'])) {
             foreach ($datas['columns'] as $column) {
                 $this->_csv .= $column['header'] . ';';
