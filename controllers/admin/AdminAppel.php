@@ -62,15 +62,18 @@ class AdminAppelController extends ModuleAdminController
             ),
             'id_employee' => array(
                 'title' => 'Id_employé',
+                'filter_key' => 'a!id_employee'
             ),
             'name' => array(
                 'title' => 'Employé',
+                'havingFilter' => false,
             ),
             'compteur' => array(
                 'title' => 'Compteur',
             ),
             'date_upd' => array(
                 'title' => 'Date',
+                'filter_key' => 'a!date_upd'
             )
         );
 
