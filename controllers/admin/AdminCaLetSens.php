@@ -212,7 +212,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 ? $pourCaRembourse . ' %' : '';
 
             $datasEmployees[$employee['id_employee']]['ajustement'] =
-                (empty(CaTools::getAjustement($employee['id_employee'], $this->getDateBetween())))
+                (CaTools::getAjustement($employee['id_employee'], $this->getDateBetween()) == 0)
                     ? ''
                     : CaTools::getAjustement($employee['id_employee'], $this->getDateBetween()) . ' €';
 
