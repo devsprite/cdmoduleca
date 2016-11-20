@@ -53,4 +53,22 @@ class AjoutSomme extends ObjectModel
             'date_ajout_somme' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
         ),
     );
+
+    public static function getImpaye($idFilterCoach = 0, $dateBetween)
+    {
+        $filter = '';
+        if ($idFilterCoach != 0) {
+            $filter = 'AND `id_employee` = ' . (int)$idFilterCoach;
+        }
+        $sql = 'SELECT SUM(`somme`)
+                FROM `' . _DB_PREFIX_ . 'ajout_somme`
+                WHERE `date_ajout_somme` BETWEEN ' . $dateBetween . '
+                AND `impaye` = 1 ';
+        $sql .= $filter;
+
+        $req = Db::getInstance()->getValue($sql);
+
+        return (empty($req)) ? '' : $req;
+    }
+
 }

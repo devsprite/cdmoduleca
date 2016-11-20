@@ -79,12 +79,12 @@
             {foreach item=employe from=$datasEmployees}
                 <div class="row group">
                     <div class="col-xs-12">CA TOTAL FINAL
-                        <span class="pull-right">{displayPrice price=$employe['caTotal']}</span>
+                        <span class="pull-right">{displayPrice price=$employe['caAjuste']}</span>
                     </div>
                 </div>
                 <div class="row group">
                     <div class="col-xs-12">CA Code Action Tous les codes
-                        <span class="pull-right"></span>
+                        <span class="pull-right">{displayPrice price=$employe['caTotal']}</span>
                     </div>
                 </div>
                 <div class="row group">
@@ -99,7 +99,7 @@
                 </div>
                 <div class="row group">
                     <div class="col-xs-12">CA Déduit Total (Retours + Impayés)
-                        <span class="pull-right">{displayPrice price=$employe['caAjuste']}</span>
+                        <span class="pull-right">{displayPrice price=$employe['caDeduit']}</span>
                     </div>
                 </div>
                 <div class="row group">
@@ -120,6 +120,11 @@
                 <div class="row group">
                     <div class="col-xs-12">Prime Parrainage
                         <span class="pull-right">{displayPrice price=$employe['primeParrainage']}</span>
+                    </div>
+                </div>
+                <div class="row group">
+                    <div class="col-xs-12">Ajustement
+                        <span class="pull-right">{$employe['ajustement']}</span>
                     </div>
                 </div>
                 <div class="row group">

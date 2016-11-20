@@ -321,7 +321,12 @@ class CaTools
             foreach ($objectifCoachs as $objectifCoach => $objectif) {
                 $dateBetween = '"' . $objectif['date_start'] . '" AND "' . $objectif['date_end'] . '"';
 
-                $caCoach = CaTools::getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
+                $ca = CaTools::getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
+                $objectifCoachs[$objectifCoach]['ajustement'] = $ajustement = CaTools::getAjustement($objectif['id_employee'], $dateBetween);
+                $objectifCoachs[$objectifCoach]['impaye'] = $impaye = AjoutSomme::getImpaye($objectif['id_employee'], $dateBetween);
+                $objectifCoachs[$objectifCoach]['avoir'] = $avoir = CaTools::getCaCoachsAvoir($objectif['id_employee'], $dateBetween);
+
+                $caCoach = $ca + $ajustement - $impaye - $avoir;
 
                 $p = ($objectif['somme'] != 0) ? round(((100 * $caCoach) / $objectif['somme']), 2) : '';
                 $objectifCoachs[$objectifCoach]['pourcentDeObjectif'] = $p;
@@ -531,7 +536,8 @@ class CaTools
         }
 
         $sql = 'SELECT SUM(`somme`) FROM `' . _DB_PREFIX_ . 'ajout_somme` 
-                WHERE `date_ajout_somme` BETWEEN ' . $getDateBetween;
+                WHERE `date_ajout_somme` BETWEEN ' . $getDateBetween . '
+                AND `impaye` IS NULL ';
         $sql .= $filter;
 
         $req = Db::getInstance()->getValue($sql);

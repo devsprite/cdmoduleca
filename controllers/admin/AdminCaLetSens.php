@@ -212,29 +212,45 @@ class AdminCaLetSensController extends ModuleAdminController
                 ? $pourCaRembourse . ' %' : '';
 
             $datasEmployees[$employee['id_employee']]['ajustement'] =
-                CaTools::getAjustement($employee['id_employee'], $this->getDateBetween());
+                (empty(CaTools::getAjustement($employee['id_employee'], $this->getDateBetween())))
+                    ? ''
+                    : CaTools::getAjustement($employee['id_employee'], $this->getDateBetween()) . ' €';
+
+            $datasEmployees[$employee['id_employee']]['caImpaye'] =
+                AjoutSomme::getImpaye($employee['id_employee'], $this->getDateBetween());
+
+            $pourCaImpaye = ($caTotal != 0) ? round((($datasEmployees[$employee['id_employee']]['caImpaye'] * 100)
+                    / $caTotal), 2) . ' %' : '';
+
+            $datasEmployees[$employee['id_employee']]['pourCaImpaye'] = $pourCaImpaye;
 
             $datasEmployees[$employee['id_employee']]['caAjuste'] =
                 ($datasEmployees[$employee['id_employee']]['caTotal'])
                     ? ($datasEmployees[$employee['id_employee']]['caTotal']
                         + $datasEmployees[$employee['id_employee']]['ajustement'])
-                    - $datasEmployees[$employee['id_employee']]['caRembourse'] : '';
+                    - $datasEmployees[$employee['id_employee']]['caAvoir']
+                    - $datasEmployees[$employee['id_employee']]['caImpaye'] : '';
 
             $datasEmployees[$employee['id_employee']]['caRembAvoir'] =
                 ($datasEmployees[$employee['id_employee']]['caTotal'])
-                    ? $datasEmployees[$employee['id_employee']]['caRembourse'] : '';
+                    ? $datasEmployees[$employee['id_employee']]['caAvoir'] : '';
 
-            $pourCaRembAvoir = ($caTotal != 0) ? round((($datasEmployees[$employee['id_employee']]['caRembAvoir'] * 100)
+            $pourCaRembAvoir = ($caTotal != 0) ? round((($datasEmployees[$employee['id_employee']]['caAvoir'] * 100)
                 / $caTotal), 2) : '';
 
             $datasEmployees[$employee['id_employee']]['pourCaRembAvoir'] = ($pourCaRembAvoir)
                 ? $pourCaRembAvoir . ' %' : '';
 
+            $datasEmployees[$employee['id_employee']]['caDeduit'] = ($datasEmployees[$employee['id_employee']]['caImpaye']
+                + $datasEmployees[$employee['id_employee']]['caAvoir'])
+                ? $datasEmployees[$employee['id_employee']]['caImpaye']
+                + $datasEmployees[$employee['id_employee']]['caRembAvoir'] : '';
+
             $datasEmployees[$employee['id_employee']]['caDejaInscrit'] =
                 CaTools::getCaDejaInscrit($employee['id_employee'], $this->getDateBetween());
 
             $caProsp = CaTools::caProsp($datasEmployees[$employee['id_employee']])
-                - $datasEmployees[$employee['id_employee']]['caRembAvoir'];
+                - $datasEmployees[$employee['id_employee']]['caAvoir'];
 
             $datasEmployees[$employee['id_employee']]['CaProsp'] = ($caProsp) ? $caProsp : '';
 
@@ -409,8 +425,8 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['nbrJourOuvre'] = (empty($nbrjourOuvre))
                 ? CaTools::getNbOpenDays($this->getDateBetween())
                 : $nbrjourOuvre;
-        }
 
+        }
 
         $this->smarty->assign(array(
             'datasEmployees' => $datasEmployees,
