@@ -324,7 +324,7 @@ class CaTools
                 $ca = CaTools::getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
                 $objectifCoachs[$objectifCoach]['ajustement'] = $ajustement = CaTools::getAjustement($objectif['id_employee'], $dateBetween);
                 $objectifCoachs[$objectifCoach]['impaye'] = $impaye = AjoutSomme::getImpaye($objectif['id_employee'], $dateBetween);
-                $objectifCoachs[$objectifCoach]['avoir'] = $avoir = CaTools::getCaCoachsAvoir($objectif['id_employee'], $dateBetween);
+                $objectifCoachs[$objectifCoach]['avoir'] = $avoir = CaTools::getCaCoachsRembourse($objectif['id_employee'], 0, $dateBetween);
 
                 $caCoach = $ca + $ajustement - $impaye - $avoir;
 
