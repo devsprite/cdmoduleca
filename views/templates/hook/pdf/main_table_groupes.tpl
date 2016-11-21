@@ -58,7 +58,7 @@
                         <td style="text-align: center; background-color: #DDDDDD">{$coach['nbrVenteGrDesaAbo']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center">{$coach['pourcenDesabo']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['totalVenteGrPar']}</td>
-                        <td style="text-align: center"></td>
+                        <td style="text-align: center">{$coach['pourVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
                     </tr>
                 {/foreach}
                 </tbody>
