@@ -50,97 +50,188 @@
                             </tr>
                             <tr style="line-height: 1.5pt;">
                                 <td style="width: 100%;">
-                                    <span>Code action : {$filterCodeAction['name']|escape:'htmlall':'UTF-8'}</span>
+                                    <span>{$filterCodeAction['name']|escape:'htmlall':'UTF-8'}</span>
                                 </td>
                             </tr>
+                            {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal)}
+                                <tr style="line-height: 1.5pt;">
+                                    <td style="width: 100%;">
+                                        <span>Tous les coachs</span>
+                                    </td>
+                                </tr>
+                            {/if}
+                            {if $coach->lastname}
+                                <tr style="line-height: 1.5pt;">
+                                    <td style="width: 100%;">
+                                        <span>Coach : {$coach->lastname} - {$coach->firstname}</span>
+                                    </td>
+                                </tr>
+                            {/if}
                         </table>
                     </td>
                 </tr>
                 <tr>
                     <td></td>
                 </tr>
-
+                {* datas Tous les Coachs *}
                 {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal)}
-                    <tr style="line-height: 1.5pt;">
-                        <td>
-                            <span>CA TOTAL FINAL : {displayPrice price=$datasEmployeesTotal['caAjuste']}</span>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>CA TOTAL FINAL : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['caAjuste']}</span>
+                        </td>
+                    </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>CA Code Action Tous les codes : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['caTotal']}</span>
+                        </td>
+                    </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>CA Fidélisation (FID) : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['caFidTotal']}</span>
+                        </td>
+                    </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>CA Prospection : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['CaProsp']}</span>
+                        </td>
+                    </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>CA Déduit Total (Retours + Impayés) </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['caDeduit']}</span>
+                        </td>
+                    </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>Prime Abonnement : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['primeVenteGrAbo']}</span>
+                        </td>
+                    </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>Prime Fichier : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['primeFichierCoach']}</span>
+                        </td>
+                    </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>Prime Parrainage : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['primeParrainage']}</span>
+                        </td>
+                    </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>Ajustement : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['ajustement']}</span>
                         </td>
                     </tr>
                 {/if}
-
-
-
-
-                {if isset($coachs) && $filterActif == 0}
-                    <tr style="line-height: 1.5pt;">
-                        <td>
-                            <span>Tous les coachs : {displayPrice price=$caCoachsTotal}</span>
-                        </td>
-                    </tr>
-                {/if}
+                {* datas Coach *}
                 {if $coach->lastname}
-                    <tr style="line-height: 1.5pt;">
-                        <td>
-                            <span>Coach {$coach->lastname|escape:'htmlall':'UTF-8'}
-                                : {displayPrice price=$caCoach}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                {/if}
-                {if isset($coachs) && $filterActif == 0}
-                    <tr style="line-height: 1.5pt;">
-                        <td>
-                            <span>CA Déduit Total (- {$caDeduitJours|escape:'htmlall':'UTF-8'}
-                                j.) : {displayPrice price=$caDeduitTotal}</span>
-                        </td>
-                    </tr>
-                {/if}
-                {if $coach->lastname}
-                    <tr style="line-height: 1.5pt;">
-                        <td>
-                            <span>CA Déduit {$coach->lastname|escape:'htmlall':'UTF-8'}
-                                (- {$caDeduitJours|escape:'htmlall':'UTF-8'}
-                                j.) : {displayPrice price=$caDeduitCoach}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                {/if}
-                {if isset($coachs) && $filterActif == 0}
-                    <tr style="line-height: 1.5pt;">
-                        <td>
-                            <span>CA FID Total : {displayPrice price=$caFidTotal}</span>
-                        </td>
-                    </tr>
-                {/if}
-                {if $coach->lastname}
-                    <tr style="line-height: 1.5pt;">
-                        <td>
-                            <span>CA FID {$coach->lastname|escape:'htmlall':'UTF-8'}
-                                : {displayPrice price=$caFidCoach}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
-                {/if}
-                {if isset($coachs) && $filterActif == 0}
-                    <tr style="line-height: 1.5pt;">
-                        <td>
-                            <span>CA Prospects Total : {displayPrice price=($caCoachsTotal - $caFidTotal)}</span>
-                        </td>
-                    </tr>
-                {/if}
-                {if $coach->lastname}
-                    <tr style="line-height: 1.5pt;">
-                        <td>
-                            <span>CA Prospect {$coach->lastname|escape:'htmlall':'UTF-8'}
-                                : {displayPrice price=($caTotalCoach - $caFidCoach)}</span>
-                        </td>
-                    </tr>
+                    {foreach item=coach from=$datasEmployees}
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>CA TOTAL FINAL : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['caAjuste']}</span>
+                            </td>
+                        </tr>
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>CA Code Action Tous les codes : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['caTotal']}</span>
+                            </td>
+                        </tr>
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>CA Fidélisation (FID) : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['caFidTotal']}</span>
+                            </td>
+                        </tr>
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>CA Prospection : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['CaProsp']}</span>
+                            </td>
+                        </tr>
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>CA Déduit Total (Retours + Impayés) </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['caDeduit']}</span>
+                            </td>
+                        </tr>
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>Prime Abonnement : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['primeVenteGrAbo']}</span>
+                            </td>
+                        </tr>
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>Prime Fichier : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['primeFichierCoach']}</span>
+                            </td>
+                        </tr>
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>Prime Parrainage : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['primeParrainage']}</span>
+                            </td>
+                        </tr>
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>Ajustement : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['ajustement']}</span>
+                            </td>
+                        </tr>
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>Nbre de jours ouvré : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{$coach['nbrJourOuvre']}</span>
+                            </td>
+                        </tr>
+                    {/foreach}
                 {/if}
                 <tr>
                     <td></td>
@@ -163,7 +254,7 @@
         <td>
             <table style="width: 100%; font-size: 8pt;;border-bottom:1px solid #448B01;">
                 <thead>
-                <tr style="background-color: #AAAAAA">
+                <tr style="background-color: #DDDDDD">
                     <th style="width: 10%">Nom</th>
                     <th style="width: 10%">Date</th>
                     <th style="width: 10%; text-align: right">Somme</th>
@@ -203,7 +294,7 @@
         <td>
             <table style="width: 100%; font-size: 8pt;border-bottom:1px solid #448B01;">
                 <thead>
-                <tr style="background-color: #AAAAAA">
+                <tr style="background-color: #DDDDDD">
                     <th style="width: 10%">Nom</th>
                     <th style="width: 10%">Date début</th>
                     <th style="width: 10%">Date fin</th>
@@ -243,7 +334,7 @@
         <td>
             <table style="width: 100%; font-size: 8pt;border-bottom:1px solid #448B01;">
                 <thead>
-                <tr style="background-color: #AAAAAA">
+                <tr style="background-color: #DDDDDD">
                     <th style="width: 10%">Nom</th>
                     <th style="width: 10%">Date début</th>
                     <th style="width: 10%">Date fin</th>

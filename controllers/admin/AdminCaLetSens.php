@@ -838,12 +838,17 @@ class AdminCaLetSensController extends ModuleAdminController
         $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/content.tpl');
         $pdf->writeHTML($html_content);
 
-        $pdf->AddPage();
-        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/main_table_coachs.tpl');
-        $pdf->writeHTML($html_content);
         if ($this->idFilterCoach == 0) {
             $pdf->AddPage();
         }
+
+        $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/main_table_coachs.tpl');
+        $pdf->writeHTML($html_content);
+
+        if ($this->idFilterCoach == 0) {
+            $pdf->AddPage();
+        }
+
         $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/main_table_groupes.tpl');
         $pdf->writeHTML($html_content);
         // ---------------------------------------------------------
