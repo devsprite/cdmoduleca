@@ -86,7 +86,7 @@ class CdModuleCA extends ModuleGrid
         );
         $this->empty_message = $this->l('Pas d\'enregistrement disponible');
         $this->paging_message = sprintf($this->l('Affichage %1$s de %2$s'), '{0} - {1}', '{2}');
-        $this->limit = 80;
+        $this->limit = 800;
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
         $this->table_charset = 'utf8';
         $this->default_sort_column = 'id';
@@ -111,6 +111,12 @@ class CdModuleCA extends ModuleGrid
                 'header' => $this->l('Client'),
                 'dataIndex' => 'id_customer',
                 'align' => 'left'
+            ),
+            array(
+                'id' => 'avoir',
+                'header' => $this->l('Avoir'),
+                'dataIndex' => 'avoir',
+                'align' => 'right',
             ),
             array(
                 'id' => 'hthp',
@@ -1179,7 +1185,7 @@ class CdModuleCA extends ModuleGrid
         $this->query = '
           SELECT SQL_CALC_FOUND_ROWS
           DISTINCT o.`id_order` AS id,
-          `amount` as avoir,
+          IF ((`amount` + `shipping_cost_amount`),CONCAT(`amount` + `shipping_cost_amount`, " €"), "" ) as avoir,
           gl.`name` AS groupe,
           CONCAT ( ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2), " €") AS hthp,
           (SELECT e.`lastname` FROM `' . _DB_PREFIX_ . 'employee` AS e WHERE o.`id_employee` = e.`id_employee`) AS id_employee,
@@ -1219,6 +1225,7 @@ class CdModuleCA extends ModuleGrid
 
         $values = Db::getInstance()->executeS($this->query);
 
+//        ddd($this->query);
         $this->_values = $values;
         $this->_totalCount = Db::getInstance()->getValue('SELECT FOUND_ROWS()');
     }
