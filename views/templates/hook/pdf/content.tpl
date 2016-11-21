@@ -30,7 +30,8 @@
                 <tr style="line-height: 2pt;">
                     <td style="width: 30%"><span style="font-size: 24pt;color: #448B01;">L&Sens </span></td>
                     <td style="width: 70%; text-align: right"><span
-                                style="font-size: 12pt;">{$smarty.now|date_format:'%A %e %B %Y à %H:%M'|capitalize|escape:'htmlall':'UTF-8'}</span></td>
+                                style="font-size: 12pt;">{$smarty.now|date_format:'%A %e %B %Y à %H:%M'|capitalize|escape:'htmlall':'UTF-8'}</span>
+                    </td>
                 </tr>
             </table>
         </td>
@@ -58,17 +59,30 @@
                 <tr>
                     <td></td>
                 </tr>
+
+                {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal)}
+                    <tr style="line-height: 1.5pt;">
+                        <td>
+                            <span>CA TOTAL FINAL : {displayPrice price=$datasEmployeesTotal['caAjuste']}</span>
+                        </td>
+                    </tr>
+                {/if}
+
+
+
+
                 {if isset($coachs) && $filterActif == 0}
-                <tr style="line-height: 1.5pt;">
-                    <td>
-                        <span>Tous les coachs : {displayPrice price=$caCoachsTotal}</span>
-                    </td>
-                </tr>
+                    <tr style="line-height: 1.5pt;">
+                        <td>
+                            <span>Tous les coachs : {displayPrice price=$caCoachsTotal}</span>
+                        </td>
+                    </tr>
                 {/if}
                 {if $coach->lastname}
                     <tr style="line-height: 1.5pt;">
                         <td>
-                            <span>Coach {$coach->lastname|escape:'htmlall':'UTF-8'} : {displayPrice price=$caCoach}</span>
+                            <span>Coach {$coach->lastname|escape:'htmlall':'UTF-8'}
+                                : {displayPrice price=$caCoach}</span>
                         </td>
                     </tr>
                     <tr>
@@ -76,16 +90,18 @@
                     </tr>
                 {/if}
                 {if isset($coachs) && $filterActif == 0}
-                <tr style="line-height: 1.5pt;">
-                    <td>
-                        <span>CA Déduit Total (- {$caDeduitJours|escape:'htmlall':'UTF-8'} j.) : {displayPrice price=$caDeduitTotal}</span>
-                    </td>
-                </tr>
+                    <tr style="line-height: 1.5pt;">
+                        <td>
+                            <span>CA Déduit Total (- {$caDeduitJours|escape:'htmlall':'UTF-8'}
+                                j.) : {displayPrice price=$caDeduitTotal}</span>
+                        </td>
+                    </tr>
                 {/if}
                 {if $coach->lastname}
                     <tr style="line-height: 1.5pt;">
                         <td>
-                            <span>CA Déduit {$coach->lastname|escape:'htmlall':'UTF-8'} (- {$caDeduitJours|escape:'htmlall':'UTF-8'}
+                            <span>CA Déduit {$coach->lastname|escape:'htmlall':'UTF-8'}
+                                (- {$caDeduitJours|escape:'htmlall':'UTF-8'}
                                 j.) : {displayPrice price=$caDeduitCoach}</span>
                         </td>
                     </tr>
@@ -94,16 +110,17 @@
                     </tr>
                 {/if}
                 {if isset($coachs) && $filterActif == 0}
-                <tr style="line-height: 1.5pt;">
-                    <td>
-                        <span>CA FID Total : {displayPrice price=$caFidTotal}</span>
-                    </td>
-                </tr>
+                    <tr style="line-height: 1.5pt;">
+                        <td>
+                            <span>CA FID Total : {displayPrice price=$caFidTotal}</span>
+                        </td>
+                    </tr>
                 {/if}
                 {if $coach->lastname}
                     <tr style="line-height: 1.5pt;">
                         <td>
-                            <span>CA FID {$coach->lastname|escape:'htmlall':'UTF-8'} : {displayPrice price=$caFidCoach}</span>
+                            <span>CA FID {$coach->lastname|escape:'htmlall':'UTF-8'}
+                                : {displayPrice price=$caFidCoach}</span>
                         </td>
                     </tr>
                     <tr>
@@ -111,23 +128,23 @@
                     </tr>
                 {/if}
                 {if isset($coachs) && $filterActif == 0}
-                <tr style="line-height: 1.5pt;">
-                    <td>
-                        <span>CA Prospects Total : {displayPrice price=($caCoachsTotal - $caFidTotal)}</span>
-                    </td>
-                </tr>
+                    <tr style="line-height: 1.5pt;">
+                        <td>
+                            <span>CA Prospects Total : {displayPrice price=($caCoachsTotal - $caFidTotal)}</span>
+                        </td>
+                    </tr>
                 {/if}
                 {if $coach->lastname}
                     <tr style="line-height: 1.5pt;">
                         <td>
                             <span>CA Prospect {$coach->lastname|escape:'htmlall':'UTF-8'}
-                                 : {displayPrice price=($caTotalCoach - $caFidCoach)}</span>
+                                : {displayPrice price=($caTotalCoach - $caFidCoach)}</span>
                         </td>
                     </tr>
                 {/if}
-                    <tr>
-                        <td></td>
-                    </tr>
+                <tr>
+                    <td></td>
+                </tr>
             </table>
         </td>
     </tr>

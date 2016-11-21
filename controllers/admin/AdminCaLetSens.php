@@ -134,45 +134,8 @@ class AdminCaLetSensController extends ModuleAdminController
     private function syntheseCoachsContentGetData()
     {
         $this->smarty->assign(array(
-            'caCoachsTotal' => CaTools::getCaCoachsTotal(0, $this->idFilterCodeAction, $this->getDateBetween()),
-            'caCoach' => CaTools::getCaCoachsTotal(
-                $this->idFilterCoach,
-                $this->idFilterCodeAction,
-                $this->getDateBetween()
-            ),
-            'caFidTotal' => CaTools::getCaDejaInscrit(0, $this->getDateBetween()),
-            'caFidCoach' => CaTools::getCaDejaInscrit($this->idFilterCoach, $this->getDateBetween()),
-            'caDeduitTotal' => CaTools::getCaDeduit(0, $this->getDateCaDeduit()),
-            'caDeduitCoach' => CaTools::getCaDeduit($this->idFilterCoach, $this->getDateCaDeduit()),
-            'caDeduitJours' => (int)Configuration::get('CDMODULECA_ORDERS_STATE_JOURS'),
-            'caTotalNbrCommandes' => CaTools::getNumberCommande(
-                0,
-                $this->idFilterCodeAction,
-                array(460, 443),
-                $this->getDateBetween()
-            ),
-            'caCoachNbrCommandes' => CaTools::getNumberCommande(
-                $this->idFilterCoach,
-                $this->idFilterCodeAction,
-                array(460, 443),
-                $this->getDateBetween()
-            ),
-            'caTotal' => CaTools::getCaCoachsTotal(0, 0, $this->getDateBetween()),
-            'caTotalCoach' => CaTools::getCaCoachsTotal($this->idFilterCoach, 0, $this->getDateBetween()),
-            'caTotalAbo' => CaTools::getNbrGrVentes(
-                0,
-                'ABO',
-                array(444, 462),
-                false,
-                true,
-                $this->getDateBetween(),
-                $this->module->lang
-            ),
             'coach' => new Employee($this->idFilterCoach),
             'filterCodeAction' => $this->getCodeActionByID(),
-            'nbrJourOuvre' => CaTools::getNbOpenDays($this->getDateBetween()),
-            'primeFichierTotal' => CaTools::primeFichier(0, $this->getDateBetween()),
-            'primeFichierCoach' => CaTools::primeFichier($this->idFilterCoach, $this->getDateBetween()),
         ));
     }
 
@@ -191,245 +154,129 @@ class AdminCaLetSensController extends ModuleAdminController
 
         $datasEmployees = array();
         foreach ($employees as $employee) {
+            $id_employe = $employee['id_employee'];
 
             $datasEmployees[$employee['id_employee']]['lastname'] = $employee['lastname'];
+
             $datasEmployees[$employee['id_employee']]['firstname'] = $employee['firstname'];
 
-            $datasEmployees[$employee['id_employee']]['caRembourse'] =
-                CaTools::getCaCoachsRembourse($employee['id_employee'], 0, $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['caRembourse'] = $this->caRembourse($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['caAvoir'] =
-                CaTools::getCaCoachsAvoir($employee['id_employee'], $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['caAvoir'] = $this->caAvoir($id_employe);
 
-            $caTotal = CaTools::getCaCoachsTotal($employee['id_employee'], 99, $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['caTotal'] = $this->caTotal($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['caTotal'] = ($caTotal) ? $caTotal : '';
+            $datasEmployees[$employee['id_employee']]['pourCaRembourse'] = $this->pourCaRembourse($datasEmployees[$id_employe]);
 
-            $pourCaRembourse = ($caTotal != 0) ? round((($datasEmployees[$employee['id_employee']]['caRembourse'] * 100)
-                / $caTotal), 2) : '';
+            $datasEmployees[$employee['id_employee']]['ajustement'] = $this->ajustement($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['pourCaRembourse'] = ($pourCaRembourse)
-                ? $pourCaRembourse . ' %' : '';
+            $datasEmployees[$employee['id_employee']]['caImpaye'] = $this->caImpaye($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['ajustement'] =
-                (CaTools::getAjustement($employee['id_employee'], $this->getDateBetween()) == 0)
-                    ? ''
-                    : CaTools::getAjustement($employee['id_employee'], $this->getDateBetween()) . ' €';
+            $datasEmployees[$employee['id_employee']]['pourCaImpaye'] = $this->pourCaImpaye($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['caImpaye'] =
-                AjoutSomme::getImpaye($employee['id_employee'], $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['caAjuste'] = $this->caAjuste($datasEmployees[$id_employe]);
 
-            $pourCaImpaye = ($caTotal != 0) ? round((($datasEmployees[$employee['id_employee']]['caImpaye'] * 100)
-                    / $caTotal), 2) . ' %' : '';
+            $datasEmployees[$employee['id_employee']]['caRembAvoir'] = $this->caRembAvoir($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['pourCaImpaye'] = $pourCaImpaye;
+            $datasEmployees[$employee['id_employee']]['pourCaRembAvoir'] = $this->pourCaRembAvoir($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['caAjuste'] =
-                ($datasEmployees[$employee['id_employee']]['caTotal'])
-                    ? ($datasEmployees[$employee['id_employee']]['caTotal']
-                        + $datasEmployees[$employee['id_employee']]['ajustement'])
-                    - $datasEmployees[$employee['id_employee']]['caAvoir']
-                    - $datasEmployees[$employee['id_employee']]['caImpaye'] : '';
+            $datasEmployees[$employee['id_employee']]['caDeduit'] = $this->caDeduit($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['caRembAvoir'] =
-                ($datasEmployees[$employee['id_employee']]['caTotal'])
-                    ? $datasEmployees[$employee['id_employee']]['caAvoir'] : '';
+            $datasEmployees[$employee['id_employee']]['caDejaInscrit'] = $this->caDejaInscrit($id_employe);
 
-            $pourCaRembAvoir = ($caTotal != 0) ? round((($datasEmployees[$employee['id_employee']]['caAvoir'] * 100)
-                / $caTotal), 2) : '';
+            $datasEmployees[$employee['id_employee']]['CaProsp'] = $this->CaProsp($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['pourCaRembAvoir'] = ($pourCaRembAvoir)
-                ? $pourCaRembAvoir . ' %' : '';
+            $datasEmployees[$employee['id_employee']]['PourcCaProspect'] = $this->PourcCaProspect($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['caDeduit'] = ($datasEmployees[$employee['id_employee']]['caImpaye']
-                + $datasEmployees[$employee['id_employee']]['caAvoir'])
-                ? $datasEmployees[$employee['id_employee']]['caImpaye']
-                + $datasEmployees[$employee['id_employee']]['caRembAvoir'] : '';
+            $datasEmployees[$employee['id_employee']]['PourcCaFID'] = $this->PourcCaFID($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['caDejaInscrit'] =
-                CaTools::getCaDejaInscrit($employee['id_employee'], $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['caFidTotal'] = $this->caFidTotal($id_employe);
 
-            $caProsp = CaTools::caProsp($datasEmployees[$employee['id_employee']])
-                - $datasEmployees[$employee['id_employee']]['caAvoir'];
+            $datasEmployees[$employee['id_employee']]['NbreVentesTotal'] = $this->NbreVentesTotal($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['CaProsp'] = ($caProsp) ? $caProsp : '';
+            $datasEmployees[$employee['id_employee']]['NbreDeProspects'] = $this->NbreDeProspects($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['PourcCaProspect'] =
-                CaTools::pourcCaProspect($datasEmployees[$employee['id_employee']]);
+            $datasEmployees[$employee['id_employee']]['CaContact'] = $this->CaContact($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['PourcCaFID'] =
-                CaTools::pourcCaFID($datasEmployees[$employee['id_employee']]);
+            $datasEmployees[$employee['id_employee']]['panierMoyen'] = $this->panierMoyen($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['caFidTotal'] =
-                CaTools::getCaDejaInscrit($employee['id_employee'], $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['nbrVenteAbo'] = $this->nbrVenteAbo($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['NbreVentesTotal'] =
-                CaTools::getNumberCommande($employee['id_employee'], null, array(460, 443), $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['nbrVenteProsp'] = $this->nbrVenteProsp($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['NbreDeProspects'] =
-                ProspectAttribueClass::getNbrProspectsAttriByCoach($employee['id_employee'], $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['nbrVenteFid'] = $this->nbrVenteFid($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['CaContact'] =
-                ($datasEmployees[$employee['id_employee']]['NbreDeProspects'])
-                    ? round((($datasEmployees[$employee['id_employee']]['caAjuste']
-                        - $datasEmployees[$employee['id_employee']]['caFidTotal'])
-                    / $datasEmployees[$employee['id_employee']]['NbreDeProspects']), 2) : '';
+            $datasEmployees[$employee['id_employee']]['tauxTransfo'] = $this->tauxTransfo($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['panierMoyen'] =
-                CaTools::getPanierMoyen($datasEmployees[$employee['id_employee']]);
+            $datasEmployees[$employee['id_employee']]['nbrVentePar'] = $this->nbrVentePar($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteAbo'] =
-                CaTools::getNbrVentes($employee['id_employee'], 'ABO', $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['nbrVenteReact'] = $this->nbrVenteReact($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteProsp'] =
-                CaTools::getNbrVentes($employee['id_employee'], 'Prosp', $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['nbrVenteCont'] = $this->nbrVenteCont($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteFid'] =
-                CaTools::getNbrVentes($employee['id_employee'], 'FID', $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['nbrVenteGrAbo'] = $this->nbrVenteGrAbo($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['tauxTransfo'] =
-                ($datasEmployees[$employee['id_employee']]['NbreDeProspects'] != 0)
-                    ? (round(((($datasEmployees[$employee['id_employee']]['NbreVentesTotal']
-                                - $datasEmployees[$employee['id_employee']]['nbrVenteFid']) * 100)
-                        / $datasEmployees[$employee['id_employee']]['NbreDeProspects']), 2)) . ' %' : '';
+            $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] = $this->totalVenteGrAbo($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['nbrVentePar'] =
-                CaTools::getNbrVentes($employee['id_employee'], 'PAR', $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['primeVenteGrAbo'] = $this->primeVenteGrAbo($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteReact'] =
-                CaTools::getNbrVentes($employee['id_employee'], 'REACT+4M', $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['nbrVenteGrDesaAbo'] = $this->nbrVenteGrDesaAbo($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteCont'] =
-                CaTools::getNbrVentes($employee['id_employee'], 'CONT ENTR', $this->getDateBetween());
+            $datasEmployees[$employee['id_employee']]['pourcenDesabo'] = $this->pourcenDesabo($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteGrAbo'] =
-                CaTools::getNbrGrVentes(
-                    $employee['id_employee'],
-                    'ABO',
-                    array(444, 462),
-                    false,
-                    false,
-                    $this->getDateBetween(),
-                    $this->module->lang
-                );
+            $datasEmployees[$employee['id_employee']]['nbrVenteGrFid'] = $this->nbrVenteGrFid($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'] =
-                CaTools::getNbrGrVentes(
-                    $employee['id_employee'],
-                    'ABO',
-                    array(444, 462),
-                    true,
-                    true,
-                    $this->getDateBetween(),
-                    $this->module->lang
-                );
+            $datasEmployees[$employee['id_employee']]['totalVenteGrFid'] = $this->totalVenteGrFid($id_employe);
 
-            $n = $datasEmployees[$employee['id_employee']]['totalVenteGrAbo'];
+            $datasEmployees[$employee['id_employee']]['nbrVenteGrProsp'] = $this->nbrVenteGrProsp($id_employe);
 
-            $primeVenteGrAbo = ($n) ? ($n / 100) * 10 : ''; // Calcul de la prime 10 % sur la vente des abos
-            $datasEmployees[$employee['id_employee']]['primeVenteGrAbo'] = $primeVenteGrAbo;
+            $datasEmployees[$employee['id_employee']]['totalVenteGrProsp'] = $this->totalVenteGrProsp($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteGrDesaAbo'] =
-                CaTools::getNbrGrVentes(
-                    $employee['id_employee'],
-                    'ABO',
-                    array(440, 453),
-                    false,
-                    false,
-                    $this->getDateBetween(),
-                    $this->module->lang
-                );
+            $datasEmployees[$employee['id_employee']]['nbrVenteGrPar'] = $this->nbrVenteGrPar($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['pourcenDesabo'] =
-                ($datasEmployees[$employee['id_employee']]['nbrVenteGrAbo'])
-                    ? round((($datasEmployees[$employee['id_employee']]['nbrVenteGrDesaAbo'] * 100)
-                        / $datasEmployees[$employee['id_employee']]['nbrVenteGrAbo']), 2) . ' %' : '';
+            $datasEmployees[$employee['id_employee']]['primeParrainage'] = $this->primeParrainage($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteGrFid'] =
-                CaTools::getNbrGrVentes(
-                    $employee['id_employee'],
-                    'FID',
-                    null,
-                    false,
-                    false,
-                    $this->getDateBetween(),
-                    $this->module->lang
-                );
+            $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] = $this->totalVenteGrPar($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['totalVenteGrFid'] =
-                CaTools::getNbrGrVentes(
-                    $employee['id_employee'],
-                    'FID',
-                    null,
-                    true,
-                    false,
-                    $this->getDateBetween(),
-                    $this->module->lang
-                );
+            $datasEmployees[$employee['id_employee']]['pourVenteGrPar'] = $this->pourVenteGrPar($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteGrProsp'] =
-                CaTools::getNbrGrVentes(
-                    $employee['id_employee'],
-                    'PROSP',
-                    null,
-                    false,
-                    false,
-                    $this->getDateBetween(),
-                    $this->module->lang
-                );
+            $datasEmployees[$employee['id_employee']]['primeFichierCoach'] = $this->primeFichierCoach($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['totalVenteGrProsp'] =
-                CaTools::getNbrGrVentes(
-                    $employee['id_employee'],
-                    'PROSP',
-                    null,
-                    true,
-                    false,
-                    $this->getDateBetween(),
-                    $this->module->lang
-                );
+            $datasEmployees[$employee['id_employee']]['nbrJourOuvre'] = $this->nbrJourOuvre($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteGrPar'] =
-                CaTools::getNbrGrVentes(
-                    $employee['id_employee'],
-                    'PAR',
-                    null,
-                    false,
-                    false,
-                    $this->getDateBetween(),
-                    $this->module->lang
-                );
+        }
 
-            $datasEmployees[$employee['id_employee']]['primeParrainage'] =
-                $this->primeParrainage($datasEmployees[$employee['id_employee']]['nbrVenteGrPar']);
+        $datasEmployeesTotal = array();
 
-            $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] =
-                CaTools::getParrainage(
-                    $employee['id_employee'],
-                    'PAR',
-                    $this->getDateBetween()
-                );
+        if(count($datasEmployees) > 1) {
+            $datasEmployeesTotal = array(
+                'caAjuste' => 0,
+                'caTotal' => 0,
+                'caFidTotal' => 0,
+                'CaProsp' => 0,
+                'caDeduit' => 0,
+                'primeVenteGrAbo' => 0,
+                'primeFichierCoach' => 0,
+                'primeParrainage' => 0,
+                'ajustement' => 0,
+            );
 
-            $datasEmployees[$employee['id_employee']]['pourVenteGrPar'] =
-                ($datasEmployees[$employee['id_employee']]['totalVenteGrPar'])
-                    ? round(
-                        ($datasEmployees[$employee['id_employee']]['totalVenteGrPar'] * 100) /
-                        $datasEmployees[$employee['id_employee']]['caAjuste'],
-                        2
-                    ) . ' %' : '';
-
-            $datasEmployees[$employee['id_employee']]['primeFichierCoach'] =
-                CaTools::primeFichier($employee['id_employee'], $this->getDateBetween());
-            $nbrjourOuvre = CaTools::getJourOuvreEmploye($employee['id_employee'], $this->getDateBetween());
-
-            $datasEmployees[$employee['id_employee']]['nbrJourOuvre'] = (empty($nbrjourOuvre))
-                ? CaTools::getNbOpenDays($this->getDateBetween())
-                : $nbrjourOuvre;
-
+            foreach ($datasEmployees as $data) {
+                $datasEmployeesTotal['caAjuste'] += $data['caAjuste'];
+                $datasEmployeesTotal['caTotal'] += $data['caTotal'];
+                $datasEmployeesTotal['caFidTotal'] += $data['caFidTotal'];
+                $datasEmployeesTotal['CaProsp'] += $data['CaProsp'];
+                $datasEmployeesTotal['caDeduit'] += $data['caDeduit'];
+                $datasEmployeesTotal['primeVenteGrAbo'] += $data['primeVenteGrAbo'];
+                $datasEmployeesTotal['primeFichierCoach'] += $data['primeFichierCoach'];
+                $datasEmployeesTotal['primeParrainage'] += $data['primeParrainage'];
+                $datasEmployeesTotal['ajustement'] += $data['ajustement'];
+            }
         }
 
         $this->smarty->assign(array(
             'datasEmployees' => $datasEmployees,
+            'datasEmployeesTotal' => $datasEmployeesTotal,
             'dateRequete' => $this->getDateBetween()
         ));
     }
@@ -1036,14 +883,372 @@ class AdminCaLetSensController extends ModuleAdminController
         return utf8_decode($name);
     }
 
-    private function primeParrainage($nbrVenteGrPar)
+    private function caRembourse($id_employee)
     {
-        if (!empty($nbrVenteGrPar)) {
+        $r = CaTools::getCaCoachsRembourse($id_employee, 0, $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function caAvoir($id_employee)
+    {
+        $r = CaTools::getCaCoachsAvoir($id_employee, $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function caTotal($id_employee)
+    {
+        $r = CaTools::getCaCoachsTotal($id_employee, 99, $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function pourCaRembourse($caRembourse)
+    {
+        $r = ($caRembourse['caTotal'] != 0) ? round((($caRembourse['caRembourse'] * 100)
+                / $caRembourse['caTotal']), 2) . ' %' : '';
+        return ($r) ? $r : '';
+    }
+
+    private function ajustement($id_employee)
+    {
+        $r = CaTools::getAjustement($id_employee, $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function caImpaye($id_employee)
+    {
+        $r = AjoutSomme::getImpaye($id_employee, $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function pourCaImpaye($id_employee)
+    {
+        $r = ($id_employee['caTotal'] != 0) ? round((($id_employee['caImpaye'] * 100)
+            / $id_employee['caTotal']), 2) : '';
+
+        return ($r) ? $r . ' %' : '';
+    }
+
+    private function caAjuste($id_employee)
+    {
+        $r = ($id_employee['caTotal'] > 0)
+            ? ($id_employee['caTotal']
+                + $id_employee['ajustement'])
+            - $id_employee['caAvoir']
+            - $id_employee['caImpaye'] : '';
+
+        return ($r) ? $r : '';
+    }
+
+    private function caRembAvoir($id_employee)
+    {
+        $r = ($id_employee['caTotal']) ? $id_employee['caAvoir'] : '';
+        return ($r) ? $r : '';
+    }
+
+    private function pourCaRembAvoir($id_employee)
+    {
+        $r = ($id_employee['caTotal'] != 0) ? round((($id_employee['caAvoir'] * 100)
+            / $id_employee['caTotal']), 2) : '';
+
+        return ($r) ? $r . ' %' : '';
+    }
+
+    private function caDeduit($id_employee)
+    {
+        $r = ($id_employee['caImpaye']
+            + $id_employee['caAvoir'] > 0)
+            ? $id_employee['caImpaye']
+            + $id_employee['caRembAvoir'] : '';
+
+        return ($r) ? $r : '';
+    }
+
+    private function caDejaInscrit($id_employee)
+    {
+        $r = CaTools::getCaDejaInscrit($id_employee, $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function CaProsp($id_employee)
+    {
+        $r = CaTools::caProsp($id_employee) - $id_employee['caAvoir'];
+        return ($r) ? $r : '';
+    }
+
+    private function PourcCaProspect($id_employee)
+    {
+        $r = CaTools::pourcCaProspect($id_employee);
+        return ($r) ? $r : '';
+    }
+
+    private function PourcCaFID($id_employee)
+    {
+        $r = CaTools::pourcCaFID($id_employee);
+        return ($r) ? $r : '';
+    }
+
+    private function caFidTotal($id_employe)
+    {
+        $r = CaTools::getCaDejaInscrit($id_employe, $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function NbreVentesTotal($id_employe)
+    {
+        $r = CaTools::getNumberCommande($id_employe, null, array(460, 443), $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function NbreDeProspects($id_employe)
+    {
+        $r = ProspectAttribueClass::getNbrProspectsAttriByCoach($id_employe, $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function CaContact($id_employe)
+    {
+        $r = ($id_employe['NbreDeProspects'])
+            ? round((($id_employe['caAjuste'] - $id_employe['caFidTotal'])
+                / $id_employe['NbreDeProspects']), 2)
+            : '';
+
+        return ($r) ? $r : '';
+    }
+
+    private function panierMoyen($id_employe)
+    {
+        $r = CaTools::getPanierMoyen($id_employe);
+        return ($r) ? $r : '';
+    }
+
+    private function nbrVenteAbo($id_employe)
+    {
+        $r = CaTools::getNbrVentes($id_employe, 'ABO', $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function nbrVenteProsp($id_employe)
+    {
+        $r = CaTools::getNbrVentes($id_employe, 'Prosp', $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function nbrVenteFid($id_employe)
+    {
+        $r = CaTools::getNbrVentes($id_employe, 'FID', $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function tauxTransfo($id_employe)
+    {
+        $r = ($id_employe['NbreDeProspects'] != 0)
+            ? (round(((($id_employe['NbreVentesTotal'] - $id_employe['nbrVenteFid']) * 100)
+                / $id_employe['NbreDeProspects']), 2))
+            : '';
+
+        return ($r) ? $r . ' %' : '';
+    }
+
+    private function nbrVentePar($id_employe)
+    {
+        $r = CaTools::getNbrVentes($id_employe, 'PAR', $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function nbrVenteReact($id_employe)
+    {
+        $r = CaTools::getNbrVentes($id_employe, 'REACT+4M', $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function nbrVenteCont($id_employe)
+    {
+        $r = CaTools::getNbrVentes($id_employe, 'CONT ENTR', $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function nbrVenteGrAbo($id_employe)
+    {
+        $r = CaTools::getNbrGrVentes(
+            $id_employe,
+            'ABO',
+            array(444, 462),
+            false,
+            false,
+            $this->getDateBetween(),
+            $this->module->lang
+        );
+
+        return ($r) ? $r : '';
+    }
+
+    private function totalVenteGrAbo($id_employe)
+    {
+        $r = CaTools::getNbrGrVentes(
+            $id_employe,
+            'ABO',
+            array(444, 462),
+            true,
+            true,
+            $this->getDateBetween(),
+            $this->module->lang
+        );
+
+        return ($r) ? $r : '';
+    }
+
+    private function primeVenteGrAbo($id_employe)
+    {
+        $n = $id_employe['totalVenteGrAbo'];
+        $prime = ($n) ? ($n / 100) * 10 : ''; // Calcul de la prime 10 % sur la vente des abos
+
+        return ($prime) ? $prime : '';
+    }
+
+    private function nbrVenteGrDesaAbo($id_employe)
+    {
+        $r = CaTools::getNbrGrVentes(
+            $id_employe,
+            'ABO',
+            array(440, 453),
+            false,
+            false,
+            $this->getDateBetween(),
+            $this->module->lang
+        );
+
+        return ($r) ? $r : '';
+    }
+
+    private function pourcenDesabo($id_employe)
+    {
+        $r = ($id_employe['nbrVenteGrAbo'])
+            ? round((($id_employe['nbrVenteGrDesaAbo'] * 100) / $id_employe['nbrVenteGrAbo']), 2)
+            : '';
+
+        return ($r) ? $r . ' %' : '';
+    }
+
+    private function nbrVenteGrFid($id_employe)
+    {
+        $r = CaTools::getNbrGrVentes(
+            $id_employe,
+            'FID',
+            null,
+            false,
+            false,
+            $this->getDateBetween(),
+            $this->module->lang
+        );
+
+        return ($r) ? $r : '';
+    }
+
+    private function totalVenteGrFid($id_employe)
+    {
+        $r = CaTools::getNbrGrVentes(
+            $id_employe,
+            'FID',
+            null,
+            true,
+            false,
+            $this->getDateBetween(),
+            $this->module->lang
+        );
+
+        return ($r) ? $r : '';
+    }
+
+    private function nbrVenteGrProsp($id_employe)
+    {
+        $r = CaTools::getNbrGrVentes(
+            $id_employe,
+            'PROSP',
+            null,
+            false,
+            false,
+            $this->getDateBetween(),
+            $this->module->lang
+        );
+
+        return ($r) ? $r : '';
+    }
+
+    private function totalVenteGrProsp($id_employe)
+    {
+        $r = CaTools::getNbrGrVentes(
+            $id_employe,
+            'PROSP',
+            null,
+            true,
+            false,
+            $this->getDateBetween(),
+            $this->module->lang
+        );
+
+        return ($r) ? $r : '';
+    }
+
+    private function nbrVenteGrPar($id_employe)
+    {
+        $r = CaTools::getNbrGrVentes(
+            $id_employe,
+            'PAR',
+            null,
+            false,
+            false,
+            $this->getDateBetween(),
+            $this->module->lang
+        );
+
+        return ($r) ? $r : '';
+    }
+
+    private function primeParrainage($id_employe)
+    {
+        if (!empty($id_employe['nbrVenteGrPar'])) {
             $prime = Configuration::get('CDMODULECA_PRIME_PARRAINAGE');
-            return $prime * $nbrVenteGrPar;
+            return $prime * $id_employe['nbrVenteGrPar'];
         }
         return '';
     }
+
+    private function totalVenteGrPar($id_employe)
+    {
+        $r = CaTools::getParrainage(
+            $id_employe,
+            'PAR',
+            $this->getDateBetween()
+        );
+
+        return ($r) ? $r : '';
+    }
+
+    private function pourVenteGrPar($id_employe)
+    {
+        $r = ($id_employe['totalVenteGrPar'])
+            ? round(($id_employe['totalVenteGrPar'] * 100) / $id_employe['caAjuste'], 2)
+            : '';
+
+        return ($r) ? $r . ' %' : '';
+    }
+
+    private function primeFichierCoach($id_employe)
+    {
+        $r = CaTools::primeFichier($id_employe, $this->getDateBetween());
+        return ($r) ? $r : '';
+    }
+
+    private function nbrJourOuvre($id_employe)
+    {
+        $nbrjourOuvre = CaTools::getJourOuvreEmploye($id_employe, $this->getDateBetween());
+        $r = (empty($nbrjourOuvre))
+            ? CaTools::getNbOpenDays($this->getDateBetween())
+            : $nbrjourOuvre;
+
+        return ($r) ? $r : '';
+    }
+
 }
 
 class MYPDF extends TCPDF

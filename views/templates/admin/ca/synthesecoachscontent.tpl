@@ -27,50 +27,55 @@
 <div class="row synthesecontent">
     <div class="col-xs-3">
         {* Tous les coachs *}
-        {if isset($coachs) && $filterActif == 0}
+        {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal)}
             <div class="row group">
                 <div class="col-xs-12">CA TOTAL FINAL
-                    <span class="pull-right"></span>
+                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caAjuste']}</span>
                 </div>
             </div>
             <div class="row group">
                 <div class="col-xs-12">CA Code Action Tous les codes
-                    <span class="pull-right"></span>
+                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caTotal']}</span>
                 </div>
             </div>
             <div class="row group">
                 <div class="col-xs-12">CA Fidélisation (FID)
-                    <span class="pull-right"></span>
+                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caFidTotal']}</span>
                 </div>
             </div>
             <div class="row group">
                 <div class="col-xs-12">CA Prospection
-                    <span class="pull-right"></span>
+                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['CaProsp']}</span>
                 </div>
             </div>
             <div class="row group">
                 <div class="col-xs-12">CA Déduit Total (Retours + Impayés)
-                    <span class="pull-right"></span>
+                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caDeduit']}</span>
                 </div>
             </div>
-            <div class="row group">
-                <div class="col-xs-12">Prime CA
-                    <span class="pull-right"></span>
-                </div>
-            </div>
+            {*<div class="row group">*}
+                {*<div class="col-xs-12">Prime CA*}
+                    {*<span class="pull-right"></span>*}
+                {*</div>*}
+            {*</div>*}
             <div class="row group">
                 <div class="col-xs-12">Prime Abonnement
-                    <span class="pull-right"></span>
+                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['primeVenteGrAbo']}</span>
                 </div>
             </div>
             <div class="row group">
                 <div class="col-xs-12">Prime Fichier
-                    <span class="pull-right"></span>
+                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['primeFichierCoach']}</span>
                 </div>
             </div>
             <div class="row group">
                 <div class="col-xs-12">Prime Parrainage
-                    <span class="pull-right"></span>
+                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['primeParrainage']}</span>
+                </div>
+            </div>
+            <div class="row group">
+                <div class="col-xs-12">Ajustement
+                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['ajustement']}</span>
                 </div>
             </div>
         {/if}
@@ -102,11 +107,11 @@
                         <span class="pull-right">{displayPrice price=$employe['caDeduit']}</span>
                     </div>
                 </div>
-                <div class="row group">
-                    <div class="col-xs-12">Prime CA
-                        <span class="pull-right"></span>
-                    </div>
-                </div>
+                {*<div class="row group">*}
+                    {*<div class="col-xs-12">Prime CA*}
+                        {*<span class="pull-right"></span>*}
+                    {*</div>*}
+                {*</div>*}
                 <div class="row group">
                     <div class="col-xs-12">Prime Abonnement
                         <span class="pull-right">{displayPrice price=$employe['primeVenteGrAbo']}</span>
@@ -124,7 +129,7 @@
                 </div>
                 <div class="row group">
                     <div class="col-xs-12">Ajustement
-                        <span class="pull-right">{$employe['ajustement']}</span>
+                        <span class="pull-right">{displayPrice price=$employe['ajustement']}</span>
                     </div>
                 </div>
                 <div class="row group">
