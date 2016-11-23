@@ -803,12 +803,15 @@ class CaTools
      * @param $dateBetween
      * @return mixed
      */
-    public static function getCaCoachsAvoir($idCoach, $dateBetween)
+    public static function getCaCoachsAvoir($idCoach = 0, $dateBetween)
     {
+        $filterCoach = ($idCoach != 0)
+            ? ' AND `id_employee` = ' . (int)$idCoach : '';
+
         $sql = 'SELECT SUM(`amount` + `shipping_cost_amount`) FROM `' . _DB_PREFIX_ . 'order_slip` AS os
                 LEFT JOIN `' . _DB_PREFIX_ . 'orders` AS o ON o.`id_order` = os.`id_order` 
-                WHERE os.date_add BETWEEN ' . $dateBetween . '
-                AND o.`id_employee` = ' . (int)$idCoach;
+                WHERE os.date_add BETWEEN ' . $dateBetween;
+        $sql .= $filterCoach;
 
         $req = Db::getInstance()->getValue($sql);
 
