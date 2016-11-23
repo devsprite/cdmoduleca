@@ -98,13 +98,7 @@ class CdModuleCA extends ModuleGrid
                 'id' => 'id',
                 'header' => $this->l('Commande'),
                 'dataIndex' => 'id',
-                'align' => 'center'
-            ),
-            array(
-                'id' => 'valid',
-                'header' => $this->l('Valide'),
-                'dataIndex' => 'valid',
-                'align' => 'center'
+                'align' => 'center',
             ),
             array(
                 'id' => 'id_customer',
@@ -113,9 +107,21 @@ class CdModuleCA extends ModuleGrid
                 'align' => 'left'
             ),
             array(
+                'id' => 'impaye',
+                'header' => $this->l('Impayé'),
+                'dataIndex' => 'impaye',
+                'align' => 'right',
+            ),
+            array(
                 'id' => 'avoir',
                 'header' => $this->l('Avoir'),
                 'dataIndex' => 'avoir',
+                'align' => 'right',
+            ),
+            array(
+                'id' => 'ajustement',
+                'header' => $this->l('Ajustement'),
+                'dataIndex' => 'ajustement',
                 'align' => 'right',
             ),
             array(
@@ -131,10 +137,10 @@ class CdModuleCA extends ModuleGrid
                 'align' => 'center'
             ),
             array(
-                'id' => 'groupe',
-                'header' => $this->l('Groupe'),
-                'dataIndex' => 'groupe',
-                'align' => 'center'
+                'id' => 'commentaire',
+                'header' => $this->l('Commentaire'),
+                'dataIndex' => 'commentaire',
+                'align' => 'left'
             ),
             array(
                 'id' => 'current_state',
@@ -1170,7 +1176,7 @@ class CdModuleCA extends ModuleGrid
         if ($this->idFilterCodeAction == 99) {
             $filterCodeAction = ' AND o.`id_code_action` != ' . (int)CaTools::getCodeActionByName('ABO');
             // Affiche les commandes avec le groupe du coach uniquement si il n'y a pas d filtre code action
-            $filterCoach = ($this->idFilterCoach != 0) ? ' AND o.`id_employee` = ' . (int)$this->idFilterCoach .' ':'';
+            $filterCoach = ($this->idFilterCoach != 0) ? ' AND o.`id_employee` = ' . (int)$this->idFilterCoach . ' ' : '';
         } elseif ($this->idFilterCodeAction != 0) {
             $filterCodeAction = ' AND o.`id_code_action` = ' . (int)$this->idFilterCodeAction;
         }
@@ -1182,16 +1188,19 @@ class CdModuleCA extends ModuleGrid
             $filterValid = ' AND o.`valid` = "1" ';
         }
 
-        $this->query = '
+        $this->query = '(
           SELECT SQL_CALC_FOUND_ROWS
           DISTINCT o.`id_order` AS id,
-          IF ((`amount` + `shipping_cost_amount`),CONCAT(`amount` + `shipping_cost_amount`, " €"), "" ) as avoir,
+          "" AS avoir,
+          "" AS impaye,
+          "" AS ajustement,
+          "" AS commentaire,
           gl.`name` AS groupe,
           CONCAT ( ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2), " €") AS hthp,
           (SELECT e.`lastname` FROM `' . _DB_PREFIX_ . 'employee` AS e WHERE o.`id_employee` = e.`id_employee`) AS id_employee,
           (SELECT UCASE(c.`lastname`) FROM `' . _DB_PREFIX_ . 'customer` AS c 
           WHERE o.`id_customer` = c.`id_customer`) AS id_customer,
-          o.`date_add`,
+          o.`date_add` AS date_add,
           o.`date_upd`,
           IF((o.`valid`) > 0, "", "Non") AS valid,
           (SELECT ca.`name` FROM `' . _DB_PREFIX_ . 'code_action` AS ca 
@@ -1202,12 +1211,79 @@ class CdModuleCA extends ModuleGrid
           AND so.`id_order` < o.`id_order` LIMIT 1) > 0, "", "Oui") as new
 				FROM `' . _DB_PREFIX_ . 'orders` AS o ';
         $this->query .= $filterGroupe;
-        $this->query .= ' LEFT JOIN `' . _DB_PREFIX_ . 'order_slip` AS os ON o.`id_order` = os.`id_order` ';
         $this->query .= ' WHERE o.`date_add` BETWEEN ' . $this->getDate();
         $this->query .= $filterCoach;
         $this->query .= $filterCodeAction;
+        $this->query .= ' AND o.`current_state` != 460';
         $this->query .= $filterValid;
         $this->query .= ' GROUP BY o.`id_order` ';
+        $this->query .= ') UNION ( 
+        SELECT os.`id_order` AS id,
+        IF((os.`amount` + os.`shipping_cost_amount`) != 0, CONCAT(os.`amount` + os.`shipping_cost_amount`," €"), "") AS avoir,
+        "",
+        "",
+        "",
+        "",
+        "",
+        (SELECT e.`lastname` FROM `' . _DB_PREFIX_ . 'employee` AS e WHERE o.`id_employee` = e.`id_employee`) AS id_employee,
+          (SELECT UCASE(c.`lastname`) FROM `' . _DB_PREFIX_ . 'customer` AS c 
+          WHERE o.`id_customer` = c.`id_customer`) AS id_customer,
+        os.`date_add` AS date_add,
+        "" ,
+        "",
+        "",
+        (SELECT osl.`name` FROM `' . _DB_PREFIX_ . 'order_state_lang` AS osl 
+          WHERE `id_lang` = "' . $this->lang . '" AND osl.`id_order_state` = o.`current_state` ) as current_state ,
+        ""
+        FROM `' . _DB_PREFIX_ . 'order_slip` AS os
+        LEFT JOIN `' . _DB_PREFIX_ . 'orders` AS o ON os.`id_order` = o.`id_order` ';
+        $this->query .= $filterGroupe;
+        $this->query .= ' WHERE os.`date_add` BETWEEN ' . $this->getDate();
+        $this->query .= $filterCoach;
+        $this->query .= $filterCodeAction;
+        $this->query .= ' GROUP BY o.`id_order` ';
+        $this->query .= ') UNION (';
+        $this->query .= 'SELECT 
+        `id_order`,
+        "",
+        IF((`somme` != 0), CONCAT(`somme`," €"), "") AS somme,
+        "",
+        a.`commentaire`,
+        "",
+        "",
+        e.`lastname`,
+        "",
+        a.`date_ajout_somme`,
+        "","","","","" ';
+        $this->query .= ' FROM `' . _DB_PREFIX_ . 'ajout_somme` AS a 
+        LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.`id_employee` = e.`id_employee`
+        WHERE `impaye` = 1
+        AND `date_ajout_somme` BETWEEN ' . $this->getDate();
+        $this->query .= ($this->idFilterCoach != 0)
+            ? ' AND a.`id_employee` = '. $this->idFilterCoach
+            :'';
+        $this->query .= ') UNION (';
+        $this->query .= 'SELECT 
+        `id_order`,
+        "",
+        "",
+        IF((`somme` != 0), CONCAT(`somme`," €"), "") AS somme,
+        a.`commentaire`,
+        "",
+        "",
+        e.`lastname`,
+        "",
+        a.`date_ajout_somme`,
+        "","","","","" ';
+        $this->query .= ' FROM `' . _DB_PREFIX_ . 'ajout_somme` AS a 
+        LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.`id_employee` = e.`id_employee`
+        WHERE `impaye` IS NULL
+        AND `date_ajout_somme` BETWEEN ' . $this->getDate();
+        $this->query .= ($this->idFilterCoach != 0)
+            ? ' AND a.`id_employee` = '. $this->idFilterCoach
+            :'';
+        $this->query .=' ORDER BY `date_ajout_somme` ASC';
+        $this->query .= ')';
 
 
         if (Validate::IsName($this->_sort)) {
@@ -1225,7 +1301,6 @@ class CdModuleCA extends ModuleGrid
 
         $values = Db::getInstance()->executeS($this->query);
 
-//        ddd($this->query);
         $this->_values = $values;
         $this->_totalCount = Db::getInstance()->getValue('SELECT FOUND_ROWS()');
     }

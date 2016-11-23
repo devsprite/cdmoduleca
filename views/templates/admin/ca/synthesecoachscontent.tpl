@@ -133,7 +133,7 @@
                     </div>
                 </div>
                 <div class="row group">
-                    <div class="col-xs-12">Nbre  de jours ouvré
+                    <div class="col-xs-12">Nbre de jours ouvrés
                         <span class="pull-right">{$employe['nbrJourOuvre']}</span>
                     </div>
                 </div>

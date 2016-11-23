@@ -132,17 +132,19 @@ class CaTools
             ? ' AND `id_employee` = ' . (int)$idFilterCoach : '';
 
         $sql = 'SELECT ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2) AS total,
-                IF((SELECT so.`id_order` FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.`id_customer` = o.`id_customer` 
+                IF((SELECT so.`id_order` FROM `' . _DB_PREFIX_ . 'orders` so 
+                WHERE so.`id_customer` = o.`id_customer` 
                 AND so.`id_order` < o.`id_order` LIMIT 1) > 0, 1, 0) as notNew
 				FROM `' . _DB_PREFIX_ . 'orders` AS o
 				WHERE `valid` = 1';
         $sql .= $filterCoach;
         $sql .= ' AND `date_add` BETWEEN ' . $dateBetween;
+
         $caFID = Db::getInstance()->executeS($sql);
 
         $total = '';
         foreach ($caFID as $ca) {
-            $total += ($ca['notNew']) ? $ca['total'] : 0;
+            $total += ($ca['notNew'] == 1) ? $ca['total'] : 0;
         }
 
         return $total;
@@ -324,7 +326,7 @@ class CaTools
                 $ca = CaTools::getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
                 $objectifCoachs[$objectifCoach]['ajustement'] = $ajustement = CaTools::getAjustement($objectif['id_employee'], $dateBetween);
                 $objectifCoachs[$objectifCoach]['impaye'] = $impaye = AjoutSomme::getImpaye($objectif['id_employee'], $dateBetween);
-                $objectifCoachs[$objectifCoach]['avoir'] = $avoir = CaTools::getCaCoachsRembourse($objectif['id_employee'], 0, $dateBetween);
+                $objectifCoachs[$objectifCoach]['avoir'] = $avoir = CaTools::getCaCoachsAvoir($objectif['id_employee'], $dateBetween);
 
                 $caCoach = $ca + $ajustement - $impaye - $avoir;
 
@@ -353,7 +355,7 @@ class CaTools
      */
     public static function caProsp($data)
     {
-        return ($data['caTotal']) ? $data['caTotal'] - $data['caDejaInscrit'] : '';
+        return ($data['caTotal'] > 0) ? $data['caTotal'] - $data['caDejaInscrit'] : '';
     }
 
     /**
@@ -803,7 +805,7 @@ class CaTools
      */
     public static function getCaCoachsAvoir($idCoach, $dateBetween)
     {
-        $sql = 'SELECT SUM(amount) FROM `' . _DB_PREFIX_ . 'order_slip` AS os
+        $sql = 'SELECT SUM(`amount` + `shipping_cost_amount`) FROM `' . _DB_PREFIX_ . 'order_slip` AS os
                 LEFT JOIN `' . _DB_PREFIX_ . 'orders` AS o ON o.`id_order` = os.`id_order` 
                 WHERE os.date_add BETWEEN ' . $dateBetween . '
                 AND o.`id_employee` = ' . (int)$idCoach;

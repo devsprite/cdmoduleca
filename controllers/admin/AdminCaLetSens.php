@@ -160,15 +160,15 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['firstname'] = $employee['firstname'];
 
-//            $datasEmployees[$employee['id_employee']]['caAvoir'] = $this->caAvoir($id_employe);
+            $datasEmployees[$employee['id_employee']]['caAvoir'] = $this->caAvoir($id_employe);
 
             $datasEmployees[$employee['id_employee']]['caTotal'] = $this->caTotal($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['caRembourse'] = $this->caRembourse($id_employe);
+//            $datasEmployees[$employee['id_employee']]['caRembourse'] = $this->caRembourse($id_employe);
 
             $datasEmployees[$employee['id_employee']]['pourCaAvoir'] = $this->pourCaAvoir($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['pourCaRembourse'] = $this->pourCaRembourse($datasEmployees[$id_employe]);
+//            $datasEmployees[$employee['id_employee']]['pourCaRembourse'] = $this->pourCaRembourse($datasEmployees[$id_employe]);
 
             $datasEmployees[$employee['id_employee']]['ajustement'] = $this->ajustement($id_employe);
 
@@ -898,7 +898,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
     private function pourCaAvoir($caRembourse)
     {
-        $r = ($caRembourse['caTotal'] != 0) ? round((($caRembourse['caRembourse'] * 100)
+        $r = ($caRembourse['caTotal'] != 0) ? round((($caRembourse['caAvoir'] * 100)
                 / $caRembourse['caTotal']), 2) . ' %' : '';
         return ($r != 0) ? $r : '';
     }
@@ -945,9 +945,8 @@ class AdminCaLetSensController extends ModuleAdminController
     private function caAjuste($id_employee)
     {
         $r = ($id_employee['caTotal'] > 0)
-            ? ($id_employee['caTotal']
-                + $id_employee['ajustement'])
-            - $id_employee['caRembourse']
+            ? ($id_employee['caTotal'])
+            - $id_employee['caAvoir']
             - $id_employee['caImpaye'] : '';
 
         return ($r != 0) ? $r : '';
@@ -955,13 +954,13 @@ class AdminCaLetSensController extends ModuleAdminController
 
     private function caRembAvoir($id_employee)
     {
-        $r = ($id_employee['caTotal']) ? $id_employee['caRembourse'] : '';
+        $r = ($id_employee['caTotal']) ? $id_employee['caAvoir'] : '';
         return ($r != 0) ? $r : '';
     }
 
     private function pourCaRembAvoir($id_employee)
     {
-        $r = ($id_employee['caTotal'] != 0) ? round((($id_employee['caRembourse'] * 100)
+        $r = ($id_employee['caTotal'] != 0) ? round((($id_employee['caAvoir'] * 100)
             / $id_employee['caTotal']), 2) : '';
 
         return ($r != 0) ? $r . ' %' : '';
@@ -970,9 +969,9 @@ class AdminCaLetSensController extends ModuleAdminController
     private function caDeduit($id_employee)
     {
         $r = ($id_employee['caImpaye']
-            + $id_employee['caRembourse'] > 0)
+            + $id_employee['caAvoir'] > 0)
             ? $id_employee['caImpaye']
-            + $id_employee['caRembAvoir'] : '';
+            + $id_employee['caAvoir'] : '';
 
         return ($r != 0) ? $r : '';
     }
@@ -985,7 +984,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
     private function CaProsp($id_employee)
     {
-        $r = CaTools::caProsp($id_employee) - $id_employee['caRembourse'];
+        $r = CaTools::caProsp($id_employee);
         return ($r != 0) ? $r : '';
     }
 

@@ -59,8 +59,8 @@
         <td class="text-right">{displayPrice price=$coach['caDejaInscrit']}</td>
         <td class="text-right">{$coach['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-right">{displayPrice price=$coach['panierMoyen']}</td>
-        <td class="text-right">{displayPrice price=$coach['caRembourse']}
-        <td class="text-right">{$coach['pourCaRembourse']|escape:'htmlall':'UTF-8'}</td>
+        <td class="text-right">{displayPrice price=$coach['caAvoir']}
+        <td class="text-right">{$coach['pourCaAvoir']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-right">{displayPrice price=$coach['caImpaye']}</td>
         <td class="text-right">{$coach['pourCaImpaye']}</td>
     </tr>
