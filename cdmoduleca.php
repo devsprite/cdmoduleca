@@ -202,6 +202,7 @@ class CdModuleCA extends ModuleGrid
             !$this->eraseTabsStatsCA() ||
             !$this->eraseTabsProspects() ||
             !$this->eraseTabsAppel() ||
+            !$this->eraseTabsHistorique() ||
             !$this->eraseTableProspectAttribue() ||
             !$this->eraseTableProspect() ||
             !$this->eraseTableAppel() ||
@@ -239,6 +240,36 @@ class CdModuleCA extends ModuleGrid
     }
 
     private function eraseTabsAppel()
+    {
+        $id_tab = (int)Tab::getIdFromClassName('AdminAppel');
+        if ($id_tab) {
+            $tab = new Tab($id_tab);
+            $tab->delete();
+        }
+        return true;
+    }
+
+    /**
+     * historique du module CA
+     * @return bool
+     */
+    public function createTabsHistorique()
+    {
+        $tab = new Tab();
+        $tab->active = 1;
+        $names = array(1 => 'Historique CA', 'Historique CA');
+        foreach (Language::getLanguages() as $language) {
+            $tab->name[$language['id_lang']] = isset($names[$language['id_lang']])
+                ? $names[$language['id_lang']] : $names[1];
+        }
+        $tab->class_name = 'AdminHistorique';
+        $tab->module = $this->name;
+        $tab->id_parent = Tab::getIdFromClassName('AdminParentStats');
+
+        return (bool)$tab->add();
+    }
+
+    private function eraseTabsHistorique()
     {
         $id_tab = (int)Tab::getIdFromClassName('AdminAppel');
         if ($id_tab) {

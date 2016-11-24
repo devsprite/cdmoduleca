@@ -33,7 +33,8 @@ function upgrade_module_1_0_1($object, $install = false)
     if (!createTableHistostatsmain($object) or
         !createTableHistostatstable($object) or
         !createTableHistoajoutsomme($object) or
-        !createTableHistoobjectifcoach($object)
+        !createTableHistoobjectifcoach($object) or
+        !$object->createTabsHistorique()
     ) {
         return false;
     }

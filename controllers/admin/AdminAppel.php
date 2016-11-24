@@ -36,10 +36,6 @@ class AdminAppelController extends ModuleAdminController
 {
     public function __construct()
     {
-        if (!defined('_PS_VERSION_')) {
-            exit;
-        }
-
         $this->module = 'cdmoduleca';
         $this->className = 'AppelClass';
         $this->table = 'appel';
