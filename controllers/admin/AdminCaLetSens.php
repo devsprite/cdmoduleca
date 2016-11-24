@@ -29,6 +29,10 @@ if (!defined('_PS_VERSION_')) {
 require_once(dirname(__FILE__) . '/../../classes/GridClass.php');
 require_once(dirname(__FILE__) . '/../../classes/AjoutSommeClass.php');
 require_once(dirname(__FILE__) . '/../../classes/CaTools.php');
+require_once(dirname(__FILE__) . '/../../classes/HistoAjoutSommeClass.php');
+require_once(dirname(__FILE__) . '/../../classes/HistoObjectifCoachClass.php');
+require_once(dirname(__FILE__) . '/../../classes/HistoStatsMainClass.php');
+require_once(dirname(__FILE__) . '/../../classes/HistoStatsTableClass.php');
 require_once(dirname(__FILE__) . '/../../classes/ProspectAttribueClass.php');
 require_once(dirname(__FILE__) . '/../../../../tools/tcpdf/tcpdf.php');
 
@@ -102,12 +106,17 @@ class AdminCaLetSensController extends ModuleAdminController
 
 
         $nameFile = $this->nameFile();
-        if (Tools::getValue('export_csv')) {
+        if (Tools::isSubmit('export_csv')) {
             $g->csvExport($engine_params, $nameFile);
         }
-        if (Tools::getValue('export_pdf')) {
+        if (Tools::isSubmit('export_pdf')) {
             $this->generatePDF($nameFile);
         }
+
+        if (Tools::isSubmit('histo')) {
+            $this->historique();
+        }
+
 
         $this->content = $this->html;
 
@@ -250,7 +259,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
         $datasEmployeesTotal = array();
 
-        if(count($datasEmployees) > 1) {
+        if (count($datasEmployees) > 1) {
             $datasEmployeesTotal = array(
                 'caAjuste' => 0,
                 'caTotal' => 0,
@@ -1262,7 +1271,128 @@ class AdminCaLetSensController extends ModuleAdminController
         return ($r != 0) ? $r : '';
     }
 
+    private function historique()
+    {
+        $histoMain = $this->insertHistoMain();
+        $this->insertHistoAjoutSomme($histoMain->id);
+        $this->insertHistoObjectifCoach($histoMain->id);
+        $this->insertHistoStatsTable($histoMain->id);
+
+    }
+
+    private function convertFloat($number)
+    {
+        return str_replace(',', '.', $number);
+    }
+
+    private function insertHistoMain()
+    {
+        $histoMain = new HistoStatsMainClass();
+        if (isset($this->smarty->tpl_vars['datasEmployeesTotal']->value['caAjuste'])) {
+            $data = $this->smarty->tpl_vars['datasEmployeesTotal'];
+            $histoMain->filterCoach = 'Tous les coachs';
+            $histoMain->datepickerFrom = substr($this->getDateBetween(), 2, 10);
+            $histoMain->datepickerTo = substr($this->getDateBetween(), 28, 10);
+            $histoMain->caAjuste = $this->convertFloat($data->value['caAjuste']);
+            $histoMain->caTotal = $this->convertFloat($data->value['caTotal']);
+            $histoMain->caFidTotal = $this->convertFloat($data->value['caFidTotal']);
+            $histoMain->CaProsp = $this->convertFloat($data->value['CaProsp']);
+            $histoMain->caDeduit = $this->convertFloat($data->value['caDeduit']);
+            $histoMain->primeVenteGrAbo = $this->convertFloat($data->value['primeVenteGrAbo']);
+            $histoMain->primeFichierCoach = $this->convertFloat($data->value['primeFichierCoach']);
+            $histoMain->primeParrainage = $this->convertFloat($data->value['primeParrainage']);
+            $histoMain->ajustement = $this->convertFloat($data->value['ajustement']);
+        } else {
+            foreach ($this->smarty->tpl_vars['datasEmployees']->value as $data) {
+                $histoMain->filterCoach = $data['lastname'];
+                $histoMain->datepickerFrom = substr($this->getDateBetween(), 2, 10);
+                $histoMain->datepickerTo = substr($this->getDateBetween(), 28, 10);
+                $histoMain->caAjuste = $this->convertFloat($data['caAjuste']);
+                $histoMain->caTotal = $data['caTotal'];
+                $histoMain->caFidTotal = $this->convertFloat($data['caFidTotal']);
+                $histoMain->CaProsp = $this->convertFloat($data['CaProsp']);
+                $histoMain->caDeduit = $this->convertFloat($data['caDeduit']);
+                $histoMain->primeVenteGrAbo = $this->convertFloat($data['primeVenteGrAbo']);
+                $histoMain->primeFichierCoach = $this->convertFloat($data['primeFichierCoach']);
+                $histoMain->primeParrainage = $this->convertFloat($data['primeParrainage']);
+                $histoMain->ajustement = $this->convertFloat($data['ajustement']);
+                $histoMain->nbrJourOuvre = (int)$data['nbrJourOuvre'];
+            }
+        }
+        $histoMain->save();
+
+        return $histoMain;
+    }
+
+    private function insertHistoAjoutSomme($id)
+    {
+        $datas = $this->smarty->tpl_vars['ajoutSommes']->value;
+        foreach ($datas as $data) {
+            $ajout = new HistoAjoutSommeClass();
+            $ajout->id_histostatsmain = $id;
+            $ajout->lastname = $data['lastname'];
+            $ajout->date_ajout_somme = substr($data['date_ajout_somme'], 0, 10);
+            $ajout->somme = $this->convertFloat($data['somme']);
+            $ajout->commentaire = $data['commentaire'];
+            $ajout->id_order = $data['id_order'];
+            $ajout->save();
+        }
+    }
+
+    private function insertHistoObjectifCoach($id)
+    {
+        $datas = $this->smarty->tpl_vars['objectifCoachs']->value;
+        foreach ($datas as $data) {
+            $objectif = new HistoObjectifCoachClass();
+            $objectif->id_histostatsmain = $id;
+            $objectif->lastname = $data['lastname'];
+            $objectif->date_start = $data['date_start'];
+            $objectif->date_end = $data['date_end'];
+            $objectif->somme = $this->convertFloat($data['somme']);
+            $objectif->caCoach = $this->convertFloat($data['caCoach']);
+            $objectif->pourcentDeObjectif = $this->convertFloat($data['pourcentDeObjectif']);
+            $objectif->heure_absence = (int)$data['heure_absence'];
+            $objectif->jour_absence = (int)$data['jour_absence'];
+            $objectif->jour_ouvre = (int)$data['jour_ouvre'];
+            $objectif->commentaire = $data['commentaire'];
+            $objectif->save();
+        }
+
+    }
+
+    private function insertHistoStatsTable($id)
+    {
+        $datas = $this->smarty->tpl_vars['datasEmployees']->value;
+        foreach ($datas as $data) {
+            $table = new HistoStatsTableClass();
+            $table->id_histostatsmain = $id;
+            $table->lastname = $data['lastname'];
+            $table->caAjuste = $this->convertFloat($data['caAjuste']);
+            $table->CaContact = $this->convertFloat($data['CaContact']);
+            $table->tauxTransfo = $this->convertFloat($data['tauxTransfo']);
+            $table->NbreDeProspects = $data['NbreDeProspects'];
+            $table->NbreVentesTotal = $data['NbreVentesTotal'];
+            $table->CaProsp = $this->convertFloat($data['CaProsp']);
+            $table->PourcCaProspect = $this->convertFloat($data['PourcCaProspect']);
+            $table->caDejaInscrit = $this->convertFloat($data['caDejaInscrit']);
+            $table->PourcCaFID = $this->convertFloat($data['PourcCaFID']);
+            $table->panierMoyen = $this->convertFloat($data['panierMoyen']);
+            $table->caAvoir = $this->convertFloat($data['caAvoir']);
+            $table->pourCaAvoir = $this->convertFloat($data['pourCaAvoir']);
+            $table->caImpaye = $this->convertFloat($data['caImpaye']);
+            $table->pourCaImpaye = $this->convertFloat($data['pourCaImpaye']);
+            $table->totalVenteGrAbo = $this->convertFloat($data['totalVenteGrAbo']);
+            $table->nbrVenteGrAbo = $data['nbrVenteGrAbo'];
+            $table->nbrVenteGrDesaAbo = $data['nbrVenteGrDesaAbo'];
+            $table->pourcenDesabo = $this->convertFloat($data['pourcenDesabo']);
+            $table->totalVenteGrPar = $this->convertFloat($data['totalVenteGrPar']);
+            $table->nbrVenteGrPar = $data['nbrVenteGrPar'];
+            $table->pourVenteGrPar = $this->convertFloat($data['pourVenteGrPar']);
+            $table->save();
+        }
+    }
 }
+
 
 class MYPDF extends TCPDF
 {

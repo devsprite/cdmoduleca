@@ -46,7 +46,7 @@ class HistoAjoutSommeClass extends ObjectModel
             'id_histostatsmain' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId', 'required' => true),
             'lastname' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_ajout_somme' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
-            'somme' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
+            'somme' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'commentaire' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
         )

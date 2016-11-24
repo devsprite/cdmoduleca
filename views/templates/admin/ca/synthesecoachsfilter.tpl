@@ -110,6 +110,9 @@
                         </form>
                     {/if}
                     {/if}
+                        <div class="col-lg-2">
+                            <a href="{$linkFilter}&histo=1" class="btn btn-info"><strong>Sauvegarde Historique</strong></a>
+                        </div>
                 </div>
 
                 {if isset($coachs) && $filterActif != 0}
