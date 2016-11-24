@@ -34,6 +34,7 @@ class HistoObjectifCoachClass extends ObjectModel
     public $id_histoobjectifcoach;
     public $id_histostatsmain;
     public $lastname;
+    public $class;
     public $date_start;
     public $date_end;
     public $somme;
@@ -50,6 +51,7 @@ class HistoObjectifCoachClass extends ObjectModel
         'fields' => array(
             'id_histostatsmain' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId', 'required' => true),
             'lastname' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'class' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_start' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_end' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'somme' => array('type' => self::TYPE_STRING, 'validate' => 'isFloat'),
@@ -61,4 +63,14 @@ class HistoObjectifCoachClass extends ObjectModel
             'commentaire' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
         )
     );
+
+    public static function getObjectif($id)
+    {
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.'histoobjectifcoach`
+                WHERE `id_histostatsmain` = "'.$id.'"
+        ';
+        $req = Db::getInstance()->executeS($sql);
+
+        return $req;
+    }
 }

@@ -52,4 +52,14 @@ class HistoAjoutSommeClass extends ObjectModel
         )
     );
 
+    public static function getAjoutSomme($id)
+    {
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.'histoajoutsomme`
+                WHERE `id_histostatsmain` = "'.$id.'"
+        ';
+        $req = Db::getInstance()->executeS($sql);
+
+        return $req;
+    }
+
 }

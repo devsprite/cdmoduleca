@@ -51,6 +51,10 @@ class AdminCaLetSensController extends ModuleAdminController
     public $idFilterCodeAction;
     public $employees_actif;
     public $commandeValid;
+    public $histoMain = false;
+    public $histoAjoutSomme;
+    public $histoObjectif;
+    public $histoTable;
 
     public function __construct()
     {
@@ -102,7 +106,9 @@ class AdminCaLetSensController extends ModuleAdminController
 
         $this->html .= $this->displayCalendar(); // choix de la date
         $this->html .= $this->syntheseCoachs();
-        $this->html .= $g->engine($engine_params); // liste des commandes (utilise le getData de cdmoduleca.php) du bas de la page
+        if (!Tools::isSubmit('id_histo')) {
+            $this->html .= $g->engine($engine_params); // liste des commandes (utilise le getData de cdmoduleca.php) du bas de la page
+        }
 
 
         $nameFile = $this->nameFile();
@@ -283,11 +289,18 @@ class AdminCaLetSensController extends ModuleAdminController
                 $datasEmployeesTotal['primeParrainage'] += $data['primeParrainage'];
                 $datasEmployeesTotal['ajustement'] += $data['ajustement'];
             }
+            $datasEmployeesTotal['nbrJourOuvre'] = CaTools::getNbOpenDays($this->getDateBetween());
         }
 
+        $ajoutSommes = CaTools::getAjoutSomme($this->idFilterCoach, $this->getDateBetween());
+        $objectifCoachs = CaTools::getObjectifCoachs($this->idFilterCoach, $this->getDateBetween());
+        $objectifs = CaTools::isObjectifAtteint($objectifCoachs);
+
         $this->smarty->assign(array(
-            'datasEmployees' => $datasEmployees,
-            'datasEmployeesTotal' => $datasEmployeesTotal,
+            'datasEmployees' => ($this->histoTable) ? $this->histoTable : $datasEmployees,
+            'datasEmployeesTotal' => ($this->histoMain) ? $this->histoMain : $datasEmployeesTotal,
+            'ajoutSommes' => ($this->histoAjoutSomme) ? $this->histoAjoutSomme : $ajoutSommes,
+            'objectifCoachs' => ($this->histoObjectif) ? $this->histoObjectif : $objectifs,
             'dateRequete' => $this->getDateBetween()
         ));
     }
@@ -564,11 +577,6 @@ class AdminCaLetSensController extends ModuleAdminController
             }
         }
 
-        $ajoutSommes = CaTools::getAjoutSomme($this->idFilterCoach, $this->getDateBetween());
-
-        $this->smarty->assign(array(
-            'ajoutSommes' => $ajoutSommes
-        ));
         $this->smarty->assign(array(
             'errors' => $this->errors,
             'confirmation' => $this->confirmation,
@@ -671,11 +679,6 @@ class AdminCaLetSensController extends ModuleAdminController
             }
         }
 
-        $objectifCoachs = CaTools::getObjectifCoachs($this->idFilterCoach, $this->getDateBetween());
-        $objectifs = CaTools::isObjectifAtteint($objectifCoachs);
-        $this->smarty->assign(array(
-            'objectifCoachs' => $objectifs
-        ));
         $this->smarty->assign(array(
             'errors' => $this->errors,
             'confirmation' => $this->confirmation,
@@ -691,6 +694,7 @@ class AdminCaLetSensController extends ModuleAdminController
         $this->setFilterCommandeValid();
         $this->ajoutSomme();
         $this->ajoutObjectif();
+        $this->viewHistorique();
 
         return parent::postProcess();
     }
@@ -1302,6 +1306,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $histoMain->primeFichierCoach = $this->convertFloat($data->value['primeFichierCoach']);
             $histoMain->primeParrainage = $this->convertFloat($data->value['primeParrainage']);
             $histoMain->ajustement = $this->convertFloat($data->value['ajustement']);
+            $histoMain->nbrJourOuvre = (int)$data->value['nbrJourOuvre'];
         } else {
             foreach ($this->smarty->tpl_vars['datasEmployees']->value as $data) {
                 $histoMain->filterCoach = $data['lastname'];
@@ -1346,6 +1351,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $objectif = new HistoObjectifCoachClass();
             $objectif->id_histostatsmain = $id;
             $objectif->lastname = $data['lastname'];
+            $objectif->class = $data['class'];
             $objectif->date_start = $data['date_start'];
             $objectif->date_end = $data['date_end'];
             $objectif->somme = $this->convertFloat($data['somme']);
@@ -1367,6 +1373,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $table = new HistoStatsTableClass();
             $table->id_histostatsmain = $id;
             $table->lastname = $data['lastname'];
+            $table->firstname = $data['firstname'];
             $table->caAjuste = $this->convertFloat($data['caAjuste']);
             $table->CaContact = $this->convertFloat($data['CaContact']);
             $table->tauxTransfo = $this->convertFloat($data['tauxTransfo']);
@@ -1389,6 +1396,21 @@ class AdminCaLetSensController extends ModuleAdminController
             $table->nbrVenteGrPar = $data['nbrVenteGrPar'];
             $table->pourVenteGrPar = $this->convertFloat($data['pourVenteGrPar']);
             $table->save();
+        }
+    }
+
+    private function viewHistorique()
+    {
+        if (Tools::isSubmit('id_histo')) {
+            $id = (int)Tools::getValue('id_histo');
+            $this->histoAjoutSomme = HistoAjoutSommeClass::getAjoutSomme($id);
+            $this->histoObjectif = HistoObjectifCoachClass::getObjectif($id);
+            $this->histoTable = HistoStatsTableClass::getTable($id);
+            $this->histoMain = get_object_vars(new HistoStatsMainClass($id));
+
+            $this->smarty->assign(array(
+                'histo' => 'true',
+            ));
         }
     }
 }

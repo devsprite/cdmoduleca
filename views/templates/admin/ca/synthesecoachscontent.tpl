@@ -27,7 +27,14 @@
 <div class="row synthesecontent">
     <div class="col-xs-3">
         {* Tous les coachs *}
-        {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal)}
+        {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal) || isset($histo)}
+            {if isset($histo)}
+                <div class="row group">
+                    <div class="col-xs-12"><strong>{$datasEmployeesTotal['filterCoach']}</strong>
+                        <span class="pull-right">Du {$datasEmployeesTotal['datepickerFrom']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'} au {$datasEmployeesTotal['datepickerTo']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</span>
+                    </div>
+                </div>
+            {/if}
             <div class="row group">
                 <div class="col-xs-12">CA TOTAL FINAL
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caAjuste']}</span>
@@ -78,9 +85,14 @@
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['ajustement']}</span>
                 </div>
             </div>
+                <div class="row group">
+                    <div class="col-xs-12">Nbre de jours ouvrés
+                        <span class="pull-right">{$datasEmployeesTotal['nbrJourOuvre']}</span>
+                    </div>
+                </div>
         {/if}
         {* Coachs *}
-        {if !empty({$coach->lastname})}
+        {if !empty({$coach->lastname}) && !isset($histo)}
             {foreach item=employe from=$datasEmployees}
                 <div class="row group">
                     <div class="col-xs-12">CA TOTAL FINAL
@@ -162,7 +174,7 @@
                     <td>{$ajoutSomme['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                     <td>{$ajoutSomme['id_order']|escape:'htmlall':'UTF-8'}</td>
                     <td>
-                        {if isset($coachs)}
+                        {if isset($coachs) && !isset($histo)}
                             {if !empty({$coach->lastname})}
                                 <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_as&id_as={$ajoutSomme['id_ajout_somme']|escape:'htmlall':'UTF-8'}">
                                     <i class="icon-edit text-success"></i>
@@ -205,7 +217,7 @@
                         </td>
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                         <td>
-                            {if isset($coachs)}
+                            {if isset($coachs) && !isset($histo)}
                                 {if !empty({$coach->lastname})}
                                     <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}">
                                         <i class="icon-edit text-success"></i>
@@ -248,7 +260,7 @@
                         <td>{$objectif['jour_ouvre']|escape:'htmlall':'UTF-8'}</td>
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                         <td>
-                            {if isset($coachs)}
+                            {if isset($coachs) && !isset($histo)}
                                 {if !empty({$coach->lastname})}
                                     <a href="{$linkFilter|escape:'htmlall':'UTF-8'}&mod_oc&id_oc={$objectif['id_objectif_coach']|escape:'htmlall':'UTF-8'}">
                                         <i class="icon-edit text-success"></i>

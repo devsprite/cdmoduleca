@@ -25,7 +25,7 @@
 
 <div class="row">
     <div class="col-xs-12">
-        {if isset($coachs)}
+        {if (isset($coachs) && !isset($histo)) || !isset($histo)}
             <form action="{$linkFilter}" method="post">
                 <div class="form-group">
                     <div class="col-lg-3 ">
@@ -51,6 +51,7 @@
                 </div>
             </form>
         {/if}
+        {if !isset($histo)}
         <form action="{$linkFilter}" method="post">
             <div class="form-group">
                 <div class="col-lg-3">
@@ -85,19 +86,22 @@
                 </div>
             </div>
         </form>
+        {/if}
     </div>
         <button id="toggle_ca" class="btn btn-success"><i class="icon-chevron-down"></i> </button>
         <div class="toggle">
             <div class="content_ca">
                 <div class="row panel">
                     <div class="col-lg-2">
+                        {if !isset($histo)}
                         <a class="btn btn-default export-csv" href="{$LinkFile}&export_csv=1">
                             <i class="icon-cloud-upload"></i> CSV</a>
+                        {/if}
                         <a class="btn btn-default export-csv" href="{$LinkFile}&export_pdf=1">
                             <i class="icon-cloud-upload"></i> PDF</a>
                     </div>
                     {if isset($coachs) && $filterActif != 0}
-                    {if isset($allow)}
+                    {if isset($allow) && !isset($histo)}
                         <form enctype="multipart/form-data" action="{$LinkFile}" method="post">
                             <div class="col-lg-3">
                                 <input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
@@ -110,12 +114,14 @@
                         </form>
                     {/if}
                     {/if}
+                    {if !isset($histo)}
                         <div class="col-lg-2">
                             <a href="{$linkFilter}&histo=1" class="btn btn-info"><strong>Sauvegarde Historique</strong></a>
                         </div>
+                    {/if}
                 </div>
 
-                {if isset($coachs) && $filterActif != 0}
+                {if isset($coachs) && $filterActif != 0 && !isset($histo)}
                 <div class="col-xs-12 hidden-print">
                     <br>
                     <h2>Ajustement</h2>

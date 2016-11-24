@@ -53,14 +53,6 @@ class AdminHistoriqueController extends ModuleAdminController
                 'title' => 'ID',
                 'callback' => 'buttonView'
             ),
-            'datepickerFrom' => array(
-                'title' => 'Du',
-                'filter_key' => 'a!datepickerFrom'
-            ),
-            'datepickerTo' => array(
-                'title' => 'Au',
-                'filter_key' => 'a!datepickerTo'
-            ),
             'filterCoach' => array(
                 'title' => 'Coach',
                 'filter_key' => 'a!filterCoach'
@@ -69,7 +61,15 @@ class AdminHistoriqueController extends ModuleAdminController
                 'title' => 'CA',
                 'filter_key' => 'a!caAjuste',
                 'callback' => 'formatNumber'
-            )
+            ),
+            'datepickerFrom' => array(
+                'title' => 'Du',
+                'filter_key' => 'a!datepickerFrom'
+            ),
+            'datepickerTo' => array(
+                'title' => 'Au',
+                'filter_key' => 'a!datepickerTo'
+            ),
         );
 
         parent::__construct();

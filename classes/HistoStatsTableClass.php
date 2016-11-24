@@ -35,6 +35,7 @@ class HistoStatsTableClass extends ObjectModel
     public $id_histostatstable;
     public $id_histostatsmain;
     public $lastname;
+    public $firstname;
     public $caAjuste;
     public $CaContact;
     public $tauxTransfo;
@@ -63,6 +64,7 @@ class HistoStatsTableClass extends ObjectModel
         'fields' => array(
             'id_histostatsmain' => array('type' => self::TYPE_INT, 'validate' => 'isNullOrUnsignedId', 'required' => true),
             'lastname' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'firstname' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'caAjuste' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'CaContact' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'tauxTransfo' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
@@ -87,5 +89,15 @@ class HistoStatsTableClass extends ObjectModel
 
         )
     );
+
+    public static function getTable($id)
+    {
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.'histostatstable`
+                WHERE `id_histostatsmain` = "'.$id.'"
+        ';
+        $req = Db::getInstance()->executeS($sql);
+
+        return $req;
+    }
 
 }
