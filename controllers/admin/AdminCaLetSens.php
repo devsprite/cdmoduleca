@@ -295,7 +295,6 @@ class AdminCaLetSensController extends ModuleAdminController
         $ajoutSommes = CaTools::getAjoutSomme($this->idFilterCoach, $this->getDateBetween());
         $objectifCoachs = CaTools::getObjectifCoachs($this->idFilterCoach, $this->getDateBetween());
         $objectifs = CaTools::isObjectifAtteint($objectifCoachs);
-
         $this->smarty->assign(array(
             'datasEmployees' => ($this->histoTable) ? $this->histoTable : $datasEmployees,
             'datasEmployeesTotal' => ($this->histoMain) ? $this->histoMain : $datasEmployeesTotal,
@@ -1403,10 +1402,15 @@ class AdminCaLetSensController extends ModuleAdminController
     {
         if (Tools::isSubmit('id_histo')) {
             $id = (int)Tools::getValue('id_histo');
-            $this->histoAjoutSomme = HistoAjoutSommeClass::getAjoutSomme($id);
-            $this->histoObjectif = HistoObjectifCoachClass::getObjectif($id);
-            $this->histoTable = HistoStatsTableClass::getTable($id);
             $this->histoMain = get_object_vars(new HistoStatsMainClass($id));
+            $histoAjoutSomme = HistoAjoutSommeClass::getAjoutSomme($id);
+            $histoObjectif = HistoObjectifCoachClass::getObjectif($id);
+            $histoTable = HistoStatsTableClass::getTable($id);
+
+            $this->histoAjoutSomme = ($histoAjoutSomme)?$histoAjoutSomme:true;
+            $this->histoObjectif = ($histoObjectif)?$histoObjectif:true;
+            $this->histoTable = ($histoTable)?$histoTable:true;
+
 
             $this->smarty->assign(array(
                 'histo' => 'true',

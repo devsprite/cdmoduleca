@@ -36,7 +36,7 @@ class AdminHistoriqueController extends ModuleAdminController
         $this->className = 'HistoStatsMainClass';
         $this->table = 'histostatsmain';
         $this->identifier = 'id_histostatsmain';
-        $this->_orderBy = 'datepickerFrom';
+        $this->_orderBy = 'id_histostatsmain';
         $this->_orderWay = 'DESC';
         $this->bootstrap = true;
         $this->lang = false;
