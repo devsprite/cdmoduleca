@@ -112,6 +112,8 @@ class AdminCaLetSensController extends ModuleAdminController
 
 
         $nameFile = $this->nameFile();
+
+
         if (Tools::isSubmit('export_csv')) {
             $g->csvExport($engine_params, $nameFile);
         }
@@ -852,14 +854,16 @@ class AdminCaLetSensController extends ModuleAdminController
         $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/content.tpl');
         $pdf->writeHTML($html_content);
 
-        if ($this->idFilterCoach == 0) {
+        if ($this->idFilterCoach == 0 && !$this->histoMain||
+            (isset($this->histoMain['filterCoach']) && $this->histoMain['filterCoach'] === 'Tous les coachs')) {
             $pdf->AddPage();
         }
 
         $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/main_table_coachs.tpl');
         $pdf->writeHTML($html_content);
 
-        if ($this->idFilterCoach == 0) {
+        if ($this->idFilterCoach == 0 && !$this->histoMain||
+            (isset($this->histoMain['filterCoach']) && $this->histoMain['filterCoach'] === 'Tous les coachs')) {
             $pdf->AddPage();
         }
 
@@ -888,11 +892,13 @@ class AdminCaLetSensController extends ModuleAdminController
     private function nameFile()
     {
         $name = Tools::substr($this->getDateBetween(), 2, 10) . '_' . Tools::substr($this->getDateBetween(), 28, 10) . '_';
-        if ($this->idFilterCoach == 0) {
+        if ($this->idFilterCoach == 0 && !$this->histoMain) {
             $name .= 'tous_les_coachs';
-        } else {
+        } elseif ($this->idFilterCoach != 0 && !$this->histoMain) {
             $e = new Employee($this->idFilterCoach);
             $name .= $e->lastname . '_' . $e->firstname;
+        } elseif ($this->histoMain != false) {
+            $name .= $this->histoMain['filterCoach'];
         }
 
         setlocale(LC_ALL, "en_US.utf8");
@@ -1407,9 +1413,9 @@ class AdminCaLetSensController extends ModuleAdminController
             $histoObjectif = HistoObjectifCoachClass::getObjectif($id);
             $histoTable = HistoStatsTableClass::getTable($id);
 
-            $this->histoAjoutSomme = ($histoAjoutSomme)?$histoAjoutSomme:true;
-            $this->histoObjectif = ($histoObjectif)?$histoObjectif:true;
-            $this->histoTable = ($histoTable)?$histoTable:true;
+            $this->histoAjoutSomme = ($histoAjoutSomme) ? $histoAjoutSomme : true;
+            $this->histoObjectif = ($histoObjectif) ? $histoObjectif : true;
+            $this->histoTable = ($histoTable) ? $histoTable : true;
 
 
             $this->smarty->assign(array(

@@ -41,24 +41,26 @@
                 <thead>
                 <tr style="width: 100%;background-color: #DDDDDD">
                     <th style="width: 10%">Nom</th>
-                    <th style="width: 15%;text-align: center; background-color: #DDDDDD">Prime Abo = 10%</th>
-                    <th style="width: 15%;text-align: center;">Nbre d'abos</th>
-                    <th style="width: 15%;text-align: center; background-color: #DDDDDD">Nbre de désabo</th>
-                    <th style="width: 15%;text-align: center;">% de désabo</th>
-                    <th style="width: 15%;text-align: center; background-color: #DDDDDD">CA Parrainage</th>
-                    <th style="width: 15%;text-align: center;">% CA Parrainage</th>
+                    <th style="width: 10%;text-align: right">CA Total Abo</th>
+                    <th style="width: 10%;text-align: center">Nbre d'abos</th>
+                    <th style="width: 10%;text-align: center">Nbre de désabo</th>
+                    <th style="width: 10%;text-align: right">% de désabo</th>
+                    <th style="width: 10%;text-align: right">CA Parrainage</th>
+                    <th style="width: 10%;text-align: center">Nbre de Parrainage</th>
+                    <th style="width: 30%;text-align: left">% de Parrainage</th>
                 </tr>
                 </thead>
                 <tbody>
                 {foreach item=coach from=$datasEmployees}
                     <tr>
                         <td>{$coach['lastname']|escape:'htmlall':'UTF-8'} ({$coach['firstname']|escape:'htmlall':'UTF-8'})</td>
-                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['primeVenteGrAbo']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['totalVenteGrAbo']}</td>
                         <td style="text-align: center">{$coach['nbrVenteGrAbo']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{$coach['nbrVenteGrDesaAbo']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center">{$coach['pourcenDesabo']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['totalVenteGrPar']}</td>
-                        <td style="text-align: center">{$coach['pourVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center">{$coach['nbrVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: left; background-color: #DDDDDD">{$coach['pourVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
                     </tr>
                 {/foreach}
                 </tbody>

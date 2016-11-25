@@ -41,40 +41,56 @@
             <table style="width: 100%;border-bottom:1px solid #448B01;">
                 <tr>
                     <td>
-                        <table style="width: 100%;border-bottom:1px solid #448B01;">
-                            <tr style="line-height: 1.5pt;">
-                                <td style="width: 100%;">
+                        {if isset($histo)}
+                            <table style="width: 100%;border-bottom:1px solid #448B01;">
+                                <tr style="line-height: 1.5pt;">
+                                    <td style="width: 100%;">
+                                    <span>Du {$datasEmployeesTotal['datepickerFrom']|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}
+                                        au {$datasEmployeesTotal['datepickerTo']|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}</span>
+                                    </td>
+                                </tr>
+                                <tr style="line-height: 1.5pt;">
+                                    <td style="width: 100%;">
+                                        <span>Coach : {$datasEmployeesTotal['filterCoach']}</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        {else}
+                            <table style="width: 100%;border-bottom:1px solid #448B01;">
+                                <tr style="line-height: 1.5pt;">
+                                    <td style="width: 100%;">
                                     <span>Du {$datepickerFrom|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}
                                         au {$datepickerTo|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}</span>
-                                </td>
-                            </tr>
-                            <tr style="line-height: 1.5pt;">
-                                <td style="width: 100%;">
-                                    <span>{$filterCodeAction['name']|escape:'htmlall':'UTF-8'}</span>
-                                </td>
-                            </tr>
-                            {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal)}
-                                <tr style="line-height: 1.5pt;">
-                                    <td style="width: 100%;">
-                                        <span>Tous les coachs</span>
                                     </td>
                                 </tr>
-                            {/if}
-                            {if $coach->lastname}
                                 <tr style="line-height: 1.5pt;">
                                     <td style="width: 100%;">
-                                        <span>Coach : {$coach->lastname} - {$coach->firstname}</span>
+                                        <span>{$filterCodeAction['name']|escape:'htmlall':'UTF-8'}</span>
                                     </td>
                                 </tr>
-                            {/if}
-                        </table>
+                                {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal)}
+                                    <tr style="line-height: 1.5pt;">
+                                        <td style="width: 100%;">
+                                            <span>Tous les coachs</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+                                {if $coach->lastname}
+                                    <tr style="line-height: 1.5pt;">
+                                        <td style="width: 100%;">
+                                            <span>Coach : {$coach->lastname} - {$coach->firstname}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
+                            </table>
+                        {/if}
                     </td>
                 </tr>
                 <tr>
                     <td></td>
                 </tr>
                 {* datas Tous les Coachs *}
-                {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal)}
+                {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal) || isset($histo)}
                     <tr style="line-height: 1.5pt;width: 100%">
                         <td style="width: 30%">
                             <span>CA TOTAL FINAL : </span>
@@ -147,9 +163,17 @@
                             <span>{displayPrice price=$datasEmployeesTotal['ajustement']}</span>
                         </td>
                     </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>Nbre de jours ouvrés</span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{$datasEmployeesTotal['nbrJourOuvre']}</span>
+                        </td>
+                    </tr>
                 {/if}
                 {* datas Coach *}
-                {if $coach->lastname}
+                {if $coach->lastname && !isset($histo)}
                     {foreach item=coach from=$datasEmployees}
                         <tr style="line-height: 1.5pt;width: 100%">
                             <td style="width: 30%">
@@ -306,15 +330,18 @@
                 </thead>
                 <tbody>
                 {foreach item=objectif from=$objectifCoachs}
-                    <tr class="{$objectif['class']|escape:'htmlall':'UTF-8'}">
-                        <td>{$objectif['lastname']|escape:'htmlall':'UTF-8'}</td>
-                        <td>{$objectif['date_start']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
-                        <td>{$objectif['date_end']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
-                        <td style="text-align: right">{displayPrice price=$objectif['somme']}</td>
-                        <td style="text-align: right">{displayPrice price=$objectif['caCoach']}</td>
-                        <td style="text-align: right">{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'} %</td>
-                        <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
-                    </tr>
+                    {if $objectif['somme'] != 0}
+                        <tr class="{$objectif['class']|escape:'htmlall':'UTF-8'}">
+                            <td>{$objectif['lastname']|escape:'htmlall':'UTF-8'}</td>
+                            <td>{$objectif['date_start']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
+                            <td>{$objectif['date_end']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
+                            <td style="text-align: right">{displayPrice price=$objectif['somme']}</td>
+                            <td style="text-align: right">{displayPrice price=$objectif['caCoach']}</td>
+                            <td style="text-align: right">{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'}%
+                            </td>
+                            <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
+                        </tr>
+                    {/if}
                 {/foreach}
             </table>
         </td>
@@ -346,15 +373,17 @@
                 </thead>
                 <tbody>
                 {foreach item=objectif from=$objectifCoachs}
-                    <tr class="{$objectif['class']|escape:'htmlall':'UTF-8'}">
-                        <td>{$objectif['lastname']|escape:'htmlall':'UTF-8'}</td>
-                        <td>{$objectif['date_start']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
-                        <td>{$objectif['date_end']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
-                        <td style="text-align: center">{if !empty({$objectif['heure_absence']})}{$objectif['heure_absence']}{/if}</td>
-                        <td style="text-align: center">{if !empty({$objectif['jour_absence']})}{$objectif['jour_absence']}{/if}</td>
-                        <td style="text-align: center">{if !empty({$objectif['jour_ouvre']})}{$objectif['jour_ouvre']|escape:'htmlall':'UTF-8'} %{/if}</td>
-                        <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
-                    </tr>
+                    {if $objectif['heure_absence'] != 0 || $objectif['jour_absence'] != 0 || $objectif['jour_ouvre'] != 0}
+                        <tr class="{$objectif['class']|escape:'htmlall':'UTF-8'}">
+                            <td>{$objectif['lastname']|escape:'htmlall':'UTF-8'}</td>
+                            <td>{$objectif['date_start']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
+                            <td>{$objectif['date_end']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
+                            <td style="text-align: center">{if !empty({$objectif['heure_absence']})}{$objectif['heure_absence']}{/if}</td>
+                            <td style="text-align: center">{if !empty({$objectif['jour_absence']})}{$objectif['jour_absence']}{/if}</td>
+                            <td style="text-align: center">{if !empty({$objectif['jour_ouvre']})}{$objectif['jour_ouvre']|escape:'htmlall':'UTF-8'}{/if}</td>
+                            <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
+                        </tr>
+                    {/if}
                 {/foreach}
             </table>
         </td>

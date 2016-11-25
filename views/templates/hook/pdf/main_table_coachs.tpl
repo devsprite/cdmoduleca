@@ -61,7 +61,7 @@
                     <tr>
                         <td style="text-align: left; background-color: #DDDDDD">{$coach['lastname']|escape:'htmlall':'UTF-8'}
                             ({$coach['firstname']|substr:0:1|escape:'htmlall':'UTF-8'}.)</td>
-                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['caTotal']}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['caAjuste']}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{$coach['CaContact']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{$coach['tauxTransfo']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{$coach['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
@@ -71,10 +71,10 @@
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['caDejaInscrit']}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{$coach['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['panierMoyen']}</td>
-                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['caRembAvoir']}</td>
-                        <td style="text-align: center; background-color: #DDDDDD">{$coach['pourCaRembAvoir']|escape:'htmlall':'UTF-8'}</td>
-                        <td style="text-align: center; background-color: #FFFFFF"></td>
-                        <td style="text-align: center; background-color: #DDDDDD"></td>
+                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['caAvoir']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{$coach['pourCaAvoir']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['caImpaye']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{$coach['pourCaImpaye']}</td>
                     </tr>
                 {/foreach}
                 </tbody>
