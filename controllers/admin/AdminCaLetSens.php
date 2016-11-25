@@ -166,11 +166,11 @@ class AdminCaLetSensController extends ModuleAdminController
             } else {
                 $employees = CaTools::getEmployees(null, $this->idFilterCoach);
             }
-
         }
 
         $datasEmployees = array();
         foreach ($employees as $employee) {
+
             $id_employe = $employee['id_employee'];
 
             $datasEmployees[$employee['id_employee']]['id_employee'] = $id_employe;
@@ -700,6 +700,7 @@ class AdminCaLetSensController extends ModuleAdminController
         $this->ajoutObjectif();
         $this->viewHistorique();
 
+
         return parent::postProcess();
     }
 
@@ -857,16 +858,18 @@ class AdminCaLetSensController extends ModuleAdminController
         $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/content.tpl');
         $pdf->writeHTML($html_content);
 
-        if ($this->idFilterCoach == 0 && !$this->histoMain||
-            (isset($this->histoMain['filterCoach']) && $this->histoMain['filterCoach'] === 'Tous les coachs')) {
+        if ($this->idFilterCoach == 0 && !$this->histoMain ||
+            (isset($this->histoMain['filterCoach']) && $this->histoMain['filterCoach'] === 'Tous les coachs')
+        ) {
             $pdf->AddPage();
         }
 
         $html_content = $this->smarty->fetch(_PS_MODULE_DIR_ . 'cdmoduleca/views/templates/hook/pdf/main_table_coachs.tpl');
         $pdf->writeHTML($html_content);
 
-        if ($this->idFilterCoach == 0 && !$this->histoMain||
-            (isset($this->histoMain['filterCoach']) && $this->histoMain['filterCoach'] === 'Tous les coachs')) {
+        if ($this->idFilterCoach == 0 && !$this->histoMain ||
+            (isset($this->histoMain['filterCoach']) && $this->histoMain['filterCoach'] === 'Tous les coachs')
+        ) {
             $pdf->AddPage();
         }
 
@@ -1413,19 +1416,25 @@ class AdminCaLetSensController extends ModuleAdminController
     {
         if (Tools::isSubmit('id_histo')) {
             $id = (int)Tools::getValue('id_histo');
-            $this->histoMain = get_object_vars(new HistoStatsMainClass($id));
-            $histoAjoutSomme = HistoAjoutSommeClass::getAjoutSomme($id);
-            $histoObjectif = HistoObjectifCoachClass::getObjectif($id);
-            $histoTable = HistoStatsTableClass::getTable($id);
+            $histoMain = get_object_vars(new HistoStatsMainClass($id));
+            // Est-ce que le coach peut voir l'historiqe ?
+            if ($this->module->viewAllCoachs[$this->context->employee->id_profile] ||
+                $this->context->employee->id == $histoMain['id_employee']
+            ) {
+                $this->histoMain = $histoMain;
+                $histoAjoutSomme = HistoAjoutSommeClass::getAjoutSomme($id);
+                $histoObjectif = HistoObjectifCoachClass::getObjectif($id);
+                $histoTable = HistoStatsTableClass::getTable($id);
 
-            $this->histoAjoutSomme = ($histoAjoutSomme) ? $histoAjoutSomme : true;
-            $this->histoObjectif = ($histoObjectif) ? $histoObjectif : true;
-            $this->histoTable = ($histoTable) ? $histoTable : true;
+                $this->histoAjoutSomme = ($histoAjoutSomme) ? $histoAjoutSomme : true;
+                $this->histoObjectif = ($histoObjectif) ? $histoObjectif : true;
+                $this->histoTable = ($histoTable) ? $histoTable : true;
 
 
-            $this->smarty->assign(array(
-                'histo' => 'true',
-            ));
+                $this->smarty->assign(array(
+                    'histo' => 'true',
+                ));
+            }
         }
     }
 }

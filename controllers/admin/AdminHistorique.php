@@ -122,7 +122,6 @@ class AdminHistoriqueController extends ModuleAdminController
         }
 
         return false;
-
     }
 
     public function postProcess()

@@ -25,7 +25,7 @@
 
 <div class="row">
     <div class="col-xs-12">
-        {if (isset($coachs) && !isset($histo)) || !isset($histo)}
+        {if (isset($coachs) && !isset($histo))}
             <form action="{$linkFilter}" method="post">
                 <div class="form-group">
                     <div class="col-lg-3 ">
