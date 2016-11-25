@@ -94,15 +94,35 @@ class AdminHistoriqueController extends ModuleAdminController
 
     public function formatNumber($id, $params)
     {
-        return $id . ' €';
+        if ($this->isAllow($id, $params)) {
+            return $id . ' €';
+        }
     }
 
     public function buttonView($id, $params)
     {
-        $tokenLite = Tools::getAdminTokenLite('AdminCaLetSens');
-        $link = self::$currentIndex . '&controller=AdminCaLetSens&id_histo=' . $id . '&token=' . $tokenLite;
-        $html = '<a href="' . $link . '" class="btn btn-info">Voir</a>';
-        return $html;
+        if ($this->isAllow($id, $params)) {
+            $tokenLite = Tools::getAdminTokenLite('AdminCaLetSens');
+            $link = self::$currentIndex . '&controller=AdminCaLetSens&id_histo=' . $id . '&token=' . $tokenLite;
+            $html = '<a href="' . $link . '" class="btn btn-info">Voir</a>';
+            return $html;
+        }
+    }
+
+    public function isAllow($id, $params)
+    {
+        $id_employee = $this->context->employee->id;
+        $profil = $this->context->employee->id_profile;
+        if ($this->module->viewAllCoachs[$profil]) {
+            return true;
+        }
+
+        if ($id_employee == $params['id_employee']) {
+            return true;
+        }
+
+        return false;
+
     }
 
     public function postProcess()
@@ -113,7 +133,7 @@ class AdminHistoriqueController extends ModuleAdminController
                 !DB::getInstance()->delete('histoajoutsomme', 'id_histostatsmain = ' . $id) ||
                 !DB::getInstance()->delete('histoobjectifcoach', 'id_histostatsmain = ' . $id) ||
                 !DB::getInstance()->delete('histostatstable', 'id_histostatsmain = ' . $id)
-            ){
+            ) {
                 $this->errors = 'Erreur lors de la suppression';
             } else {
                 $this->confirmations = 'Base de donnée mise à jour';

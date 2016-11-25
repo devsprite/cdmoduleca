@@ -33,6 +33,7 @@ if (!defined('_PS_VERSION_')) {
 class HistoStatsMainClass extends ObjectModel
 {
     public $id_histostatsmain;
+    public $id_employee;
     public $datepickerFrom;
     public $datepickerTo;
     public $filterCoach;
@@ -52,6 +53,7 @@ class HistoStatsMainClass extends ObjectModel
         'table' => 'histostatsmain',
         'primary' => 'id_histostatsmain',
         'fields' => array(
+            'id_employee' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'datepickerFrom' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'datepickerTo' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'filterCoach' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),

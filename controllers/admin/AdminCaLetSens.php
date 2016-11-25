@@ -173,6 +173,8 @@ class AdminCaLetSensController extends ModuleAdminController
         foreach ($employees as $employee) {
             $id_employe = $employee['id_employee'];
 
+            $datasEmployees[$employee['id_employee']]['id_employee'] = $id_employe;
+
             $datasEmployees[$employee['id_employee']]['lastname'] = $employee['lastname'];
 
             $datasEmployees[$employee['id_employee']]['firstname'] = $employee['firstname'];
@@ -292,6 +294,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $datasEmployeesTotal['ajustement'] += $data['ajustement'];
             }
             $datasEmployeesTotal['nbrJourOuvre'] = CaTools::getNbOpenDays($this->getDateBetween());
+            $datasEmployeesTotal['id_employee'] = 0;
         }
 
         $ajoutSommes = CaTools::getAjoutSomme($this->idFilterCoach, $this->getDateBetween());
@@ -1302,6 +1305,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $histoMain->filterCoach = 'Tous les coachs';
             $histoMain->datepickerFrom = substr($this->getDateBetween(), 2, 10);
             $histoMain->datepickerTo = substr($this->getDateBetween(), 28, 10);
+            $histoMain->id_employee = $data->value['id_employee'];
             $histoMain->caAjuste = $this->convertFloat($data->value['caAjuste']);
             $histoMain->caTotal = $this->convertFloat($data->value['caTotal']);
             $histoMain->caFidTotal = $this->convertFloat($data->value['caFidTotal']);
@@ -1315,6 +1319,7 @@ class AdminCaLetSensController extends ModuleAdminController
         } else {
             foreach ($this->smarty->tpl_vars['datasEmployees']->value as $data) {
                 $histoMain->filterCoach = $data['lastname'];
+                $histoMain->id_employee = $data['id_employee'];
                 $histoMain->datepickerFrom = substr($this->getDateBetween(), 2, 10);
                 $histoMain->datepickerTo = substr($this->getDateBetween(), 28, 10);
                 $histoMain->caAjuste = $this->convertFloat($data['caAjuste']);
