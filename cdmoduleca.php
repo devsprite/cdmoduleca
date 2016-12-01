@@ -1158,8 +1158,6 @@ class CdModuleCA extends ModuleGrid
      */
     public function hookActionValidateOrder($params)
     {
-        $employee = (isset($this->context->employee->id)) ? $this->context->employee->id : false;
-        if ($employee != false) { // est-ce que la commande est faite par un employé ?
             $idOrder = Order::getOrderByCartId($this->context->cart->id);
             // Récupération du coach et du code action envoyé par le formulaire de commande
             $coach = Tools::getValue('coach');
@@ -1179,7 +1177,6 @@ class CdModuleCA extends ModuleGrid
                     Db::getInstance()->execute($req);
                 }
             }
-        }
 
         return true;
     }
