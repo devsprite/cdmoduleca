@@ -197,10 +197,11 @@
                 <th style="width: 15%">Nom</th>
                 <th style="width: 10%">Date début</th>
                 <th style="width: 10%">Date fin</th>
-                <th style="width: 10%"><span class="pull-right">Objectif</span></th>
-                <th style="width: 10%"><span class="pull-right">CA</span></th>
-                <th style="width: 10%"><span class="pull-right">% Objectif</span></th>
-                <th style="width: 30%">Commentaire</th>
+                <th style="width: 8%"><span class="pull-right">Objectif</span></th>
+                <th style="width: 8%"><span class="pull-right">CA</span></th>
+                <th style="width: 8%"><span class="pull-right">Reste à faire</span></th>
+                <th style="width: 8%"><span class="pull-right">% Objectif</span></th>
+                <th style="width: 28%">Commentaire</th>
                 <th style="width: 5%"></th>
             </tr>
             </thead>
@@ -213,6 +214,7 @@
                         <td>{$objectif['date_end']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
                         <td><span class="pull-right">{displayPrice price=$objectif['somme']}</span></td>
                         <td><span class="pull-right">{displayPrice price=$objectif['caCoach']}</span></td>
+                        <td><span class="pull-right">{displayPrice price=$objectif['resteAFaire']}</span></td>
                         <td><span class="pull-right">{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'} %</span>
                         </td>
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>

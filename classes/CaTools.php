@@ -330,6 +330,7 @@ class CaTools
 
                 $caCoach = $ca + $ajustement - $impaye - $avoir;
 
+                $objectifCoachs[$objectifCoach]['resteAFaire'] = $objectif['somme'] - $caCoach;
                 $p = ($objectif['somme'] != 0) ? round(((100 * $caCoach) / $objectif['somme']), 2) : '';
                 $objectifCoachs[$objectifCoach]['pourcentDeObjectif'] = $p;
                 $objectifCoachs[$objectifCoach]['caCoach'] = $caCoach;

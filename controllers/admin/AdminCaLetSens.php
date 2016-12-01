@@ -1369,6 +1369,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $objectif->date_end = $data['date_end'];
             $objectif->somme = $this->convertFloat($data['somme']);
             $objectif->caCoach = $this->convertFloat($data['caCoach']);
+            $objectif->resteAFaire = $objectif->somme - $objectif->caCoach;
             $objectif->pourcentDeObjectif = $this->convertFloat($data['pourcentDeObjectif']);
             $objectif->heure_absence = (int)$data['heure_absence'];
             $objectif->jour_absence = (int)$data['jour_absence'];
