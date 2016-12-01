@@ -1474,7 +1474,6 @@ class AdminCaLetSensController extends ModuleAdminController
 
 class MYPDF extends TCPDF
 {
-
     // Page footer
     public function footer()
     {
