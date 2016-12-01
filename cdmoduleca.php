@@ -1247,7 +1247,7 @@ class CdModuleCA extends ModuleGrid
         $this->query .= ' GROUP BY o.`id_order` ';
         $this->query .= ') UNION ( 
         SELECT os.`id_order` AS id,
-        IF((os.`amount` + os.`shipping_cost_amount`) != 0, CONCAT(os.`amount` + os.`shipping_cost_amount`," €"), "") AS avoir,
+        IF((os.`total_products_tax_excl`) != 0, CONCAT(ROUND(os.`total_products_tax_excl`, 2)," €"), "") AS avoir,
         "",
         "",
         "",
@@ -1333,7 +1333,7 @@ class CdModuleCA extends ModuleGrid
         $this->_totalCount = Db::getInstance()->getValue('SELECT FOUND_ROWS()');
     }
 
-    private function getIdCoach($coach)
+    private function sogetIdCoach($coach)
     {
         $req = new DbQuery();
         $req->select('id_employee')

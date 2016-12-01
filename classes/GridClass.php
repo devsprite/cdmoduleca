@@ -300,7 +300,7 @@ class GridClass extends Module
         $sql .= ' GROUP BY o.`id_order` ';
         $sql .= ') UNION ( 
         SELECT os.`id_order` AS id,
-        IF((os.`amount` + os.`shipping_cost_amount`) != 0, os.`amount` + os.`shipping_cost_amount`, "") AS avoir,
+        IF((os.`total_products_tax_excl`) != 0, ROUND(os.`total_products_tax_excl`, 2), "") AS avoir,
         "",
         "",
         "",

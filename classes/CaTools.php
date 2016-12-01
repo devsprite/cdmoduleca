@@ -808,7 +808,7 @@ class CaTools
         $filterCoach = ($idCoach != 0)
             ? ' AND `id_employee` = ' . (int)$idCoach : '';
 
-        $sql = 'SELECT SUM(`amount` + `shipping_cost_amount`) FROM `' . _DB_PREFIX_ . 'order_slip` AS os
+        $sql = 'SELECT SUM(`total_products_tax_excl`) FROM `' . _DB_PREFIX_ . 'order_slip` AS os
                 LEFT JOIN `' . _DB_PREFIX_ . 'orders` AS o ON o.`id_order` = os.`id_order` 
                 WHERE os.date_add BETWEEN ' . $dateBetween;
         $sql .= $filterCoach;
