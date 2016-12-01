@@ -324,8 +324,9 @@
                     <th style="width: 10%">Date fin</th>
                     <th style="width: 10%;text-align: right">Objectif</th>
                     <th style="width: 10%;text-align: right">CA</th>
+                    <th style="width: 10%;text-align: right">Reste à faire</th>
                     <th style="width: 10%;text-align: right">% Objectif</th>
-                    <th style="width: 40%">Commentaire</th>
+                    <th style="width: 30%">Commentaire</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -337,6 +338,7 @@
                             <td>{$objectif['date_end']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
                             <td style="text-align: right">{displayPrice price=$objectif['somme']}</td>
                             <td style="text-align: right">{displayPrice price=$objectif['caCoach']}</td>
+                            <td style="text-align: right">{displayPrice price=$objectif['resteAFaire']}</td>
                             <td style="text-align: right">{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'}%
                             </td>
                             <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>

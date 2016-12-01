@@ -40,8 +40,8 @@ function upgrade_module_1_0_3($object, $install = false)
 
 function addColumnHistostatsmain($object)
 {
-    $sql = 'ALTER TABLE `'._DB_PREFIX_.'histostatsmain`
-            ADD COLUMN `resteAFaire` INT(12) NOT NULL AFTER `CaProsp`';
+    $sql = 'ALTER TABLE `'._DB_PREFIX_.'histoobjectifcoach`
+            ADD COLUMN `resteAFaire` INT(12) NOT NULL AFTER `CaCoach`';
 
     if (!DB::getInstance()->execute($sql)){
         return false;
