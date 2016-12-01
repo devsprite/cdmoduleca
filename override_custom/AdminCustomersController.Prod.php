@@ -627,7 +627,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
     {
         $tpl = $this->createTemplate('helpers/list/list_action_default.tpl');
         if (!array_key_exists('contact', self::$cache_lang))
-            self::$cache_lang['contact'] = $this->l('Contacté');
+            self::$cache_lang['contact'] = $this->l('NRP');
 
         $tpl->assign(array(
             'href' =>
@@ -652,7 +652,7 @@ class AdminCustomersController extends AdminCustomersControllerCore
     {
         $tpl = $this->createTemplate('helpers/list/list_action_default.tpl');
         if (!array_key_exists('repondeur', self::$cache_lang))
-            self::$cache_lang['repondeur'] = $this->l('Répondeur');
+            self::$cache_lang['repondeur'] = $this->l('Message répondeur');
 
         $tpl->assign(array(
             'href' =>
@@ -719,11 +719,11 @@ class AdminCustomersController extends AdminCustomersControllerCore
         <table>
             <tbody>
                 <tr class="cd_contacte">
-                    <td title="Contact Matin' . PHP_EOL . $v['matin'] . '" class="cd_cel cd_color_' . $messages['matin'] . '"></td>
-                    <td title="Contact Midi' . PHP_EOL . $v['midi'] . '" class="cd_cel cd_color_' . $messages['midi'] . '"></td>
-                    <td title="Contact Aprés-Midi' . PHP_EOL . $v['apres_midi'] . '" class="cd_cel cd_color_' . $messages['apres_midi'] . '"></td>
-                    <td title="Contact Soir' . PHP_EOL . $v['soir'] . '" class="cd_cel cd_color_' . $messages['soir'] . '"></td>
-                    <td title="Contact Répondeur' . PHP_EOL . $v['repondeur'] . '" class="cd_cel cd_color_rep_' . $messages['repondeur'] . '"></td>
+                    <td title="NRP Matin' . PHP_EOL . $v['matin'] . '" class="cd_cel cd_color_' . $messages['matin'] . '"></td>
+                    <td title="NRP Midi' . PHP_EOL . $v['midi'] . '" class="cd_cel cd_color_' . $messages['midi'] . '"></td>
+                    <td title="NRP Aprés-Midi' . PHP_EOL . $v['apres_midi'] . '" class="cd_cel cd_color_' . $messages['apres_midi'] . '"></td>
+                    <td title="NRP Soir' . PHP_EOL . $v['soir'] . '" class="cd_cel cd_color_' . $messages['soir'] . '"></td>
+                    <td title="Message Répondeur' . PHP_EOL . $v['repondeur'] . '" class="cd_cel cd_color_rep_' . $messages['repondeur'] . '"></td>
                 </tr>
             </tbody>
         </table>

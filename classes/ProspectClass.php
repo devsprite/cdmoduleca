@@ -276,6 +276,7 @@ class ProspectClass extends ObjectModel
             $prospect->injoignable = 'oui';
         }
         $prospect->update();
+        ProspectClass::setContact();
     }
 
     /**
