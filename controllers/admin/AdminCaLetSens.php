@@ -67,6 +67,7 @@ class AdminCaLetSensController extends ModuleAdminController
         $this->employees_actif = 1;
         $this->commandeValid = 2;
 
+
         parent::__construct();
     }
 
@@ -75,6 +76,9 @@ class AdminCaLetSensController extends ModuleAdminController
     {
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/statscdmoduleca.css');
         $this->context->controller->addJS(_PS_MODULE_DIR_ . 'cdmoduleca/views/js/statscdmoduleca.js');
+
+        $this->initEmployeeDefaultValues();
+
         $engine_params = array(
             'id' => 'id_order',
             'title' => $this->module->displayName,
@@ -498,7 +502,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $this->context->cookie->cdmoduleca_id_filter_code_action = Tools::getValue('filterCodeAction');
         }
         $this->idFilterCodeAction = ($this->context->cookie->cdmoduleca_id_filter_code_action)
-            ? $this->context->cookie->cdmoduleca_id_filter_code_action : '0';
+            ? $this->context->cookie->cdmoduleca_id_filter_code_action : '99';
 
         return $this->idFilterCodeAction;
     }
@@ -1436,6 +1440,33 @@ class AdminCaLetSensController extends ModuleAdminController
                     'histo' => 'true',
                 ));
             }
+        }
+    }
+
+    private function initEmployeeDefaultValues()
+    {
+        $this->context->cookie->cdmoculeca_id_filter_coach =
+            (isset($this->context->cookie->cdmoculeca_id_filter_coach))
+                ?$this->context->cookie->cdmoculeca_id_filter_coach
+                : '0' ;
+        $this->context->cookie->cdmoduleca_id_filter_code_action =
+            (isset($this->context->cookie->cdmoduleca_id_filter_code_action))
+                ? $this->context->cookie->cdmoduleca_id_filter_code_action
+                : '99';
+        $this->context->cookie->cdmoculeca_filter_commande =
+            (isset($this->context->cookie->cdmoculeca_filter_commande))
+                ?$this->context->cookie->cdmoculeca_filter_commande
+                :'1';
+        $this->context->cookie->cdmoculeca_id_filter_coach_actif =
+            (isset($this->context->cookie->cdmoculeca_id_filter_coach_actif))
+                ?$this->context->cookie->cdmoculeca_id_filter_coach_actif:
+                'on';
+        if (empty($this->context->employee->stats_date_from)) {
+            $from = date('Y-m-01');
+            $to = date('Y-m-t');
+            $this->context->employee->stats_date_from = $from;
+            $this->context->employee->stats_date_to = $to;
+            $this->context->employee->update();
         }
     }
 }

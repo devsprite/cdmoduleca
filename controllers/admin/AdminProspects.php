@@ -52,6 +52,7 @@ class AdminProspectsController extends ModuleAdminController
 
     public function initContent()
     {
+        $this->initEmployeeDefaultValues();
         $isAllow = $this->module->viewAllCoachs[$this->context->employee->id_profile];
         $linkFilterCoachs = AdminController::$currentIndex . '&module=' . $this->module->name
             . '&token=' . Tools::getValue('token');
@@ -656,6 +657,33 @@ class AdminProspectsController extends ModuleAdminController
                 Configuration::updateValue('CDMODULECA_NBR_JOUR_MAX_PROSPECTS', $jourMaxProspect);
                 $this->confirmations = $this->module->l('Nombre de jour d\'ancienneté des prospects mis à jour');
             }
+        }
+    }
+
+    private function initEmployeeDefaultValues()
+    {
+        $this->context->cookie->cdmoculeca_id_filter_coach =
+            (isset($this->context->cookie->cdmoculeca_id_filter_coach))
+                ?$this->context->cookie->cdmoculeca_id_filter_coach
+                : '0' ;
+        $this->context->cookie->cdmoduleca_id_filter_code_action =
+            (isset($this->context->cookie->cdmoduleca_id_filter_code_action))
+                ? $this->context->cookie->cdmoduleca_id_filter_code_action
+                : '99';
+        $this->context->cookie->cdmoculeca_filter_commande =
+            (isset($this->context->cookie->cdmoculeca_filter_commande))
+                ?$this->context->cookie->cdmoculeca_filter_commande
+                :'1';
+        $this->context->cookie->cdmoculeca_id_filter_coach_actif =
+            (isset($this->context->cookie->cdmoculeca_id_filter_coach_actif))
+                ?$this->context->cookie->cdmoculeca_id_filter_coach_actif:
+                'on';
+        if (empty($this->context->employee->stats_date_from)) {
+            $from = date('Y-m-01');
+            $to = date('Y-m-t');
+            $this->context->employee->stats_date_from = $from;
+            $this->context->employee->stats_date_to = $to;
+            $this->context->employee->update();
         }
     }
 }
