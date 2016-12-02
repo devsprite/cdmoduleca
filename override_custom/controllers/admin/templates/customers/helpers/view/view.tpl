@@ -55,13 +55,18 @@
 						</a>
 					</div>
                     <div class="btn-group cd-group-action">
-                        <a href="index.php?controller=AdminCustomers&amp;token={$token|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;contact" title="Contacté" class="default btn btn-default">
-                            <i class="icon-asterisk"></i> Contacté
+                        <a href="index.php?controller=AdminCustomers&amp;token={$token|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;contact" title="NRP" class="default btn btn-default">
+                            <i class="icon-asterisk"></i> NRP
                         </a>
                         <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                             <i class="icon-caret-down"></i>&nbsp;
                         </button>
                         <ul class="dropdown-menu">
+                            <li>
+                                <a href="index.php?controller=AdminCustomers&amp;token={$token|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;repondeur" title="Message Répondeur" class="default">
+                                    <i class="icon-asterisk"></i> Message Répondeur
+                                </a>
+                            </li>
                             <li>
                                 <a href="index.php?controller=AdminCustomers&amp;token={$token|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;traite" title="Traité" class="edit">
                                     <i class="icon-pencil"></i> Traité
@@ -72,11 +77,6 @@
                                     {*<i class="icon-trash"></i> Injoignable*}
                                 {*</a>*}
                             {*</li>*}
-                            <li>
-                                <a href="index.php?controller=AdminCustomers&amp;token={$token|escape:'html':'UTF-8'}&amp;id_customer={$customer->id|intval}&amp;repondeur" title="Répondeur" class="default">
-                                    <i class="icon-asterisk"></i> Répondeur
-                                </a>
-                            </li>
                         </ul>
                     </div>
 				</div>

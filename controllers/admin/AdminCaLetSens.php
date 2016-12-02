@@ -432,7 +432,7 @@ class AdminCaLetSensController extends ModuleAdminController
     {
         $isOk = true;
         if ($datas[0][0] == 'Date valeur' &&
-            $datas[0][1] == 'libellé' &&
+            $datas[0][1] == 'Libellé' &&
             $datas[0][2] == 'Nom' &&
             $datas[0][4] == 'CMD' &&
             $datas[0][5] == 'Coach' &&
