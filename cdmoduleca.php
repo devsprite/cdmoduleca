@@ -1333,7 +1333,7 @@ class CdModuleCA extends ModuleGrid
         $this->_totalCount = Db::getInstance()->getValue('SELECT FOUND_ROWS()');
     }
 
-    private function sogetIdCoach($coach)
+    private function getIdCoach($coach)
     {
         $req = new DbQuery();
         $req->select('id_employee')
