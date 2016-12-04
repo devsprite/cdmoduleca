@@ -271,9 +271,11 @@ class AdminCaLetSensController extends ModuleAdminController
 
         }
 
-        $datasEmployeesTotal = array();
 
+        $datasEmployeesTotal = array();
+        $total = array();
         if (count($datasEmployees) > 1) {
+            $total = $this->total($datasEmployees);
             $datasEmployeesTotal = array(
                 'caAjuste' => 0,
                 'caTotal' => 0,
@@ -309,7 +311,8 @@ class AdminCaLetSensController extends ModuleAdminController
             'datasEmployeesTotal' => ($this->histoMain) ? $this->histoMain : $datasEmployeesTotal,
             'ajoutSommes' => ($this->histoAjoutSomme) ? $this->histoAjoutSomme : $ajoutSommes,
             'objectifCoachs' => ($this->histoObjectif) ? $this->histoObjectif : $objectifs,
-            'dateRequete' => $this->getDateBetween()
+            'dateRequete' => $this->getDateBetween(),
+            'total' => $total
         ));
     }
 
@@ -920,7 +923,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
     private function caAvoir($id_employee)
     {
-        $r = CaTools::getCaCoachsAvoir($id_employee, $this->getDateBetween());
+        $r = round(CaTools::getCaCoachsAvoir($id_employee, $this->getDateBetween()), 2);
         return ($r != 0) ? $r : '';
     }
 
@@ -982,7 +985,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
     private function caRembAvoir($id_employee)
     {
-        $r = ($id_employee['caTotal']) ? $id_employee['caAvoir'] : '';
+        $r = ($id_employee['caTotal']) ? round($id_employee['caAvoir'], 2) : '';
         return ($r != 0) ? $r : '';
     }
 
@@ -1447,19 +1450,19 @@ class AdminCaLetSensController extends ModuleAdminController
     {
         $this->context->cookie->cdmoculeca_id_filter_coach =
             (isset($this->context->cookie->cdmoculeca_id_filter_coach))
-                ?$this->context->cookie->cdmoculeca_id_filter_coach
-                : '0' ;
+                ? $this->context->cookie->cdmoculeca_id_filter_coach
+                : '0';
         $this->context->cookie->cdmoduleca_id_filter_code_action =
             (isset($this->context->cookie->cdmoduleca_id_filter_code_action))
                 ? $this->context->cookie->cdmoduleca_id_filter_code_action
                 : '99';
         $this->context->cookie->cdmoculeca_filter_commande =
             (isset($this->context->cookie->cdmoculeca_filter_commande))
-                ?$this->context->cookie->cdmoculeca_filter_commande
-                :'1';
+                ? $this->context->cookie->cdmoculeca_filter_commande
+                : '1';
         $this->context->cookie->cdmoculeca_id_filter_coach_actif =
             (isset($this->context->cookie->cdmoculeca_id_filter_coach_actif))
-                ?$this->context->cookie->cdmoculeca_id_filter_coach_actif:
+                ? $this->context->cookie->cdmoculeca_id_filter_coach_actif :
                 'on';
         if (empty($this->context->employee->stats_date_from)) {
             $from = date('Y-m-01');
@@ -1468,6 +1471,79 @@ class AdminCaLetSensController extends ModuleAdminController
             $this->context->employee->stats_date_to = $to;
             $this->context->employee->update();
         }
+    }
+
+    private function total($datasEmployees)
+    {
+        $datas = array(
+            'caAjuste' => 0,
+            'CaContact' => 0,
+            'tauxTransfo' => 0,
+            'NbreDeProspects' => 0,
+            'NbreVentesTotal' => 0,
+            'CaProsp' => 0,
+            'PourcCaProspect' => 0,
+            'caDejaInscrit' => 0,
+            'PourcCaFID' => 0,
+            'panierMoyen' => 0,
+            'caAvoir' => 0,
+            'pourCaAvoir' => 0,
+            'caImpaye' => 0,
+            'pourCaImpaye' => 0,
+            'totalVenteGrAbo' => 0,
+            'nbrVenteGrAbo' => 0,
+            'nbrVenteGrDesaAbo' => 0,
+            'pourcenDesabo' => 0,
+            'totalVenteGrPar' => 0,
+            'nbrVenteGrPar' => 0,
+            'pourVenteGrPar' => 0,
+        );
+        $cpt = array(
+            'caAjuste' => 0,
+            'CaContact' => 0,
+            'tauxTransfo' => 0,
+            'NbreDeProspects' => 0,
+            'NbreVentesTotal' => 0,
+            'CaProsp' => 0,
+            'PourcCaProspect' => 0,
+            'caDejaInscrit' => 0,
+            'PourcCaFID' => 0,
+            'panierMoyen' => 0,
+            'caAvoir' => 0,
+            'pourCaAvoir' => 0,
+            'caImpaye' => 0,
+            'pourCaImpaye' => 0,
+            'totalVenteGrAbo' => 0,
+            'nbrVenteGrAbo' => 0,
+            'nbrVenteGrDesaAbo' => 0,
+            'pourcenDesabo' => 0,
+            'totalVenteGrPar' => 0,
+            'nbrVenteGrPar' => 0,
+            'pourVenteGrPar' => 0,
+        );
+        foreach ($datasEmployees as $data) {
+            foreach ($datas as $d => $v) {
+                if ($data[$d] > 0) {
+                    $datas[$d] += $data[$d];
+                    $cpt[$d] += 1;
+                }
+            }
+        }
+
+        $datas['PourcCaProspect'] = (!empty($datas['PourcCaProspect']))
+            ? round($datas['PourcCaProspect'] / $cpt['PourcCaProspect'], 2) . ' %' : '';
+        $datas['PourcCaFID'] = (!empty($datas['PourcCaFID']))
+            ? round($datas['PourcCaFID'] / $cpt['PourcCaFID'], 2) . ' %' : '';
+        $datas['pourCaAvoir'] = (!empty($datas['pourCaAvoir']))
+            ? round($datas['pourCaAvoir'] / $cpt['pourCaAvoir'], 2) . ' %' : '';
+        $datas['pourCaImpaye'] = (!empty($datas['pourCaImpaye']))
+            ? round($datas['pourCaImpaye'] / $cpt['pourCaImpaye'], 2) . ' %' : '';
+        $datas['pourcenDesabo'] = (!empty($datas['pourcenDesabo']))
+            ? round($datas['pourcenDesabo'] / $cpt['pourcenDesabo'], 2) . ' %' : '';
+        $datas['panierMoyen'] = (!empty($datas['panierMoyen']))
+            ? round($datas['panierMoyen'] / $cpt['panierMoyen'], 2) : '';
+
+        return $datas;
     }
 }
 

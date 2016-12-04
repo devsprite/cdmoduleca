@@ -101,14 +101,6 @@
                     </tr>
                     <tr style="line-height: 1.5pt;width: 100%">
                         <td style="width: 30%">
-                            <span>CA Code Action Tous les codes : </span>
-                        </td>
-                        <td style="width: 15%;text-align: right">
-                            <span>{displayPrice price=$datasEmployeesTotal['caTotal']}</span>
-                        </td>
-                    </tr>
-                    <tr style="line-height: 1.5pt;width: 100%">
-                        <td style="width: 30%">
                             <span>CA Fidélisation (FID) : </span>
                         </td>
                         <td style="width: 15%;text-align: right">
@@ -181,14 +173,6 @@
                             </td>
                             <td style="width: 15%;text-align: right">
                                 <span>{displayPrice price=$coach['caAjuste']}</span>
-                            </td>
-                        </tr>
-                        <tr style="line-height: 1.5pt;width: 100%">
-                            <td style="width: 30%">
-                                <span>CA Code Action Tous les codes : </span>
-                            </td>
-                            <td style="width: 15%;text-align: right">
-                                <span>{displayPrice price=$coach['caTotal']}</span>
                             </td>
                         </tr>
                         <tr style="line-height: 1.5pt;width: 100%">

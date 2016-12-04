@@ -63,6 +63,19 @@
                         <td style="text-align: left; background-color: #DDDDDD">{$coach['pourVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
                     </tr>
                 {/foreach}
+
+                {if !empty($total)}
+                    <tr>
+                        <td>Total</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$total['totalVenteGrAbo']}</td>
+                        <td style="text-align: center">{$total['nbrVenteGrAbo']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{$total['nbrVenteGrDesaAbo']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center">{$total['pourcenDesabo']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$total['totalVenteGrPar']}</td>
+                        <td style="text-align: center">{$total['nbrVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: left; background-color: #DDDDDD">{$total['pourVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
+                    </tr>
+                {/if}
                 </tbody>
             </table>
         </td>

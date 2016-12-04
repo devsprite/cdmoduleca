@@ -41,11 +41,6 @@
                 </div>
             </div>
             <div class="row group">
-                <div class="col-xs-12">CA Code Action Tous les codes
-                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caTotal']}</span>
-                </div>
-            </div>
-            <div class="row group">
                 <div class="col-xs-12">CA Fidélisation (FID)
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caFidTotal']}</span>
                 </div>
@@ -97,11 +92,6 @@
                 <div class="row group">
                     <div class="col-xs-12">CA TOTAL FINAL
                         <span class="pull-right">{displayPrice price=$employe['caAjuste']}</span>
-                    </div>
-                </div>
-                <div class="row group">
-                    <div class="col-xs-12">CA Code Action Tous les codes
-                        <span class="pull-right">{displayPrice price=$employe['caTotal']}</span>
                     </div>
                 </div>
                 <div class="row group">

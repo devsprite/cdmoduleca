@@ -77,6 +77,25 @@
                         <td style="text-align: center; background-color: #DDDDDD">{$coach['pourCaImpaye']}</td>
                     </tr>
                 {/foreach}
+                {if !empty($total)}
+                    <tr>
+                        <td style="text-align: left; background-color: #DDDDDD">Total</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$total['caAjuste']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{$total['CaContact']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{$total['tauxTransfo']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{$total['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{$total['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$total['CaProsp']}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{$total['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$total['caDejaInscrit']}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{$total['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$total['panierMoyen']}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$total['caAvoir']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{$total['pourCaAvoir']|escape:'htmlall':'UTF-8'}</td>
+                        <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$total['caImpaye']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{$total['pourCaImpaye']}</td>
+                    </tr>
+                {/if}
                 </tbody>
             </table>
         </td>

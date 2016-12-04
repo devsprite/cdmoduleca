@@ -1171,7 +1171,7 @@ class CdModuleCA extends ModuleGrid
                 // Si il y a les id, on met à jour la commande passé avec les id coach et code_action
                 if (!empty($id_coach) && !empty($id_code_action)) {
                     $req = 'UPDATE `' . _DB_PREFIX_ . 'orders`
-                    SET `id_employee` = ' . (int)$id_coach . ', `id_code_action` = ' . (int)$id_code_action . ' 
+                    SET `id_employee` = ' . (int)$id_coach . ', `id_code_action` = ' . (int)$id_code_action . '
                     WHERE `id_order` = ' . (int)$idOrder;
 
                     Db::getInstance()->execute($req);

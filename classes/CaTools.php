@@ -380,7 +380,7 @@ class CaTools
     public static function pourcCaFID($data)
     {
         if ($data['caTotal'] != 0) {
-            return number_format(($data['caDejaInscrit'] * 100) / $data['caAjuste'], 2) . ' %';
+            return round(($data['caDejaInscrit'] * 100) / $data['caAjuste'], 2) . ' %';
         }
         return '';
     }
@@ -388,7 +388,7 @@ class CaTools
     public static function getPanierMoyen($data)
     {
         if ($data['NbreVentesTotal'] != 0) {
-            return $data['caAjuste'] / $data['NbreVentesTotal'];
+            return round($data['caAjuste'] / $data['NbreVentesTotal'], 2);
         }
         return '';
     }

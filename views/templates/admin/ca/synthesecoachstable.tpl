@@ -65,6 +65,26 @@
         <td class="text-right">{$coach['pourCaImpaye']}</td>
     </tr>
     {/foreach}
+    {if !empty($total)}
+            <tr>
+                <td>Total</td>
+                <td class="text-right">{displayPrice price=$total['caAjuste']}</td>
+                <td class="text-center">{$total['CaContact']|escape:'htmlall':'UTF-8'}</td>
+                <td class="text-right">{$total['tauxTransfo']|escape:'htmlall':'UTF-8'}</td>
+                <td class="text-center">{$total['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
+                <td class="text-center">{$total['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
+                <td class="text-right">{displayPrice price=$total['CaProsp']}</td>
+                <td class="text-right">{$total['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>
+                <td class="text-right">{displayPrice price=$total['caDejaInscrit']}</td>
+                <td class="text-right">{$total['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
+                <td class="text-right">{displayPrice price=$total['panierMoyen']}</td>
+                <td class="text-right">{displayPrice price=$total['caAvoir']}
+                <td class="text-right">{$total['pourCaAvoir']|escape:'htmlall':'UTF-8'}</td>
+                <td class="text-right">{displayPrice price=$total['caImpaye']}</td>
+                <td class="text-right">{$total['pourCaImpaye']}</td>
+            </tr>
+    {/if}
+
     </tbody>
 </table>
 <hr>
@@ -96,5 +116,17 @@
             <td class="text-left">{$coach['pourVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
         </tr>
     {/foreach}
+    {if !empty($total)}
+        <tr>
+            <td>Total</td>
+            <td class="text-right">{displayPrice price=$total['totalVenteGrAbo']}</td>
+            <td class="text-center">{$total['nbrVenteGrAbo']|escape:'htmlall':'UTF-8'}</td>
+            <td class="text-center">{$total['nbrVenteGrDesaAbo']|escape:'htmlall':'UTF-8'}</td>
+            <td class="text-right">{$total['pourcenDesabo']|escape:'htmlall':'UTF-8'}</td>
+            <td class="text-right">{displayPrice price=$total['totalVenteGrPar']}</td>
+            <td class="text-center">{$total['nbrVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
+            <td class="text-left">{$total['pourVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
+        </tr>
+    {/if}
     </tbody>
 </table>
