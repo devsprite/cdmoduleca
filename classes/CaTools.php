@@ -846,4 +846,13 @@ class CaTools
         $tabDate = explode('/', $date_ajout);
         return date('Y-m-d', strtotime((int)$tabDate[2] . '-' . (int)$tabDate['1'] . '-' . (int)$tabDate[0]));
     }
+
+    public static function getOrderDetailsCoach($id_order)
+    {
+        $sql = 'SELECT `code_action`, `coach`, `id_code_action`, `id_employee` FROM `'._DB_PREFIX_.'orders`
+                WHERE `id_order` = "'.(int)$id_order.'" ';
+        $req = Db::getInstance()->getRow($sql);
+
+        return $req;
+    }
 }

@@ -63,7 +63,7 @@ class CdModuleCA extends ModuleGrid
     {
         $this->name = 'cdmoduleca';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.3';
+        $this->version = '1.0.4';
         $this->author = 'Dominique';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1179,6 +1179,32 @@ class CdModuleCA extends ModuleGrid
         }
 
         return true;
+    }
+
+    /**
+     * fix payment by internet
+     */
+    public function hookActionOrderStatusUpdate()
+    {
+        $idOrder = Order::getOrderByCartId($this->context->cart->id);
+        $order = CaTools::getOrderDetailsCoach($idOrder);
+
+        if ( (empty($order['id_code_action']) || empty($order['id_employee'])) &&
+             (!empty($order['code_action']) && !empty($order['coach']) )
+        ) {
+            // Correspondance entre le coach et le code action en id correspondant
+            $id_coach = $this->getIdCoach($order['coach']);
+            $id_code_action = $this->getIdCodeAction($order['code_action']);
+
+            // Si il y a les id, on met à jour la commande passé avec les id coach et code_action
+            if (!empty($id_coach) && !empty($id_code_action)) {
+                $req = 'UPDATE `' . _DB_PREFIX_ . 'orders`
+                    SET `id_employee` = ' . (int)$id_coach . ', `id_code_action` = ' . (int)$id_code_action . '
+                    WHERE `id_order` = ' . (int)$idOrder;
+
+                Db::getInstance()->execute($req);
+            }
+        }
     }
 
     /**
