@@ -1158,25 +1158,25 @@ class CdModuleCA extends ModuleGrid
      */
     public function hookActionValidateOrder($params)
     {
-            $idOrder = Order::getOrderByCartId($this->context->cart->id);
-            // Récupération du coach et du code action envoyé par le formulaire de commande
-            $coach = Tools::getValue('coach');
-            $code_action = Tools::getValue('order_code_action');
+        $idOrder = Order::getOrderByCartId($this->context->cart->id);
+        // Récupération du coach et du code action envoyé par le formulaire de commande
+        $coach = Tools::getValue('coach');
+        $code_action = Tools::getValue('order_code_action');
 
-            if (!empty($coach) && !empty($code_action)) {
-                // Correspondance entre le coach et le code action en id correspondant
-                $id_coach = $this->getIdCoach($coach);
-                $id_code_action = $this->getIdCodeAction($code_action);
+        if (!empty($coach) && !empty($code_action)) {
+            // Correspondance entre le coach et le code action en id correspondant
+            $id_coach = $this->getIdCoach($coach);
+            $id_code_action = $this->getIdCodeAction($code_action);
 
-                // Si il y a les id, on met à jour la commande passé avec les id coach et code_action
-                if (!empty($id_coach) && !empty($id_code_action)) {
-                    $req = 'UPDATE `' . _DB_PREFIX_ . 'orders`
+            // Si il y a les id, on met à jour la commande passé avec les id coach et code_action
+            if (!empty($id_coach) && !empty($id_code_action)) {
+                $req = 'UPDATE `' . _DB_PREFIX_ . 'orders`
                     SET `id_employee` = ' . (int)$id_coach . ', `id_code_action` = ' . (int)$id_code_action . '
                     WHERE `id_order` = ' . (int)$idOrder;
 
-                    Db::getInstance()->execute($req);
-                }
+                Db::getInstance()->execute($req);
             }
+        }
 
         return true;
     }
@@ -1186,7 +1186,12 @@ class CdModuleCA extends ModuleGrid
      */
     protected function getData()
     {
-        $this->idFilterCoach = $this->context->cookie->cdmoculeca_id_filter_coach;
+        if ($this->viewAllCoachs[$this->context->employee->id_profile]) {
+            $this->idFilterCoach = $this->context->cookie->cdmoculeca_id_filter_coach;
+        } else {
+            $this->idFilterCoach = $this->context->employee->id;
+        }
+
         $this->idFilterCodeAction = $this->context->cookie->cdmoduleca_id_filter_code_action;
         $this->commandeValid = $this->context->cookie->cdmoculeca_filter_commande;
 
@@ -1288,8 +1293,8 @@ class CdModuleCA extends ModuleGrid
         WHERE `impaye` = 1
         AND `date_ajout_somme` BETWEEN ' . $this->getDate();
         $this->query .= ($this->idFilterCoach != 0)
-            ? ' AND a.`id_employee` = '. $this->idFilterCoach
-            :'';
+            ? ' AND a.`id_employee` = ' . $this->idFilterCoach
+            : '';
         $this->query .= ') UNION (';
         $this->query .= 'SELECT 
         `id_order`,
@@ -1308,9 +1313,9 @@ class CdModuleCA extends ModuleGrid
         WHERE `impaye` IS NULL
         AND `date_ajout_somme` BETWEEN ' . $this->getDate();
         $this->query .= ($this->idFilterCoach != 0)
-            ? ' AND a.`id_employee` = '. $this->idFilterCoach
-            :'';
-        $this->query .=' ORDER BY `date_ajout_somme` ASC';
+            ? ' AND a.`id_employee` = ' . $this->idFilterCoach
+            : '';
+        $this->query .= ' ORDER BY `date_ajout_somme` ASC';
         $this->query .= ')';
 
 
