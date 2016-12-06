@@ -37,6 +37,7 @@
             <th>Traité</th>
             <th>Injoignable</th>
             <th>Contacté</th>
+            <th>Inscrit le</th>
             <th>Date Prospection</th>
         </tr>
         </thead>
@@ -49,6 +50,7 @@
                 <td>{$prosp['traite']|escape:'htmlall':'UTF-8'}</td>
                 <td>{$prosp['injoignable']|escape:'htmlall':'UTF-8'}</td>
                 <td>{$prosp['contacte']|escape:'UTF-8'}</td>
+                <td>{$prosp['date_add']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
                 <td>{$prosp['date_debut']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</td>
             </tr>
         {/foreach}
