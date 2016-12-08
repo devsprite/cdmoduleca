@@ -115,7 +115,7 @@ class CaTools
 
     public static function getCodeActionByName($name)
     {
-        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'code_action` WHERE `name` = "' . pSQL($name) . '"';
+        $sql = 'SELECT `groupe` FROM `' . _DB_PREFIX_ . 'code_action` WHERE `name` = "' . pSQL($name) . '"';
 
         return Db::getInstance()->getValue($sql);
     }
@@ -136,7 +136,9 @@ class CaTools
                 WHERE so.`id_customer` = o.`id_customer` 
                 AND so.`id_order` < o.`id_order` LIMIT 1) > 0, 1, 0) as notNew
 				FROM `' . _DB_PREFIX_ . 'orders` AS o
-				WHERE `valid` = 1';
+				WHERE `valid` = 1
+				AND o.`current_state` != 460
+				AND o.`id_code_action` = 20';
         $sql .= $filterCoach;
         $sql .= ' AND `date_add` BETWEEN ' . $dateBetween;
 
@@ -387,8 +389,16 @@ class CaTools
 
     public static function getPanierMoyen($data)
     {
-        if ($data['NbreVentesTotal'] != 0) {
-            return round($data['caAjuste'] / $data['NbreVentesTotal'], 2);
+        if ($data['nbrVenteProsp'] != 0) {
+            return round($data['CaProsp'] / $data['nbrVenteProsp'], 2);
+        }
+        return '';
+    }
+
+    public static function getPanierMoyenFid($data)
+    {
+        if ($data['nbrVenteFid'] != 0) {
+            return round($data['caDejaInscrit'] / $data['nbrVenteFid'], 2);
         }
         return '';
     }
@@ -411,17 +421,16 @@ class CaTools
             $sql_code_action = ' AND `id_code_action` = "' . (int)$code_action . '" ';
         }
 
-
         $sql = 'SELECT SQL_CALC_FOUND_ROWS id_order
 				FROM `' . _DB_PREFIX_ . 'orders` AS o
 				WHERE `valid` = 1 ';
         $sql .= $sql_code_action;
         $sql .= $filterCoach;
+        $sql .= ' AND o.`current_state` != 460'; // Commande gratuite
         $sql .= ' AND `date_add` BETWEEN ' . $dateBetween;
         $nbrVenteFID = Db::getInstance()->executeS($sql);
 
-
-        $nbrRows = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
+        $nbrRows = Db::getInstance()->getValue('SELECT FOUND_ROWS()');
 
         return ($nbrRows) ? $nbrRows : ''; // ($nbrVenteFID) ? $nbrVenteFID : '';
     }

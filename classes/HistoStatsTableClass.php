@@ -46,6 +46,7 @@ class HistoStatsTableClass extends ObjectModel
     public $caDejaInscrit;
     public $PourcCaFID;
     public $panierMoyen;
+    public $panierMoyenFid;
     public $caAvoir;
     public $pourCaAvoir;
     public $caImpaye;
@@ -75,6 +76,7 @@ class HistoStatsTableClass extends ObjectModel
             'caDejaInscrit' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'PourcCaFID' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'panierMoyen' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'panierMoyenFid' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'caAvoir' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'pourCaAvoir' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'caImpaye' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),

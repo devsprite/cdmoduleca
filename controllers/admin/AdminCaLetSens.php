@@ -222,13 +222,15 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['CaContact'] = $this->CaContact($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['panierMoyen'] = $this->panierMoyen($datasEmployees[$id_employe]);
-
             $datasEmployees[$employee['id_employee']]['nbrVenteAbo'] = $this->nbrVenteAbo($id_employe);
 
             $datasEmployees[$employee['id_employee']]['nbrVenteProsp'] = $this->nbrVenteProsp($id_employe);
 
             $datasEmployees[$employee['id_employee']]['nbrVenteFid'] = $this->nbrVenteFid($id_employe);
+
+            $datasEmployees[$employee['id_employee']]['panierMoyen'] = $this->panierMoyen($datasEmployees[$id_employe]);
+
+            $datasEmployees[$employee['id_employee']]['panierMoyenFid'] = $this->panierMoyenFid($datasEmployees[$id_employe]);
 
             $datasEmployees[$employee['id_employee']]['tauxTransfo'] = $this->tauxTransfo($datasEmployees[$id_employe]);
 
@@ -1064,6 +1066,12 @@ class AdminCaLetSensController extends ModuleAdminController
         return ($r != 0) ? $r : '';
     }
 
+    private function panierMoyenFid($id_employe)
+    {
+        $r = CaTools::getPanierMoyenFid($id_employe);
+        return ($r != 0) ? $r : '';
+    }
+
     private function nbrVenteAbo($id_employe)
     {
         $r = CaTools::getNbrVentes($id_employe, 'ABO', $this->getDateBetween());
@@ -1072,7 +1080,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
     private function nbrVenteProsp($id_employe)
     {
-        $r = CaTools::getNbrVentes($id_employe, 'Prosp', $this->getDateBetween());
+        $r = CaTools::getNbrVentes($id_employe, 'PROSP', $this->getDateBetween());
         return ($r != 0) ? $r : '';
     }
 
@@ -1085,7 +1093,7 @@ class AdminCaLetSensController extends ModuleAdminController
     private function tauxTransfo($id_employe)
     {
         $r = ($id_employe['NbreDeProspects'] != 0)
-            ? (round(((($id_employe['NbreVentesTotal'] - $id_employe['nbrVenteFid']) * 100)
+            ? (round(((($id_employe['nbrVenteProsp']) * 100)
                 / $id_employe['NbreDeProspects']), 2))
             : '';
 
@@ -1404,6 +1412,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $table->caDejaInscrit = $this->convertFloat($data['caDejaInscrit']);
             $table->PourcCaFID = $this->convertFloat($data['PourcCaFID']);
             $table->panierMoyen = $this->convertFloat($data['panierMoyen']);
+            $table->panierMoyenFid = $this->convertFloat($data['panierMoyenFid']);
             $table->caAvoir = $this->convertFloat($data['caAvoir']);
             $table->pourCaAvoir = $this->convertFloat($data['pourCaAvoir']);
             $table->caImpaye = $this->convertFloat($data['caImpaye']);
@@ -1458,6 +1467,7 @@ class AdminCaLetSensController extends ModuleAdminController
             'caDejaInscrit' => 0,
             'PourcCaFID' => 0,
             'panierMoyen' => 0,
+            'panierMoyenFid' => 0,
             'caAvoir' => 0,
             'pourCaAvoir' => 0,
             'caImpaye' => 0,
@@ -1469,6 +1479,8 @@ class AdminCaLetSensController extends ModuleAdminController
             'totalVenteGrPar' => 0,
             'nbrVenteGrPar' => 0,
             'pourVenteGrPar' => 0,
+            'nbrVenteProsp' => 0,
+            'nbrVenteFid' => 0
         );
         $cpt = array(
             'caAjuste' => 0,
@@ -1481,6 +1493,7 @@ class AdminCaLetSensController extends ModuleAdminController
             'caDejaInscrit' => 0,
             'PourcCaFID' => 0,
             'panierMoyen' => 0,
+            'panierMoyenFid' => 0,
             'caAvoir' => 0,
             'pourCaAvoir' => 0,
             'caImpaye' => 0,
@@ -1492,6 +1505,8 @@ class AdminCaLetSensController extends ModuleAdminController
             'totalVenteGrPar' => 0,
             'nbrVenteGrPar' => 0,
             'pourVenteGrPar' => 0,
+            'nbrVenteProsp' => 0,
+            'nbrVenteFid' => 0
         );
         foreach ($datasEmployees as $data) {
             foreach ($datas as $d => $v) {
@@ -1502,34 +1517,32 @@ class AdminCaLetSensController extends ModuleAdminController
             }
         }
 
-        $datas['PourcCaProspect'] = (!empty($datas['PourcCaProspect']))
-            ? round($datas['PourcCaProspect'] / $cpt['PourcCaProspect'], 2) . ' %' : '';
-        $datas['PourcCaFID'] = (!empty($datas['PourcCaFID']))
-            ? round($datas['PourcCaFID'] / $cpt['PourcCaFID'], 2) . ' %' : '';
-        $datas['pourCaAvoir'] = (!empty($datas['pourCaAvoir']))
-            ? round($datas['pourCaAvoir'] / $cpt['pourCaAvoir'], 2) . ' %' : '';
-        $datas['pourCaImpaye'] = (!empty($datas['pourCaImpaye']))
-            ? round($datas['pourCaImpaye'] / $cpt['pourCaImpaye'], 2) . ' %' : '';
-        $datas['pourcenDesabo'] = (!empty($datas['pourcenDesabo']))
-            ? round($datas['pourcenDesabo'] / $cpt['pourcenDesabo'], 2) . ' %' : '';
-        $datas['panierMoyen'] = (!empty($datas['panierMoyen']))
-            ? round($datas['panierMoyen'] / $cpt['panierMoyen'], 2) : '';
 
+        $datas['panierMoyen'] = round($datas['CaProsp'] / $datas['nbrVenteProsp'], 2);
+        $datas['panierMoyenFid'] = round($datas['caDejaInscrit'] / $datas['nbrVenteFid'], 2);
+        $datas['CaContact'] = round($datas['CaProsp'] / $datas['NbreDeProspects'], 2) . ' %';
+        $datas['tauxTransfo'] = round((($datas['nbrVenteProsp'] * 100) / $datas['NbreDeProspects']), 2) . ' %';
+        $datas['PourcCaProspect'] = round(($datas['CaProsp'] * 100) / $datas['caAjuste'], 2) . ' %';
+        $datas['PourcCaFID'] = round($datas['caDejaInscrit'] * 100 / $datas['caAjuste'], 2) . ' %';
+        $datas['pourCaAvoir'] = round(($datas['caAvoir'] * 100) / $datas['caAjuste'], 2) . ' %';
+        $datas['pourCaImpaye'] = round(($datas['caImpaye'] * 100) / $datas['caAjuste'], 2) . ' %';
+        $datas['pourcenDesabo'] = round(($datas['nbrVenteGrDesaAbo'] * 100) / $datas['nbrVenteGrAbo'], 2) . ' %';
+        $datas['pourVenteGrPar'] = round(($datas['totalVenteGrPar'] * 100) / $datas['caAjuste'], 2) . ' %';
         return $datas;
     }
 
     private function defautValues()
     {
-        if (empty($this->context->cookie->cdmoculeca_id_filter_coach )) {
+        if (empty($this->context->cookie->cdmoculeca_id_filter_coach)) {
             $this->context->cookie->cdmoculeca_id_filter_coach = '0';
         }
-        if (empty($this->context->cookie->cdmoculeca_id_filter_coach_actif )) {
+        if (empty($this->context->cookie->cdmoculeca_id_filter_coach_actif)) {
             $this->context->cookie->cdmoculeca_id_filter_coach_actif = 'on';
         }
-        if (empty($this->context->cookie->cdmoculeca_filter_commande )) {
+        if (empty($this->context->cookie->cdmoculeca_filter_commande)) {
             $this->context->cookie->cdmoculeca_filter_commande = '1';
         }
-        if (empty($this->context->cookie->cdmoduleca_id_filter_code_action )) {
+        if (empty($this->context->cookie->cdmoduleca_id_filter_code_action)) {
             $this->context->cookie->cdmoduleca_id_filter_code_action = '99';
         }
 

@@ -63,7 +63,7 @@ class CdModuleCA extends ModuleGrid
     {
         $this->name = 'cdmoduleca';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.4';
+        $this->version = '1.0.5';
         $this->author = 'Dominique';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -700,6 +700,8 @@ class CdModuleCA extends ModuleGrid
      */
     public function getContent()
     {
+        $this->updateOrdersTableIdCodeAction();
+        $this->updateOrdersTableIdEmployee();
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/bootstrap.min.css');
         $this->postProcess();
         $this->displayForm();
@@ -1377,7 +1379,7 @@ class CdModuleCA extends ModuleGrid
     private function getIdCodeAction($code_action)
     {
         $req = new DbQuery();
-        $req->select('id_code_action')
+        $req->select('groupe')
             ->from('code_action')
             ->where('name = "' . pSQL($code_action) . '"');
 

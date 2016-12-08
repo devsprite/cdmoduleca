@@ -46,10 +46,11 @@
                     <th style="width: 5%;text-align: center">Nbre de Fichiers</th>
                     <th style="width: 5%;text-align: center">Nbre de Ventes TOTAL</th>
                     <th style="width: 7%;text-align: center">CA Prospection</th>
+                    <th style="width: 7%;text-align: center">Panier Moyen Prospect</th>
                     <th style="width: 5%;text-align: center">% CA Prospect</th>
                     <th style="width: 7%;text-align: center">CA FID</th>
+                    <th style="width: 7%;text-align: center">Panier Moyen FID</th>
                     <th style="width: 5%;text-align: center">% CA FID</th>
-                    <th style="width: 7%;text-align: center">Panier Moyen</th>
                     <th style="width: 7%;text-align: center">CA Retour</th>
                     <th style="width: 6%;text-align: center">% CA Retour</th>
                     <th style="width: 6%;text-align: center">CA Impayé</th>
@@ -67,10 +68,11 @@
                         <td style="text-align: center; background-color: #DDDDDD">{$coach['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{$coach['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['CaProsp']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['panierMoyen']}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{$coach['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['caDejaInscrit']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['panierMoyenFid']}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{$coach['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
-                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$coach['panierMoyen']}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['caAvoir']}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{$coach['pourCaAvoir']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$coach['caImpaye']}</td>
@@ -86,10 +88,11 @@
                         <td style="text-align: center; background-color: #DDDDDD">{$total['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{$total['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$total['CaProsp']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$total['panierMoyen']}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{$total['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$total['caDejaInscrit']}</td>
+                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$total['panierMoyenFid']}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{$total['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
-                        <td style="text-align: center; background-color: #DDDDDD">{displayPrice price=$total['panierMoyen']}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$total['caAvoir']}</td>
                         <td style="text-align: center; background-color: #DDDDDD">{$total['pourCaAvoir']|escape:'htmlall':'UTF-8'}</td>
                         <td style="text-align: center; background-color: #FFFFFF">{displayPrice price=$total['caImpaye']}</td>

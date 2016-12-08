@@ -35,10 +35,11 @@
         <th style="width: 5%;text-align: center">Nbre de Fichiers</th>
         <th style="width: 5%;text-align: center">Nbre de Ventes TOTAL</th>
         <th style="width: 5%;text-align: right">CA Prospection</th>
+        <th style="width: 5%;text-align: center">Panier Moyen Prospect</th>
         <th style="width: 5%;text-align: center">% CA Prospect</th>
         <th style="width: 5%;text-align: right">CA FID</th>
+        <th style="width: 5%;text-align: center">Panier Moyen FID</th>
         <th style="width: 5%;text-align: center">% CA FID</th>
-        <th style="width: 5%;text-align: right">Panier Moyen</th>
         <th style="width: 5%;text-align: right">CA Retour</th>
         <th style="width: 5%;text-align: center">% CA Retour</th>
         <th style="width: 5%;text-align: right">CA Impayé</th>
@@ -55,10 +56,11 @@
         <td class="text-center">{$coach['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-center">{$coach['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-right">{displayPrice price=$coach['CaProsp']}</td>
+        <td class="text-right">{displayPrice price=$coach['panierMoyen']}</td>
         <td class="text-right">{$coach['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-right">{displayPrice price=$coach['caDejaInscrit']}</td>
+        <td class="text-right">{displayPrice price=$coach['panierMoyenFid']}</td>
         <td class="text-right">{$coach['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
-        <td class="text-right">{displayPrice price=$coach['panierMoyen']}</td>
         <td class="text-right">{displayPrice price=$coach['caAvoir']}
         <td class="text-right">{$coach['pourCaAvoir']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-right">{displayPrice price=$coach['caImpaye']}</td>
@@ -74,10 +76,11 @@
                 <td class="text-center">{$total['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
                 <td class="text-center">{$total['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
                 <td class="text-right">{displayPrice price=$total['CaProsp']}</td>
+                <td class="text-right">{displayPrice price=$total['panierMoyen']}</td>
                 <td class="text-right">{$total['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>
                 <td class="text-right">{displayPrice price=$total['caDejaInscrit']}</td>
+                <td class="text-right">{displayPrice price=$total['panierMoyenFid']}</td>
                 <td class="text-right">{$total['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
-                <td class="text-right">{displayPrice price=$total['panierMoyen']}</td>
                 <td class="text-right">{displayPrice price=$total['caAvoir']}
                 <td class="text-right">{$total['pourCaAvoir']|escape:'htmlall':'UTF-8'}</td>
                 <td class="text-right">{displayPrice price=$total['caImpaye']}</td>
