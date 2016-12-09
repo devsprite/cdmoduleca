@@ -319,7 +319,7 @@ class CdModuleCA extends ModuleGrid
         $this->context->controller->addCSS($this->_path . 'views/css/compteur.css', 'all');
         $this->context->controller->addJS($this->_path . 'views/js/compteur.js');
         $objectifCoach[] = CaTools::getObjectifCoach($this->context->employee->id);
-        $objectif = CaTools::isObjectifAtteint($objectifCoach);
+        $objectif = CaTools::isProjectifAtteint($objectifCoach);
         $objectif[0]['appels'] = (isset($_COOKIE['appelKeyyo'])) ? (int)$_COOKIE['appelKeyyo'] : '0';
 
         $this->smarty->assign(array(

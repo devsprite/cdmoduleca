@@ -30,8 +30,21 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_1_0_5($object, $install = false)
 {
-    if (!addColumnHistostatsmain($object)
+    if (!addColumnHistostatsmain($object) ||
+        !addColumnHistoobjectifcoach($object)
     ) {
+        return false;
+    }
+
+    return true;
+}
+
+function addColumnHistoobjectifcoach($object)
+{
+    $sql = 'ALTER TABLE `'._DB_PREFIX_.'histoobjectifcoach`
+            ADD COLUMN `projectif` DECIMAL(16,2) NULLAFTER `caCoach`';
+
+    if (!DB::getInstance()->execute($sql)){
         return false;
     }
 
@@ -41,7 +54,7 @@ function upgrade_module_1_0_5($object, $install = false)
 function addColumnHistostatsmain($object)
 {
     $sql = 'ALTER TABLE `'._DB_PREFIX_.'histostatstable`
-            ADD COLUMN `panierMoyenFid` INT(12) NOT NULL AFTER `panierMoyen`';
+            ADD COLUMN `panierMoyenFid` DECIMAL(16,2) NULL AFTER `panierMoyen`';
 
     if (!DB::getInstance()->execute($sql)){
         return false;

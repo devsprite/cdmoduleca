@@ -306,7 +306,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
         $ajoutSommes = CaTools::getAjoutSomme($this->idFilterCoach, $this->getDateBetween());
         $objectifCoachs = CaTools::getObjectifCoachs($this->idFilterCoach, $this->getDateBetween());
-        $objectifs = CaTools::isObjectifAtteint($objectifCoachs);
+        $objectifs = CaTools::isProjectifAtteint($objectifCoachs);
         $this->smarty->assign(array(
             'datasEmployees' => ($this->histoTable) ? $this->histoTable : $datasEmployees,
             'datasEmployeesTotal' => ($this->histoMain) ? $this->histoMain : $datasEmployeesTotal,
@@ -1383,6 +1383,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $objectif->date_end = $data['date_end'];
             $objectif->somme = $this->convertFloat($data['somme']);
             $objectif->caCoach = $this->convertFloat($data['caCoach']);
+            $objectif->projectif = $this->convertFloat($data['projectif']);
             $objectif->resteAFaire = $this->convertFloat($objectif->somme - $objectif->caCoach);
             $objectif->pourcentDeObjectif = $this->convertFloat($data['pourcentDeObjectif']);
             $objectif->heure_absence = (int)$data['heure_absence'];

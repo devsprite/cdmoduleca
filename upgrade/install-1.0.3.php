@@ -41,7 +41,7 @@ function upgrade_module_1_0_3($object, $install = false)
 function addColumnHistostatsmain($object)
 {
     $sql = 'ALTER TABLE `'._DB_PREFIX_.'histoobjectifcoach`
-            ADD COLUMN `resteAFaire` INT(12) NOT NULL AFTER `CaCoach`';
+            ADD COLUMN `resteAFaire` DECIMAL(16,2) NULL AFTER `CaCoach`';
 
     if (!DB::getInstance()->execute($sql)){
         return false;

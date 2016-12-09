@@ -32,7 +32,7 @@
                 <td>{if !empty($objectif['pourcentDeObjectif'])}{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'}%{/if}</td>
             </tr>
             <tr>
-                <td colspan="2">{if isset($objectif['caCoach'])}{displayPrice price=$objectif['caCoach']}{/if}
+                <td colspan="2">{if isset($objectif['projectif'])}P {displayPrice price=$objectif['projectif']}{/if}
                     {if isset($objectif['somme'])} / {displayPrice price=$objectif['somme']}{/if}</td>
             </tr>
         </tbody>

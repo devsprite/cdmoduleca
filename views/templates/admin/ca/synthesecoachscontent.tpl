@@ -190,7 +190,7 @@
                 <th style="width: 8%"><span class="pull-right">Objectif</span></th>
                 <th style="width: 8%"><span class="pull-right">CA</span></th>
                 <th style="width: 8%"><span class="pull-right">Reste à faire</span></th>
-                <th style="width: 8%"><span class="pull-right">% Objectif</span></th>
+                <th style="width: 8%"><span class="pull-right">Projectif</span></th>
                 <th style="width: 28%">Commentaire</th>
                 <th style="width: 5%"></th>
             </tr>
@@ -205,7 +205,7 @@
                         <td><span class="pull-right">{displayPrice price=$objectif['somme']}</span></td>
                         <td><span class="pull-right">{displayPrice price=$objectif['caCoach']}</span></td>
                         <td><span class="pull-right">{displayPrice price=$objectif['resteAFaire']}</span></td>
-                        <td><span class="pull-right">{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'} %</span>
+                        <td><span class="pull-right">{displayPrice price=$objectif['projectif']|escape:'htmlall':'UTF-8'}</span>
                         </td>
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                         <td>

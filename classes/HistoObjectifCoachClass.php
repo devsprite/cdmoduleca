@@ -39,6 +39,7 @@ class HistoObjectifCoachClass extends ObjectModel
     public $date_end;
     public $somme;
     public $caCoach;
+    public $projectif;
     public $resteAFaire;
     public $pourcentDeObjectif;
     public $heure_absence;
@@ -57,6 +58,7 @@ class HistoObjectifCoachClass extends ObjectModel
             'date_end' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'somme' => array('type' => self::TYPE_STRING, 'validate' => 'isFloat'),
             'caCoach' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'projectif' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'resteAFaire' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'pourcentDeObjectif' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'heure_absence' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),

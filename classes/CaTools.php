@@ -318,24 +318,39 @@ class CaTools
      * @param $objectifCoachs
      * @return mixed
      */
-    public static function isObjectifAtteint($objectifCoachs)
+    public static function isProjectifAtteint($objectifCoachs)
     {
         if ($objectifCoachs) {
 
             foreach ($objectifCoachs as $objectifCoach => $objectif) {
                 $dateBetween = '"' . $objectif['date_start'] . '" AND "' . $objectif['date_end'] . '"';
-
+                $betweenDateNow = '"' . $objectif['date_start'] . '" AND "' . date('Y-m-d 00:00:01') . '"';
                 $ca = CaTools::getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
-                $objectifCoachs[$objectifCoach]['ajustement'] = $ajustement = CaTools::getAjustement($objectif['id_employee'], $dateBetween);
-                $objectifCoachs[$objectifCoach]['impaye'] = $impaye = AjoutSomme::getImpaye($objectif['id_employee'], $dateBetween);
-                $objectifCoachs[$objectifCoach]['avoir'] = $avoir = CaTools::getCaCoachsAvoir($objectif['id_employee'], $dateBetween);
+
+                $ajustement = CaTools::getAjustement($objectif['id_employee'], $dateBetween);
+                $impaye = AjoutSomme::getImpaye($objectif['id_employee'], $dateBetween);
+                $avoir = CaTools::getCaCoachsAvoir($objectif['id_employee'], $dateBetween);
+
+                $jourTravaille = CaTools::getJourOuvreEmploye($objectif['id_employee'], $dateBetween);
+                $joursTravaille = CaTools::getNbOpenDays($betweenDateNow);
+                $joursTravailleTotal = CaTools::getNbOpenDays($dateBetween);
+                $joursAbsent = CaTools::getAbsenceEmployee($objectif['id_employee'], $betweenDateNow);
 
                 $caCoach = $ca + $ajustement - $impaye - $avoir;
+                $objectifCoachs[$objectifCoach]['resteAFaire'] = $objectif['somme'] - $caCoach;
+                $caCoach = $ca + $ajustement - $impaye - $avoir;
+
+                $projectif = '';
+                if ($joursTravaille != 0) {
+                    $projectif = ($caCoach / $joursTravaille) * ($joursTravailleTotal - $joursAbsent['jours']);
+                }
 
                 $objectifCoachs[$objectifCoach]['resteAFaire'] = $objectif['somme'] - $caCoach;
-                $p = ($objectif['somme'] != 0) ? round(((100 * $caCoach) / $objectif['somme']), 2) : '';
+
+                $p = ($objectif['somme'] != 0) ? round(((100 * $projectif) / $objectif['somme']), 2) : '';
                 $objectifCoachs[$objectifCoach]['pourcentDeObjectif'] = $p;
                 $objectifCoachs[$objectifCoach]['caCoach'] = $caCoach;
+                $objectifCoachs[$objectifCoach]['projectif'] = $projectif;
                 $class = '';
                 if ($p < 50) {
                     $class = 'danger';
@@ -858,8 +873,8 @@ class CaTools
 
     public static function getOrderDetailsCoach($id_order)
     {
-        $sql = 'SELECT `code_action`, `coach`, `id_code_action`, `id_employee` FROM `'._DB_PREFIX_.'orders`
-                WHERE `id_order` = "'.(int)$id_order.'" ';
+        $sql = 'SELECT `code_action`, `coach`, `id_code_action`, `id_employee` FROM `' . _DB_PREFIX_ . 'orders`
+                WHERE `id_order` = "' . (int)$id_order . '" ';
         $req = Db::getInstance()->getRow($sql);
 
         return $req;
