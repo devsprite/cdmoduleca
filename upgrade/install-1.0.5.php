@@ -42,7 +42,7 @@ function upgrade_module_1_0_5($object, $install = false)
 function addColumnHistoobjectifcoach($object)
 {
     $sql = 'ALTER TABLE `'._DB_PREFIX_.'histoobjectifcoach`
-            ADD COLUMN `projectif` DECIMAL(16,2) NULLAFTER `caCoach`';
+            ADD COLUMN `projectif` DECIMAL(16,2) NULL AFTER `caCoach`';
 
     if (!DB::getInstance()->execute($sql)){
         return false;
