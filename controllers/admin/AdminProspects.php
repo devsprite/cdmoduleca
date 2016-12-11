@@ -112,6 +112,19 @@ class AdminProspectsController extends ModuleAdminController
             $this->viewProspectsAttribue();
         }
 
+        if (Tools::isSubmit('addclient') && Tools::getValue('addclient') == 1) {
+            $id_customer = (int)Tools::getValue('id_customer');
+            $link_customer = '';
+            if (Tools::isSubmit('viewcustomer')) {
+                $link_customer = '&id_customer='.$id_customer.'&viewcustomer';
+            }
+
+            $this->addProspect($id_customer);
+
+            $link = $this->context->link->getAdminLink('AdminCustomers') . $link_customer;
+            Tools::redirectAdmin($link);
+        }
+
         return parent::postProcess();
     }
 
@@ -293,6 +306,37 @@ class AdminProspectsController extends ModuleAdminController
                 $this->errors[] = $this->module->l('Il y a une erreur pour le prospect '
                     . $c->id . '. Corriger les informations de ce client.');
             }
+        }
+    }
+
+    private function addProspect($id_customer)
+    {
+        $id_group = $this->module->getGroupeEmployee($this->context->employee->id);
+        $isExist = ProspectClass::isProspectExistByIdCustomer($id_customer);
+
+        if (!empty($id_group) && empty($isExist)) {
+            $c = new Customer($id_customer);
+            $g = $c->getGroups();
+            unset($g[array_search('1', $g)]);
+            $g[] = $id_group;
+            $c->updateGroup($g);
+            $c->id_default_group = (int)$id_group;
+            $c->update();
+            $id_employe = $this->context->employee->id;
+            $attriProspect = new ProspectAttribueClass();
+            $attriProspect->date_debut = date('Y-m-d');
+            $attriProspect->date_fin = date('Y-m-d');
+            $attriProspect->id_employee = $id_employe;
+            $attriProspect->nbr_prospect_attribue = 1;
+            $attriProspect->add();
+
+            $prospect = new ProspectClass();
+            $prospect->id_customer = $id_customer;
+            $prospect->id_prospect_attribue = $attriProspect->id;
+            $prospect->traite = 'Nouveau';
+            $prospect->injoignable = 'non';
+            $prospect->date_debut = date('Y-m-d');
+            $prospect->add();
         }
     }
 

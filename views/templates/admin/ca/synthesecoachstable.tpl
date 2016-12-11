@@ -109,14 +109,14 @@
     <tbody>
     {foreach item=coach from=$datasEmployees}
         <tr>
-            <td>{$coach['lastname']|escape:'htmlall':'UTF-8'} ({$coach['firstname']|escape:'htmlall':'UTF-8'})</td>
-            <td class="text-right">{displayPrice price=$coach['totalVenteGrAbo']}</td>
-            <td class="text-center">{$coach['nbrVenteGrAbo']|escape:'htmlall':'UTF-8'}</td>
-            <td class="text-center">{$coach['nbrVenteGrDesaAbo']|escape:'htmlall':'UTF-8'}</td>
-            <td class="text-right">{$coach['pourcenDesabo']|escape:'htmlall':'UTF-8'}</td>
-            <td class="text-right">{displayPrice price=$coach['totalVenteGrPar']}</td>
-            <td class="text-center">{$coach['nbrVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
-            <td class="text-left">{$coach['pourVenteGrPar']|escape:'htmlall':'UTF-8'}</td>
+            <td>{$coach['lastname']|escape:'htmlall':'UTF-8'} ({$coach.firstname|escape:'htmlall':'UTF-8'})</td>
+            <td class="text-right">{displayPrice price=$coach.totalVenteGrAbo}</td>
+            <td class="text-center">{$coach.nbrVenteGrAbo|escape:'htmlall':'UTF-8'}</td>
+            <td class="text-center">{$coach.nbrVenteGrDesaAbo|escape:'htmlall':'UTF-8'}</td>
+            <td class="text-right">{$coach.pourcenDesabo|escape:'htmlall':'UTF-8'}</td>
+            <td class="text-right">{displayPrice price=$coach.totalVenteGrPar}</td>
+            <td class="text-center">{$coach.nbrVenteGrPar|escape:'htmlall':'UTF-8'}</td>
+            <td class="text-left">{$coach.pourVenteGrPar|escape:'htmlall':'UTF-8'}</td>
         </tr>
     {/foreach}
     {if !empty($total)}

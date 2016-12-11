@@ -284,7 +284,7 @@ class ProspectClass extends ObjectModel
      * @param $id
      * @return ProspectClass
      */
-    private static function getProspectsByIdCu($id)
+    public static function getProspectsByIdCu($id)
     {
         $sql = 'SELECT `id_prospect` FROM `' . _DB_PREFIX_ . 'prospect` WHERE `id_customer` = ' . (int)$id;
         $req = Db::getInstance()->getValue($sql);

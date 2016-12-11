@@ -543,7 +543,9 @@ class CaTools
 
     public static function getGroupeCoach($id_employee)
     {
-        $sql = 'SELECT `id_group` FROM `' . _DB_PREFIX_ . 'group_lang` WHERE `id_employee` = ' . (int)$id_employee;
+        $sql = 'SELECT `id_group` 
+                FROM `' . _DB_PREFIX_ . 'group_lang` 
+                WHERE `id_employee` = ' . (int)$id_employee;
         $req = Db::getInstance()->getValue($sql);
 
         return $req;
