@@ -322,7 +322,9 @@ class AdminProspectsController extends ModuleAdminController
             $c->updateGroup($g);
             $c->id_default_group = (int)$id_group;
             $c->update();
+
             $id_employe = $this->context->employee->id;
+
             $attriProspect = new ProspectAttribueClass();
             $attriProspect->date_debut = date('Y-m-d');
             $attriProspect->date_fin = date('Y-m-d');
