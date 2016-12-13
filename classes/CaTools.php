@@ -352,9 +352,9 @@ class CaTools
                 $objectifCoachs[$objectifCoach]['caCoach'] = $caCoach;
                 $objectifCoachs[$objectifCoach]['projectif'] = $projectif;
                 $class = '';
-                if ($p < 50) {
+                if ($p < 90) {
                     $class = 'danger';
-                } elseif ($p >= 50 && $p < 100) {
+                } elseif ($p >= 90 && $p < 100) {
                     $class = 'warning';
                 } elseif ($p >= 100) {
                     $class = 'success';
