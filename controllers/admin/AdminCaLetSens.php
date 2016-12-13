@@ -1521,7 +1521,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
         $datas['panierMoyen'] = round($datas['CaProsp'] / $datas['nbrVenteProsp'], 2);
         $datas['panierMoyenFid'] = round($datas['caDejaInscrit'] / $datas['nbrVenteFid'], 2);
-        $datas['CaContact'] = round($datas['CaProsp'] / $datas['NbreDeProspects'], 2) . ' %';
+        $datas['CaContact'] = round($datas['CaProsp'] / $datas['NbreDeProspects'], 2);
         $datas['tauxTransfo'] = round((($datas['nbrVenteProsp'] * 100) / $datas['NbreDeProspects']), 2) . ' %';
         $datas['PourcCaProspect'] = round(($datas['CaProsp'] * 100) / $datas['caAjuste'], 2) . ' %';
         $datas['PourcCaFID'] = round($datas['caDejaInscrit'] * 100 / $datas['caAjuste'], 2) . ' %';

@@ -51,7 +51,7 @@
     <tr>
         <td>{$coach['lastname']|escape:'htmlall':'UTF-8'} ({$coach['firstname']|escape:'htmlall':'UTF-8'})</td>
         <td class="text-right">{displayPrice price=$coach['caAjuste']}</td>
-        <td class="text-center">{$coach['CaContact']|escape:'htmlall':'UTF-8'}</td>
+        <td class="text-center">{displayPrice price=$coach['CaContact']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-right">{$coach['tauxTransfo']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-center">{$coach['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
         <td class="text-center">{$coach['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
@@ -71,7 +71,7 @@
             <tr>
                 <td>Total</td>
                 <td class="text-right">{displayPrice price=$total['caAjuste']}</td>
-                <td class="text-center">{$total['CaContact']|escape:'htmlall':'UTF-8'}</td>
+                <td class="text-center">{displayPrice price=$total['CaContact']|escape:'htmlall':'UTF-8'}</td>
                 <td class="text-right">{$total['tauxTransfo']|escape:'htmlall':'UTF-8'}</td>
                 <td class="text-center">{$total['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
                 <td class="text-center">{$total['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
