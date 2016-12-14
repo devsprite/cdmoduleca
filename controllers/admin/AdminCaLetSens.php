@@ -55,6 +55,7 @@ class AdminCaLetSensController extends ModuleAdminController
     public $histoAjoutSomme;
     public $histoObjectif;
     public $histoTable;
+    public $primeCaValues;
 
     public function __construct()
     {
@@ -66,6 +67,25 @@ class AdminCaLetSensController extends ModuleAdminController
         $this->path_tpl = _PS_MODULE_DIR_ . 'cdmoduleca/views/templates/admin/ca/';
         $this->employees_actif = 1;
         $this->commandeValid = 2;
+        $this->primeCaValues = array(
+            '5634' => '1.6',
+            '6573' => '2.66',
+            '7512' => '3.73',
+            '8451' => '4.79',
+            '9390' => '5.86',
+            '10329' => '7.46',
+            '11268' => '8.52',
+            '12207' => '9.59',
+            '13146' => '10.65',
+            '14085' => '11.72',
+            '15023' => '13.85',
+            '15962' => '14.91',
+            '16901' => '15.98',
+            '17840' => '15.98',
+            '18779' => '15.98',
+            '20000' => '15.98'
+        );
+
 
         $this->defautValues();
 
@@ -270,6 +290,10 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['nbrJourOuvre'] = $this->nbrJourOuvre($id_employe);
 
+            $datasEmployees[$employee['id_employee']]['absence'] = $this->absence($id_employe);
+
+            $datasEmployees[$employee['id_employee']]['primeCA'] = $this->primeCA($datasEmployees[$id_employe]);
+
         }
 
 
@@ -285,6 +309,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 'caDeduit' => 0,
                 'primeVenteGrAbo' => 0,
                 'primeFichierCoach' => 0,
+                'primeCA' => 0,
                 'primeParrainage' => 0,
                 'ajustement' => 0,
             );
@@ -297,6 +322,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $datasEmployeesTotal['caDeduit'] += $data['caDeduit'];
                 $datasEmployeesTotal['primeVenteGrAbo'] += $data['primeVenteGrAbo'];
                 $datasEmployeesTotal['primeFichierCoach'] += $data['primeFichierCoach'];
+                $datasEmployeesTotal['primeCA'] += $data['primeCA'];
                 $datasEmployeesTotal['primeParrainage'] += $data['primeParrainage'];
                 $datasEmployeesTotal['ajustement'] += $data['ajustement'];
             }
@@ -1300,6 +1326,35 @@ class AdminCaLetSensController extends ModuleAdminController
         return ($r != 0) ? $r : '';
     }
 
+    private function primeCA($employe)
+    {
+        $ca = floatval($employe['caAjuste']);
+        $joursOuvre = (int)CaTools::getNbOpenDays($this->getDateBetween());
+        $abscence = $employe['absence'];
+        $joursReel = (int)$employe['nbrJourOuvre'] - $abscence['jours'];
+        $result = 0;
+        $pourcentage = 0;
+
+        if (!empty($ca) && !empty($joursReel)) {
+            $ca = ($ca / $joursReel) * $joursOuvre;
+
+            foreach ($this->primeCaValues as $key => $value) {
+                if ($ca >= $key) {
+                    $pourcentage = $value;
+                }
+            }
+
+            $result = ($ca / 100) * $pourcentage;
+        }
+
+        return $result;
+    }
+
+    private function absence($id_employe)
+    {
+        return CaTools::getAbsenceEmployee($id_employe, $this->getDateBetween());
+    }
+
     private function historique()
     {
         $histoMain = $this->insertHistoMain();
@@ -1329,6 +1384,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $histoMain->CaProsp = $this->convertFloat($data->value['CaProsp']);
             $histoMain->caDeduit = $this->convertFloat($data->value['caDeduit']);
             $histoMain->primeVenteGrAbo = $this->convertFloat($data->value['primeVenteGrAbo']);
+            $histoMain->primeCA = $this->convertFloat($data->value['primeCA']);
             $histoMain->primeFichierCoach = $this->convertFloat($data->value['primeFichierCoach']);
             $histoMain->primeParrainage = $this->convertFloat($data->value['primeParrainage']);
             $histoMain->ajustement = $this->convertFloat($data->value['ajustement']);
@@ -1345,6 +1401,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $histoMain->CaProsp = $this->convertFloat($data['CaProsp']);
                 $histoMain->caDeduit = $this->convertFloat($data['caDeduit']);
                 $histoMain->primeVenteGrAbo = $this->convertFloat($data['primeVenteGrAbo']);
+                $histoMain->primeCA = $this->convertFloat($data['primeCA']);
                 $histoMain->primeFichierCoach = $this->convertFloat($data['primeFichierCoach']);
                 $histoMain->primeParrainage = $this->convertFloat($data['primeParrainage']);
                 $histoMain->ajustement = $this->convertFloat($data['ajustement']);
@@ -1434,7 +1491,7 @@ class AdminCaLetSensController extends ModuleAdminController
         if (Tools::isSubmit('id_histo')) {
             $id = (int)Tools::getValue('id_histo');
             $histoMain = get_object_vars(new HistoStatsMainClass($id));
-            // Est-ce que le coach peut voir l'historiqe ?
+            // Est-ce que le coach peut voir l'historique ?
             if ($this->module->viewAllCoachs[$this->context->employee->id_profile] ||
                 $this->context->employee->id == $histoMain['id_employee']
             ) {
@@ -1556,6 +1613,8 @@ class AdminCaLetSensController extends ModuleAdminController
             setcookie('stats_date', 'on', time() + 3600);
         }
     }
+
+
 }
 
 

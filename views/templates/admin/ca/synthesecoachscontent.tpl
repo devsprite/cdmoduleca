@@ -31,7 +31,8 @@
             {if isset($histo)}
                 <div class="row group">
                     <div class="col-xs-12"><strong>{$datasEmployeesTotal['filterCoach']}</strong>
-                        <span class="pull-right">Du {$datasEmployeesTotal['datepickerFrom']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'} au {$datasEmployeesTotal['datepickerTo']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</span>
+                        <span class="pull-right">Du {$datasEmployeesTotal['datepickerFrom']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}
+                            au {$datasEmployeesTotal['datepickerTo']|date_format:'%d/%m/%Y'|escape:'htmlall':'UTF-8'}</span>
                     </div>
                 </div>
             {/if}
@@ -55,11 +56,13 @@
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caDeduit']}</span>
                 </div>
             </div>
-            {*<div class="row group">*}
-                {*<div class="col-xs-12">Prime CA*}
-                    {*<span class="pull-right"></span>*}
-                {*</div>*}
-            {*</div>*}
+            {if isset($datasEmployeesTotal['primeCA'])}
+                <div class="row group">
+                    <div class="col-xs-12">Prime CA
+                        <span class="pull-right">{displayPrice price=$datasEmployeesTotal['primeCA']}</span>
+                    </div>
+                </div>
+            {/if}
             <div class="row group">
                 <div class="col-xs-12">Prime Abonnement
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['primeVenteGrAbo']}</span>
@@ -80,11 +83,11 @@
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['ajustement']}</span>
                 </div>
             </div>
-                <div class="row group">
-                    <div class="col-xs-12">Nbre de jours ouvrés
-                        <span class="pull-right">{$datasEmployeesTotal['nbrJourOuvre']}</span>
-                    </div>
+            <div class="row group">
+                <div class="col-xs-12">Nbre de jours ouvrés
+                    <span class="pull-right">{$datasEmployeesTotal['nbrJourOuvre']}</span>
                 </div>
+            </div>
         {/if}
         {* Coachs *}
         {if !empty({$coach->lastname}) && !isset($histo)}
@@ -109,11 +112,11 @@
                         <span class="pull-right">{displayPrice price=$employe['caDeduit']}</span>
                     </div>
                 </div>
-                {*<div class="row group">*}
-                    {*<div class="col-xs-12">Prime CA*}
-                        {*<span class="pull-right"></span>*}
-                    {*</div>*}
-                {*</div>*}
+                <div class="row group">
+                    <div class="col-xs-12">Prime CA
+                        <span class="pull-right">{displayPrice price=$employe['primeCA']}</span>
+                    </div>
+                </div>
                 <div class="row group">
                     <div class="col-xs-12">Prime Abonnement
                         <span class="pull-right">{displayPrice price=$employe['primeVenteGrAbo']}</span>
@@ -205,7 +208,8 @@
                         <td><span class="pull-right">{displayPrice price=$objectif['somme']}</span></td>
                         <td><span class="pull-right">{displayPrice price=$objectif['caCoach']}</span></td>
                         <td><span class="pull-right">{displayPrice price=$objectif['resteAFaire']}</span></td>
-                        <td><span class="pull-right">{displayPrice price=$objectif['projectif']|escape:'htmlall':'UTF-8'}</span>
+                        <td>
+                            <span class="pull-right">{displayPrice price=$objectif['projectif']|escape:'htmlall':'UTF-8'}</span>
                         </td>
                         <td>{$objectif['commentaire']|wordwrap:50:"\n":true|escape:'htmlall':'UTF-8'}</td>
                         <td>
