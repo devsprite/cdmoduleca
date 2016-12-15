@@ -29,11 +29,11 @@
         <tbody class="compteur_{if isset($objectif['class'])}{$objectif['class']|escape:'htmlall':'UTF-8'}{/if}">
             <tr>
                 <td><span id="compteurAppels"></span> <i id="iconCompteurAppels" class="icon-phone"></i></td>
-                <td>{if !empty($objectif['pourcentDeObjectif'])}{$objectif['pourcentDeObjectif']|escape:'htmlall':'UTF-8'}%{/if}</td>
+                <td>{if !empty($objectif['projectif'])}P {displayPrice price=$objectif['projectif']}{/if}</td>
             </tr>
             <tr>
-                <td colspan="2">{if isset($objectif['projectif'])}P {displayPrice price=$objectif['projectif']}{/if}
-                    {if isset($objectif['somme'])} / {displayPrice price=$objectif['somme']}{/if}</td>
+                <td colspan="2">{if !empty($objectif['caCoach'])}{displayPrice price=$objectif['caCoach']}{/if}
+                    {if !empty($objectif['somme'])} / {displayPrice price=$objectif['somme']}{/if}</td>
             </tr>
         </tbody>
     </table>
