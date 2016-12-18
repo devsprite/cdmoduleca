@@ -117,20 +117,28 @@
                     </tr>
                     <tr style="line-height: 1.5pt;width: 100%">
                         <td style="width: 30%">
+                            <span>CA Parrainage : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['totalVenteGrPar']}</span>
+                        </td>
+                    </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
                             <span>CA Déduit Total (Retours + Impayés) </span>
                         </td>
                         <td style="width: 15%;text-align: right">
                             <span>{displayPrice price=$datasEmployeesTotal['caDeduit']}</span>
                         </td>
                     </tr>
-                    <tr style="line-height: 1.5pt;width: 100%">
-                        <td style="width: 30%">
-                            <span>Prime CA : </span>
-                        </td>
-                        <td style="width: 15%;text-align: right">
-                            <span>{displayPrice price=$datasEmployeesTotal['primeCA']}</span>
-                        </td>
-                    </tr>
+                    {*<tr style="line-height: 1.5pt;width: 100%">*}
+                        {*<td style="width: 30%">*}
+                            {*<span>Prime CA : </span>*}
+                        {*</td>*}
+                        {*<td style="width: 15%;text-align: right">*}
+                            {*<span>{displayPrice price=$datasEmployeesTotal['primeCA']}</span>*}
+                        {*</td>*}
+                    {*</tr>*}
                     <tr style="line-height: 1.5pt;width: 100%">
                         <td style="width: 30%">
                             <span>Prime Abonnement : </span>
@@ -201,20 +209,28 @@
                         </tr>
                         <tr style="line-height: 1.5pt;width: 100%">
                             <td style="width: 30%">
+                                <span>CA Parrainage : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['totalVenteGrPar']}</span>
+                            </td>
+                        </tr>
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
                                 <span>CA Déduit Total (Retours + Impayés) </span>
                             </td>
                             <td style="width: 15%;text-align: right">
                                 <span>{displayPrice price=$coach['caDeduit']}</span>
                             </td>
                         </tr>
-                        <tr style="line-height: 1.5pt;width: 100%">
-                            <td style="width: 30%">
-                                <span>Prime CA : </span>
-                            </td>
-                            <td style="width: 15%;text-align: right">
-                                <span>{displayPrice price=$coach['primeCA']}</span>
-                            </td>
-                        </tr>
+                        {*<tr style="line-height: 1.5pt;width: 100%">*}
+                            {*<td style="width: 30%">*}
+                                {*<span>Prime CA : </span>*}
+                            {*</td>*}
+                            {*<td style="width: 15%;text-align: right">*}
+                                {*<span>{displayPrice price=$coach['primeCA']}</span>*}
+                            {*</td>*}
+                        {*</tr>*}
                         <tr style="line-height: 1.5pt;width: 100%">
                             <td style="width: 30%">
                                 <span>Prime Abonnement : </span>

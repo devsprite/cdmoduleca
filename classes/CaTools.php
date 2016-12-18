@@ -375,7 +375,7 @@ class CaTools
      */
     public static function caProsp($data)
     {
-        return ($data['caTotal'] > 0) ? $data['caTotal'] - $data['caDejaInscrit'] : '';
+        return ($data['caTotal'] > 0) ? $data['caTotal'] - $data['caDejaInscrit'] -$data['totalVenteGrPar'] - $data['caAvoir']: '';
     }
 
     /**

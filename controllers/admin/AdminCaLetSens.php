@@ -228,6 +228,10 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['caDejaInscrit'] = $this->caDejaInscrit($id_employe);
 
+            $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] = $this->totalVenteGrPar($id_employe);
+
+            $datasEmployees[$employee['id_employee']]['pourVenteGrPar'] = $this->pourVenteGrPar($datasEmployees[$id_employe]);
+
             $datasEmployees[$employee['id_employee']]['CaProsp'] = $this->CaProsp($datasEmployees[$id_employe]);
 
             $datasEmployees[$employee['id_employee']]['PourcCaProspect'] = $this->PourcCaProspect($datasEmployees[$id_employe]);
@@ -307,6 +311,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 'caFidTotal' => 0,
                 'CaProsp' => 0,
                 'caDeduit' => 0,
+                'totalVenteGrPar' => 0,
                 'primeVenteGrAbo' => 0,
                 'primeFichierCoach' => 0,
                 'primeCA' => 0,
@@ -323,6 +328,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $datasEmployeesTotal['primeVenteGrAbo'] += $data['primeVenteGrAbo'];
                 $datasEmployeesTotal['primeFichierCoach'] += $data['primeFichierCoach'];
                 $datasEmployeesTotal['primeCA'] += $data['primeCA'];
+                $datasEmployeesTotal['totalVenteGrPar'] += $data['totalVenteGrPar'];
                 $datasEmployeesTotal['primeParrainage'] += $data['primeParrainage'];
                 $datasEmployeesTotal['ajustement'] += $data['ajustement'];
             }
@@ -1385,6 +1391,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $histoMain->caDeduit = $this->convertFloat($data->value['caDeduit']);
             $histoMain->primeVenteGrAbo = $this->convertFloat($data->value['primeVenteGrAbo']);
             $histoMain->primeCA = $this->convertFloat($data->value['primeCA']);
+            $histoMain->totalVenteGrPar = $this->convertFloat($data->value['totalVenteGrPar']);
             $histoMain->primeFichierCoach = $this->convertFloat($data->value['primeFichierCoach']);
             $histoMain->primeParrainage = $this->convertFloat($data->value['primeParrainage']);
             $histoMain->ajustement = $this->convertFloat($data->value['ajustement']);
@@ -1402,6 +1409,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $histoMain->caDeduit = $this->convertFloat($data['caDeduit']);
                 $histoMain->primeVenteGrAbo = $this->convertFloat($data['primeVenteGrAbo']);
                 $histoMain->primeCA = $this->convertFloat($data['primeCA']);
+                $histoMain->totalVenteGrPar = $this->convertFloat($data['totalVenteGrPar']);
                 $histoMain->primeFichierCoach = $this->convertFloat($data['primeFichierCoach']);
                 $histoMain->primeParrainage = $this->convertFloat($data['primeParrainage']);
                 $histoMain->ajustement = $this->convertFloat($data['ajustement']);
