@@ -63,7 +63,7 @@ class CdModuleCA extends ModuleGrid
     {
         $this->name = 'cdmoduleca';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.7';
+        $this->version = '1.0.8';
         $this->author = 'Dominique';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1170,6 +1170,18 @@ class CdModuleCA extends ModuleGrid
             $id_coach = $this->getIdCoach($coach);
             $id_code_action = $this->getIdCodeAction($code_action);
 
+            if (empty($id_code_action)) {
+                $data = array(
+                   'id_code_action' => '',
+                    'name' => pSQL($code_action),
+                    'description' => pSQL($code_action),
+                    'groupe' => 2
+                );
+
+                Db::getInstance()->insert('code_action', $data);
+            }
+
+            $id_code_action = $this->getIdCodeAction($code_action);
             // Si il y a les id, on met à jour la commande passé avec les id coach et code_action
             if (!empty($id_coach) && !empty($id_code_action)) {
                 $req = 'UPDATE `' . _DB_PREFIX_ . 'orders`
@@ -1196,6 +1208,19 @@ class CdModuleCA extends ModuleGrid
         ) {
             // Correspondance entre le coach et le code action en id correspondant
             $id_coach = $this->getIdCoach($order['coach']);
+            $id_code_action = $this->getIdCodeAction($order['code_action']);
+
+            if (empty($id_code_action)) {
+                $data = array(
+                    'id_code_action' => '',
+                    'name' => pSQL($order['code_action']),
+                    'description' => pSQL($order['code_action']),
+                    'groupe' => 2
+                );
+
+                Db::getInstance()->insert('code_action', $data);
+            }
+
             $id_code_action = $this->getIdCodeAction($order['code_action']);
 
             // Si il y a les id, on met à jour la commande passé avec les id coach et code_action
