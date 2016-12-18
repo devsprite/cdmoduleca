@@ -337,8 +337,10 @@ class AdminCaLetSensController extends ModuleAdminController
         }
 
         $ajoutSommes = CaTools::getAjoutSomme($this->idFilterCoach, $this->getDateBetween());
+        $ajoutSommes = $this->addTotalAjoutSommes($ajoutSommes);
         $objectifCoachs = CaTools::getObjectifCoachs($this->idFilterCoach, $this->getDateBetween());
         $objectifs = CaTools::isProjectifAtteint($objectifCoachs);
+        $objectifs = $this->addTotalObjectifs($objectifs);
         $this->smarty->assign(array(
             'datasEmployees' => ($this->histoTable) ? $this->histoTable : $datasEmployees,
             'datasEmployeesTotal' => ($this->histoMain) ? $this->histoMain : $datasEmployeesTotal,
@@ -1620,6 +1622,66 @@ class AdminCaLetSensController extends ModuleAdminController
             $this->context->employee->update();
             setcookie('stats_date', 'on', time() + 3600);
         }
+    }
+
+    private function addTotalAjoutSommes($ajoutSommes)
+    {
+        $total = 0;
+        foreach ($ajoutSommes as $key) {
+            $total += $key['somme'];
+        }
+        $ajoutSommes[] = array(
+                'id_ajout_somme' => '',
+                'somme' => $total,
+                'id_order' => '',
+                'id_employee' => '',
+                'date_ajout_somme' => '',
+                'commentaire' => '',
+                'lastname' => 'Total'
+            );
+
+        return $ajoutSommes;
+    }
+
+    private function addTotalObjectifs($objectifs)
+    {
+        $totalSomme = 0;
+        $totalHeure_absence = 0;
+        $totalJour_absence = 0;
+        $totalJour_ouvre = 0;
+        $totalResteAFaire = 0;
+        $totalCaCoach = 0;
+        $totalProjectif = 0;
+
+        foreach ($objectifs as $key) {
+            $totalSomme += $key['somme'];
+            $totalHeure_absence += $key['heure_absence'];
+            $totalJour_absence += $key['jour_absence'];
+            $totalJour_ouvre += $key['jour_ouvre'];
+            $totalResteAFaire += $key['resteAFaire'];
+            $totalCaCoach += $key['caCoach'];
+            $totalProjectif += $key['projectif'];
+        }
+
+        $objectifs[] = array(
+            'id_objectif_coach' => '',
+            'somme' => $totalSomme,
+            'commentaire' => '',
+            'id_employee' => '',
+            'date_start' => '',
+            'date_end' => '',
+            'lastname' => 'Total',
+            'heure_absence' => $totalHeure_absence,
+            'jour_absence' => $totalJour_absence,
+            'jour_ouvre' => $totalJour_ouvre,
+            'resteAFaire' => $totalResteAFaire,
+            'pourcentDeObjectif' => '',
+            'caCoach' => $totalCaCoach,
+            'projectif' => $totalProjectif,
+            'class' => ''
+        );
+
+        return $objectifs;
     }
 
 
