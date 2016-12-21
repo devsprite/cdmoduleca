@@ -477,6 +477,7 @@ class AdminCaLetSensController extends ModuleAdminController
             strtolower($datas[0][5]) == 'coach' &&
             strtolower(utf8_encode($datas[0][6])) == 'reste à payer'
         ) {
+
             array_shift($datas);
 
             foreach ($datas as $data) {
