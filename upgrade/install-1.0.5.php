@@ -30,8 +30,8 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_1_0_5($object, $install = false)
 {
-    if (!addColumnHistostatsmain($object) ||
-        !addColumnHistoobjectifcoach($object)
+    if (!addColumnHistostatsmain_1_0_5($object) ||
+        !addColumnHistoobjectifcoach_1_0_5($object)
     ) {
         return false;
     }
@@ -39,7 +39,7 @@ function upgrade_module_1_0_5($object, $install = false)
     return true;
 }
 
-function addColumnHistoobjectifcoach($object)
+function addColumnHistoobjectifcoach_1_0_5($object)
 {
     $sql = 'ALTER TABLE `'._DB_PREFIX_.'histoobjectifcoach`
             ADD COLUMN `projectif` DECIMAL(16,2) NULL AFTER `caCoach`';
@@ -51,7 +51,7 @@ function addColumnHistoobjectifcoach($object)
     return true;
 }
 
-function addColumnHistostatsmain($object)
+function addColumnHistostatsmain_1_0_5($object)
 {
     $sql = 'ALTER TABLE `'._DB_PREFIX_.'histostatstable`
             ADD COLUMN `panierMoyenFid` DECIMAL(16,2) NULL AFTER `panierMoyen`';

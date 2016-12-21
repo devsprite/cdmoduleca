@@ -469,12 +469,13 @@ class AdminCaLetSensController extends ModuleAdminController
     private function importfile($datas)
     {
         $isOk = true;
-        if ($datas[0][0] == 'Date valeur' &&
-            $datas[0][1] == 'Libellé' &&
-            $datas[0][2] == 'Nom' &&
-            $datas[0][4] == 'CMD' &&
-            $datas[0][5] == 'Coach' &&
-            $datas[0][6] == 'Reste à payer'
+
+        if (strtolower($datas[0][0]) == 'date valeur' &&
+            strtolower(utf8_encode($datas[0][1])) == 'libellé' &&
+            strtolower($datas[0][2]) == 'nom' &&
+            strtolower($datas[0][4]) == 'cmd' &&
+            strtolower($datas[0][5]) == 'coach' &&
+            strtolower(utf8_encode($datas[0][6])) == 'reste à payer'
         ) {
             array_shift($datas);
 

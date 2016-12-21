@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_1_0_2($object, $install = false)
 {
-    if (!addColumnHistostatsmain($object)
+    if (!addColumnHistostatsmain_1_0_2($object)
     ) {
         return false;
     }
@@ -38,7 +38,7 @@ function upgrade_module_1_0_2($object, $install = false)
     return true;
 }
 
-function addColumnHistostatsmain($object)
+function addColumnHistostatsmain_1_0_2($object)
 {
     $sql = 'ALTER TABLE `'._DB_PREFIX_.'histostatsmain`
             ADD COLUMN `id_employee` INT(12) NOT NULL AFTER `id_histostatsmain`';

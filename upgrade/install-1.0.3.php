@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_1_0_3($object, $install = false)
 {
-    if (!addColumnHistostatsmain($object)
+    if (!addColumnHistostatsmain_1_0_3($object)
     ) {
         return false;
     }
@@ -38,10 +38,10 @@ function upgrade_module_1_0_3($object, $install = false)
     return true;
 }
 
-function addColumnHistostatsmain($object)
+function addColumnHistostatsmain_1_0_3($object)
 {
     $sql = 'ALTER TABLE `'._DB_PREFIX_.'histoobjectifcoach`
-            ADD COLUMN `resteAFaire` DECIMAL(16,2) NULL AFTER `CaCoach`';
+            ADD COLUMN `resteAFaire` DECIMAL(16,2) NULL AFTER `caCoach`';
 
     if (!DB::getInstance()->execute($sql)){
         return false;
