@@ -40,3 +40,7 @@
 .cd-group-action > a {
     top:0px!important;
 }
+
+.handler {
+    cursor: pointer;
+}

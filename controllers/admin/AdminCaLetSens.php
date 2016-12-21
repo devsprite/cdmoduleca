@@ -471,11 +471,9 @@ class AdminCaLetSensController extends ModuleAdminController
         $isOk = true;
 
         if (strtolower($datas[0][0]) == 'date valeur' &&
-            strtolower(utf8_encode($datas[0][1])) == 'libellé' &&
             strtolower($datas[0][2]) == 'nom' &&
             strtolower($datas[0][4]) == 'cmd' &&
-            strtolower($datas[0][5]) == 'coach' &&
-            strtolower(utf8_encode($datas[0][6])) == 'reste à payer'
+            strtolower($datas[0][5]) == 'coach'
         ) {
 
             array_shift($datas);

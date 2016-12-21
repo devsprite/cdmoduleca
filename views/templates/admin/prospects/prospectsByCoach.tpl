@@ -28,13 +28,13 @@
         <div class="panel-heading">
             Prospects attribués
         </div>
-        <table class="table table-hover">
+        <table class="table table-hover" id="simpleTable">
             <thead>
             <tr>
-                <th>Du</th>
-                <th>Au</th>
-                <th>Coach</th>
-                <th>Nbre Prospects</th>
+                <th class="handler" data-sort="string">Du</th>
+                <th class="handler" data-sort="string">Au</th>
+                <th class="handler" data-sort="string">Coach</th>
+                <th class="handler" data-sort="int" >Nbre Prospects</th>
                 <th></th>
             </tr>
             </thead>

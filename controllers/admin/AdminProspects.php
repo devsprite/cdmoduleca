@@ -89,6 +89,8 @@ class AdminProspectsController extends ModuleAdminController
     public function setMedia()
     {
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/adminprospects.css');
+        $this->context->controller->addJS(_PS_MODULE_DIR_ . 'cdmoduleca/views/js/stupidtable.js');
+        $this->context->controller->addJS(_PS_MODULE_DIR_ . 'cdmoduleca/views/js/prospect.js');
         parent::setMedia();
     }
 

@@ -28,17 +28,17 @@
     <div class="panel-heading">
         Prospects
     </div>
-    <table class="table table-striped">
+    <table class="table table-striped" id="simpleTableProspect">
         <thead>
         <tr>
-            <th>Id</th>
-            <th>Nom</th>
+            <th class="handler" data-sort="string">Id</th>
+            <th class="handler" data-sort="string">Nom</th>
             <th>Coach</th>
-            <th>Traité</th>
-            <th>Injoignable</th>
+            <th class="handler" data-sort="string">Traité</th>
+            <th class="handler" data-sort="string">Injoignable</th>
             <th>Contacté</th>
-            <th>Inscrit le</th>
-            <th>Date Prospection</th>
+            <th class="handler" data-sort="string">Inscrit le</th>
+            <th class="handler" data-sort="string">Date Prospection</th>
         </tr>
         </thead>
         <tbody>
