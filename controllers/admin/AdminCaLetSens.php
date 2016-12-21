@@ -1649,19 +1649,20 @@ class AdminCaLetSensController extends ModuleAdminController
         $totalHeure_absence = 0;
         $totalJour_absence = 0;
         $totalJour_ouvre = 0;
-        $totalResteAFaire = 0;
+        $totalResteAFaire = (float)0;
         $totalCaCoach = 0;
-        $totalProjectif = 0;
-
+        $totalProjectif = 0.0;
         foreach ($objectifs as $key) {
-            $totalSomme += $key['somme'];
-            $totalHeure_absence += $key['heure_absence'];
-            $totalJour_absence += $key['jour_absence'];
-            $totalJour_ouvre += $key['jour_ouvre'];
-            $totalResteAFaire += $key['resteAFaire'];
-            $totalCaCoach += $key['caCoach'];
-            $totalProjectif += $key['projectif'];
-        }
+            if ($key['somme'] != 0) {
+                $totalSomme += $key['somme'];
+                $totalHeure_absence += $key['heure_absence'];
+                $totalJour_absence += $key['jour_absence'];
+                $totalJour_ouvre += $key['jour_ouvre'];
+                $totalResteAFaire += $key['resteAFaire'];
+                $totalCaCoach += $key['caCoach'];
+                $totalProjectif += $key['projectif'];
+            }
+       }
 
         $objectifs[] = array(
             'id_objectif_coach' => '',
