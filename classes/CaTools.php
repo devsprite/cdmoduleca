@@ -376,6 +376,7 @@ class CaTools
         $sql .= ' WHERE `date_add` BETWEEN ';
         $sql .= $dateBetween;
         $sql .= ' AND `valid` = 1 ';
+        $sql .= ' AND `current_state` != 460';
         $sql .= $filterCoach;
         $sql .= $filterCodeAction;
 

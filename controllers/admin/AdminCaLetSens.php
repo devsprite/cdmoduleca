@@ -483,7 +483,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 if (!Validate::isDateFormat($data[0])) {
                     $isOk = false;
                 }
-
+                if (!empty($data[0]) && !empty($data[6])) {
                 $reqEmploye = new DbQuery();
                 $reqEmploye->select('DISTINCT id_employee')
                     ->from('employee')
@@ -493,17 +493,17 @@ class AdminCaLetSensController extends ModuleAdminController
                 if (count($listCoachs) != 1) {
                     $isOk = false;
                 };
-
-                if ($isOk) {
-                    $aj = new AjoutSomme();
-                    $aj->date_ajout_somme = $data[0];
-                    $aj->commentaire = pSQL($data[1] . '-' . $data[3] . ' - ' . $data[2] . ' - ' . $data['5']);
-                    $aj->id_order = (int)$data[4];
-                    $aj->id_employee = (int)$listCoachs[0]['id_employee'];
-                    $aj->somme = (float)$data[6];
-                    $aj->impaye = 1;
-                    if (!$aj->save()) {
-                        $isOk = false;
+                    if ($isOk) {
+                        $aj = new AjoutSomme();
+                        $aj->date_ajout_somme = $data[0];
+                        $aj->commentaire = pSQL($data[1] . '-' . $data[3] . ' - ' . $data[2] . ' - ' . $data['5']);
+                        $aj->id_order = (int)$data[4];
+                        $aj->id_employee = (int)$listCoachs[0]['id_employee'];
+                        $aj->somme = (float)$data[6];
+                        $aj->impaye = 1;
+                        if (!$aj->save()) {
+                            $isOk = false;
+                        }
                     }
                 }
             }
@@ -1631,14 +1631,14 @@ class AdminCaLetSensController extends ModuleAdminController
             $total += $key['somme'];
         }
         $ajoutSommes[] = array(
-                'id_ajout_somme' => '',
-                'somme' => $total,
-                'id_order' => '',
-                'id_employee' => '',
-                'date_ajout_somme' => '',
-                'commentaire' => '',
-                'lastname' => 'Total'
-            );
+            'id_ajout_somme' => '',
+            'somme' => $total,
+            'id_order' => '',
+            'id_employee' => '',
+            'date_ajout_somme' => '',
+            'commentaire' => '',
+            'lastname' => 'Total'
+        );
 
         return $ajoutSommes;
     }
@@ -1662,7 +1662,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $totalCaCoach += $key['caCoach'];
                 $totalProjectif += $key['projectif'];
             }
-       }
+        }
 
         $objectifs[] = array(
             'id_objectif_coach' => '',
