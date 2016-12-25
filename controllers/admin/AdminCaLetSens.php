@@ -435,7 +435,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $files = $helper->process();
                 if ($files) {
                     foreach ($files as $file) {
-                        if ($file['type'] == 'text/csv') {
+                        if ($file['type'] == 'text/csv' || $file['type'] == 'application/octet-stream') {
                             if (isset($file['save_path'])) {
                                 if ($file['size'] > 3000000) {
                                     $this->errors[] = Tools::displayError('La taille du fichier est trop grande.');
