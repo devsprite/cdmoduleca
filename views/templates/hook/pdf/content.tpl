@@ -131,14 +131,14 @@
                             <span>{displayPrice price=$datasEmployeesTotal['caDeduit']}</span>
                         </td>
                     </tr>
-                    {*<tr style="line-height: 1.5pt;width: 100%">*}
-                        {*<td style="width: 30%">*}
-                            {*<span>Prime CA : </span>*}
-                        {*</td>*}
-                        {*<td style="width: 15%;text-align: right">*}
-                            {*<span>{displayPrice price=$datasEmployeesTotal['primeCA']}</span>*}
-                        {*</td>*}
-                    {*</tr>*}
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
+                            <span>Prime Chiffre d'Affaires : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['primeCA']}</span>
+                        </td>
+                    </tr>
                     <tr style="line-height: 1.5pt;width: 100%">
                         <td style="width: 30%">
                             <span>Prime Abonnement : </span>
@@ -223,14 +223,14 @@
                                 <span>{displayPrice price=$coach['caDeduit']}</span>
                             </td>
                         </tr>
-                        {*<tr style="line-height: 1.5pt;width: 100%">*}
-                            {*<td style="width: 30%">*}
-                                {*<span>Prime CA : </span>*}
-                            {*</td>*}
-                            {*<td style="width: 15%;text-align: right">*}
-                                {*<span>{displayPrice price=$coach['primeCA']}</span>*}
-                            {*</td>*}
-                        {*</tr>*}
+                        <tr style="line-height: 1.5pt;width: 100%">
+                            <td style="width: 30%">
+                                <span>Prime Chiffre d'Affaires : </span>
+                            </td>
+                            <td style="width: 15%;text-align: right">
+                                <span>{displayPrice price=$coach['primeCA']}</span>
+                            </td>
+                        </tr>
                         <tr style="line-height: 1.5pt;width: 100%">
                             <td style="width: 30%">
                                 <span>Prime Abonnement : </span>

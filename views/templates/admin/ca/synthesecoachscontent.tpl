@@ -61,13 +61,13 @@
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caDeduit']}</span>
                 </div>
             </div>
-            {*{if isset($datasEmployeesTotal['primeCA'])}*}
-                {*<div class="row group">*}
-                    {*<div class="col-xs-12">Prime CA*}
-                        {*<span class="pull-right">{displayPrice price=$datasEmployeesTotal['primeCA']}</span>*}
-                    {*</div>*}
-                {*</div>*}
-            {*{/if}*}
+            {if isset($datasEmployeesTotal['primeCA'])}
+                <div class="row group">
+                    <div class="col-xs-12">Prime Chiffre d'Affaires
+                        <span class="pull-right">{displayPrice price=$datasEmployeesTotal['primeCA']}</span>
+                    </div>
+                </div>
+            {/if}
             <div class="row group">
                 <div class="col-xs-12">Prime Abonnement
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['primeVenteGrAbo']}</span>
@@ -122,11 +122,11 @@
                         <span class="pull-right">{displayPrice price=$employe['caDeduit']}</span>
                     </div>
                 </div>
-                {*<div class="row group">*}
-                    {*<div class="col-xs-12">Prime CA*}
-                        {*<span class="pull-right">{displayPrice price=$employe['primeCA']}</span>*}
-                    {*</div>*}
-                {*</div>*}
+                <div class="row group">
+                    <div class="col-xs-12">Prime Chiffre d'Affaires
+                        <span class="pull-right">{displayPrice price=$employe['primeCA']}</span>
+                    </div>
+                </div>
                 <div class="row group">
                     <div class="col-xs-12">Prime Abonnement
                         <span class="pull-right">{displayPrice price=$employe['primeVenteGrAbo']}</span>
