@@ -36,11 +36,13 @@
                     </div>
                 </div>
             {/if}
+            {if $datasEmployeesTotal['caTotalAvecAbo'] != 0}
             <div class="row group">
                 <div class="col-xs-12">CA TOTAL FINAL AVEC ABO
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caTotalAvecAbo']}</span>
                 </div>
             </div>
+            {/if}
             <div class="row group">
                 <div class="col-xs-12">CA TOTAL FINAL
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caAjuste']}</span>
