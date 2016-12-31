@@ -37,6 +37,11 @@
                 </div>
             {/if}
             <div class="row group">
+                <div class="col-xs-12">CA TOTAL FINAL AVEC ABO
+                    <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caTotalAvecAbo']}</span>
+                </div>
+            </div>
+            <div class="row group">
                 <div class="col-xs-12">CA TOTAL FINAL
                     <span class="pull-right">{displayPrice price=$datasEmployeesTotal['caAjuste']}</span>
                 </div>

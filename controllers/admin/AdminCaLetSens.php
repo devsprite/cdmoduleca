@@ -300,7 +300,6 @@ class AdminCaLetSensController extends ModuleAdminController
 
         }
 
-
         $datasEmployeesTotal = array();
         $total = array();
         if (count($datasEmployees) > 1) {
@@ -312,6 +311,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 'CaProsp' => 0,
                 'caDeduit' => 0,
                 'totalVenteGrPar' => 0,
+                'totalVenteGrAbo' => 0,
                 'primeVenteGrAbo' => 0,
                 'primeFichierCoach' => 0,
                 'primeCA' => 0,
@@ -329,10 +329,12 @@ class AdminCaLetSensController extends ModuleAdminController
                 $datasEmployeesTotal['primeFichierCoach'] += $data['primeFichierCoach'];
                 $datasEmployeesTotal['primeCA'] += $data['primeCA'];
                 $datasEmployeesTotal['totalVenteGrPar'] += $data['totalVenteGrPar'];
+                $datasEmployeesTotal['totalVenteGrAbo'] += $data['totalVenteGrAbo'];
                 $datasEmployeesTotal['primeParrainage'] += $data['primeParrainage'];
                 $datasEmployeesTotal['ajustement'] += $data['ajustement'];
             }
             $datasEmployeesTotal['nbrJourOuvre'] = CaTools::getNbOpenDays($this->getDateBetween());
+            $datasEmployeesTotal['caTotalAvecAbo'] = $datasEmployeesTotal['caAjuste'] + $datasEmployeesTotal['totalVenteGrAbo'];
             $datasEmployeesTotal['id_employee'] = 0;
         }
 
@@ -1394,6 +1396,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $histoMain->primeVenteGrAbo = $this->convertFloat($data->value['primeVenteGrAbo']);
             $histoMain->primeCA = $this->convertFloat($data->value['primeCA']);
             $histoMain->totalVenteGrPar = $this->convertFloat($data->value['totalVenteGrPar']);
+            $histoMain->caTotalAvecAbo = $this->convertFloat($data->value['caTotalAvecAbo']);
             $histoMain->primeFichierCoach = $this->convertFloat($data->value['primeFichierCoach']);
             $histoMain->primeParrainage = $this->convertFloat($data->value['primeParrainage']);
             $histoMain->ajustement = $this->convertFloat($data->value['ajustement']);

@@ -44,6 +44,7 @@ class HistoStatsMainClass extends ObjectModel
     public $caDeduit;
     public $primeCA;
     public $totalVenteGrPar;
+    public $caTotalAvecAbo;
     public $primeVenteGrAbo;
     public $primeFichierCoach;
     public $primeParrainage;
@@ -65,6 +66,7 @@ class HistoStatsMainClass extends ObjectModel
             'caDeduit' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'primeCA' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'totalVenteGrPar' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
+            'caTotalAvecAbo' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'primeVenteGrAbo' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'primeFichierCoach' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'primeParrainage' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),

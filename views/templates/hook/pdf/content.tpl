@@ -93,6 +93,14 @@
                 {if isset($coachs) && $filterActif == 0 && !empty($datasEmployeesTotal) || isset($histo)}
                     <tr style="line-height: 1.5pt;width: 100%">
                         <td style="width: 30%">
+                            <span>CA TOTAL FINAL AVEC ABO : </span>
+                        </td>
+                        <td style="width: 15%;text-align: right">
+                            <span>{displayPrice price=$datasEmployeesTotal['caTotalAvecAbo']}</span>
+                        </td>
+                    </tr>
+                    <tr style="line-height: 1.5pt;width: 100%">
+                        <td style="width: 30%">
                             <span>CA TOTAL FINAL : </span>
                         </td>
                         <td style="width: 15%;text-align: right">
