@@ -56,7 +56,8 @@ class CdModuleCA extends ModuleGrid
         'CDMODULECA_PROSPECTS_JOUR' => '26', // Nombre de prospects par jour et par coach
         'CDMODULECA_PROSPECTS_HEURE' => '4.33', // Nombre de prospects par heure et par coach
         'CDMODULECA_NBR_JOUR_MAX_PROSPECTS' => '10', // Nombre de jour avant la date index (ancien prospects)
-        'CDMODULECA_PROSPECTS_INDEX_DATE' => '2016-11-08 00:00:00' // Date pour la prise en compte des nouveaux prospects
+        'CDMODULECA_PROSPECTS_INDEX_DATE' => '2016-11-08 00:00:00', // Date pour la prise en compte des nouveaux prospects
+        'CDMODULECA_SEUIL_PRIME_FICHIER' => '18'
     );
 
     public function __construct()
@@ -755,6 +756,7 @@ class CdModuleCA extends ModuleGrid
             Configuration::updateValue('CDMODULECA_ORDERS_STATE_JOURS', (int)Tools::getValue('os_nbr_jours'));
         } elseif (Tools::isSubmit('submitConfiguration')) {
             Configuration::updateValue('CDMODULECA_PRIME_FICHIER', (float)(Tools::getValue('co_prime_fichier')));
+            Configuration::updateValue('CDMODULECA_SEUIL_PRIME_FICHIER', (float)(Tools::getValue('co_seuil_prime_fichier')));
             Configuration::updateValue('CDMODULECA_PROSPECTS_JOUR', (float)(Tools::getValue('co_prospects_jour')));
             Configuration::updateValue('CDMODULECA_PROSPECTS_HEURE', (float)(Tools::getValue('co_prospects_heure')));
             Configuration::updateValue('CDMODULECA_NBR_JOUR_MAX_PROSPECTS', (int)(Tools::getValue('co_prospects_jour_max')));
@@ -781,6 +783,14 @@ class CdModuleCA extends ModuleGrid
     private function generateFormConstantes()
     {
         $inputs = array();
+        $inputs[] = array(
+            'type' => 'text',
+            'label' => 'Seuil de Calcul Prime fichier',
+            'name' => 'co_seuil_prime_fichier',
+            'desc' => 'Montant du seuil de calcul de la prime',
+            'class' => 'input fixed-width-md',
+            'suffix' => '€'
+        );
         $inputs[] = array(
             'type' => 'text',
             'label' => 'Prime fichier',
@@ -1086,7 +1096,8 @@ class CdModuleCA extends ModuleGrid
             'co_prospects_jour' => Configuration::get('CDMODULECA_PROSPECTS_JOUR'),
             'co_prospects_heure' => Configuration::get('CDMODULECA_PROSPECTS_HEURE'),
             'co_prospects_jour_max' => Configuration::get('CDMODULECA_NBR_JOUR_MAX_PROSPECTS'),
-            'co_prime_parrainage' => Configuration::get('CDMODULECA_PRIME_PARRAINAGE')
+            'co_prime_parrainage' => Configuration::get('CDMODULECA_PRIME_PARRAINAGE'),
+            'co_seuil_prime_fichier' => Configuration::get('CDMODULECA_SEUIL_PRIME_FICHIER')
         );
 
         return $values;

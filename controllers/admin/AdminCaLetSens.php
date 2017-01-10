@@ -290,7 +290,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['pourVenteGrPar'] = $this->pourVenteGrPar($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['primeFichierCoach'] = $this->primeFichierCoach($id_employe);
+            $datasEmployees[$employee['id_employee']]['primeFichierCoach'] = $this->primeFichierCoach($datasEmployees[$id_employe]);
 
             $datasEmployees[$employee['id_employee']]['nbrJourOuvre'] = $this->nbrJourOuvre($id_employe);
 
@@ -1320,9 +1320,13 @@ class AdminCaLetSensController extends ModuleAdminController
         return ($r != 0) ? $r . ' %' : '';
     }
 
-    private function primeFichierCoach($id_employe)
+    private function primeFichierCoach($employe)
     {
-        $r = CaTools::primeFichier($id_employe, $this->getDateBetween());
+        $r = 0;
+        $seuil = Configuration::get('CDMODULECA_SEUIL_PRIME_FICHIER');
+        if($employe['CaContact'] > $seuil ) {
+            $r = CaTools::primeFichier($employe['id_employee'], $this->getDateBetween());
+        }
         return ($r != 0) ? $r : '';
     }
 
