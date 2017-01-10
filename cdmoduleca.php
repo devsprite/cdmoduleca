@@ -700,8 +700,8 @@ class CdModuleCA extends ModuleGrid
      */
     public function getContent()
     {
-        //$this->updateOrdersTableIdCodeAction();
-        //$this->updateOrdersTableIdEmployee();
+        $this->updateOrdersTableIdCodeAction();
+        $this->updateOrdersTableIdEmployee();
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/bootstrap.min.css');
         $this->postProcess();
         $this->displayForm();
