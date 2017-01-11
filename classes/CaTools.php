@@ -326,7 +326,7 @@ class CaTools
 
                 $projectif = '';
                 if ($joursTravaille != 0) {
-                    $projectif = ($caCoach / $joursTravaille) * ($joursTravailleTotal - $joursAbsent['jours']);
+                    $projectif = ($caCoach / ($joursTravaille - $joursAbsent['jours'])) * ($joursTravailleTotal - $joursAbsent['jours']);
                     $p = "($caCoach / $joursTravaille) * ($joursTravailleTotal - $joursAbs)";
                  }
 
