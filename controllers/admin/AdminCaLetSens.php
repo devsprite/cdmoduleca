@@ -1350,10 +1350,10 @@ class AdminCaLetSensController extends ModuleAdminController
         $pourcentage = 0;
 
         if (!empty($ca) && !empty($joursReel)) {
-            $ca = ($ca / $joursReel) * $joursOuvre;
+            $caprime = ($ca / $joursReel) * $joursOuvre;
 
             foreach ($this->primeCaValues as $key => $value) {
-                if ($ca >= $key) {
+                if ($caprime >= $key) {
                     $pourcentage = $value;
                 }
             }
