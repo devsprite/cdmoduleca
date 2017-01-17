@@ -49,22 +49,22 @@
     <tbody>
     {foreach item=coach from=$datasEmployees}
     <tr>
-        <td>{$coach['lastname']|escape:'htmlall':'UTF-8'} ({$coach['firstname']|escape:'htmlall':'UTF-8'})</td>
-        <td class="text-right">{displayPrice price=$coach['caAjuste']}</td>
-        <td class="text-center">{displayPrice price=$coach['CaContact']|escape:'htmlall':'UTF-8'}</td>
-        <td class="text-right">{$coach['tauxTransfo']|escape:'htmlall':'UTF-8'}</td>
-        <td class="text-center">{$coach['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>
-        <td class="text-center">{$coach['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>
-        <td class="text-right">{displayPrice price=$coach['CaProsp']}</td>
-        <td class="text-right">{displayPrice price=$coach['panierMoyen']}</td>
-        <td class="text-right">{$coach['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>
-        <td class="text-right">{displayPrice price=$coach['caDejaInscrit']}</td>
-        <td class="text-right">{displayPrice price=$coach['panierMoyenFid']}</td>
-        <td class="text-right">{$coach['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>
-        <td class="text-right">{displayPrice price=$coach['caAvoir']}
-        <td class="text-right">{$coach['pourCaAvoir']|escape:'htmlall':'UTF-8'}</td>
-        <td class="text-right">{displayPrice price=$coach['caImpaye']}</td>
-        <td class="text-right">{$coach['pourCaImpaye']}</td>
+        <td>{$coach['lastname']|escape:'htmlall':'UTF-8'} ({$coach['firstname']|escape:'htmlall':'UTF-8'})</td>{*Nom*}
+        <td class="text-right">{displayPrice price=$coach['caAjuste']}</td>{*CA TOTAL FINAL*}
+        <td class="text-center">{displayPrice price=$coach['CaContact']|escape:'htmlall':'UTF-8'}</td>{*CA/Contact Prospect*}
+        <td class="text-right">{$coach['tauxTransfo']|escape:'htmlall':'UTF-8'}</td>{*% de Transfo Prospect*}
+        <td class="text-center">{$coach['NbreDeProspects']|escape:'htmlall':'UTF-8'}</td>{*Nbre de Fichiers*}
+        <td class="text-center">{$coach['NbreVentesTotal']|escape:'htmlall':'UTF-8'}</td>{*Nbre de Ventes TOTAL*}
+        <td class="text-right">{displayPrice price=$coach['CaProsp']}</td>{*CA Prospection*}
+        <td class="text-right">{displayPrice price=$coach['panierMoyen']}</td>{*Panier Moyen Prospect*}
+        <td class="text-right">{$coach['PourcCaProspect']|escape:'htmlall':'UTF-8'}</td>{*% CA Prospect*}
+        <td class="text-right">{displayPrice price=$coach['caFidTotal']}</td>{*CA FID*}
+        <td class="text-right">{displayPrice price=$coach['panierMoyenFid']}</td>{*Panier Moyen FID*}
+        <td class="text-right">{$coach['PourcCaFID']|escape:'htmlall':'UTF-8'}</td>{*% CA FID*}
+        <td class="text-right">{displayPrice price=$coach['caAvoir']}</td>{*CA Retour*}
+        <td class="text-right">{$coach['pourCaAvoir']|escape:'htmlall':'UTF-8'}</td>{*% CA Retour*}
+        <td class="text-right">{displayPrice price=$coach['caImpaye']}</td>{*CA Impayé*}
+        <td class="text-right">{$coach['pourCaImpaye']}</td>{*% Impayé*}
     </tr>
     {/foreach}
     {if !empty($total)}

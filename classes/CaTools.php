@@ -288,8 +288,7 @@ class CaTools
      */
     public static function isProjectifAtteint($objectifCoachs)
     {
-        if ($objectifCoachs) {
-
+        if ($objectifCoachs[0]["id_employee"] != null) {
             foreach ($objectifCoachs as $objectifCoach => $objectif) {
                 $dateBetween = '"' . $objectif['date_start'] . '" AND "' . $objectif['date_end'] . '"';
                 $betweenDateNow = '"' . $objectif['date_start'] . '" AND "' . date('Y-m-d 23:59:59') . '"';
@@ -582,12 +581,9 @@ class CaTools
         }
 
         $sql = 'SELECT SUM(`somme`) FROM `' . _DB_PREFIX_ . 'ajout_somme` 
-                WHERE `date_ajout_somme` BETWEEN ' . $getDateBetween . '
-                AND `impaye` IS NULL ';
+                WHERE `date_ajout_somme` BETWEEN ' . $getDateBetween;
         $sql .= $filter;
-
         $req = Db::getInstance()->getValue($sql);
-
         return $req;
     }
 

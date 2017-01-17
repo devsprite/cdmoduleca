@@ -218,6 +218,8 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['pourCaImpaye'] = $this->pourCaImpaye($datasEmployees[$id_employe]);
 
+            $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] = $this->totalVenteGrPar($id_employe);
+
             $datasEmployees[$employee['id_employee']]['caAjuste'] = $this->caAjuste($datasEmployees[$id_employe]);
 
             $datasEmployees[$employee['id_employee']]['caRembAvoir'] = $this->caRembAvoir($datasEmployees[$id_employe]);
@@ -285,8 +287,6 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['nbrVenteGrPar'] = $this->nbrVenteGrPar($id_employe);
 
             $datasEmployees[$employee['id_employee']]['primeParrainage'] = $this->primeParrainage($datasEmployees[$id_employe]);
-
-            $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] = $this->totalVenteGrPar($id_employe);
 
             $datasEmployees[$employee['id_employee']]['pourVenteGrPar'] = $this->pourVenteGrPar($datasEmployees[$id_employe]);
 
@@ -1015,7 +1015,9 @@ class AdminCaLetSensController extends ModuleAdminController
         $r = ($id_employee['caTotal'] > 0)
             ? ($id_employee['caTotal'])
             - $id_employee['caAvoir']
-            - $id_employee['caImpaye'] : '';
+            - $id_employee['caImpaye']
+            + $id_employee['ajustement']
+            : '';
 
         return ($r != 0) ? $r : '';
     }
