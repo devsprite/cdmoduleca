@@ -1091,10 +1091,8 @@ class AdminCaLetSensController extends ModuleAdminController
     private function CaContact($id_employe)
     {
         $r = ($id_employe['NbreDeProspects'])
-            ? round((($id_employe['caAjuste'] - $id_employe['caFidTotal'])
-                / $id_employe['NbreDeProspects']), 2)
+            ? round((($id_employe['CaProsp']) / $id_employe['NbreDeProspects']), 2)
             : '';
-
         return ($r != 0) ? $r : '';
     }
 
