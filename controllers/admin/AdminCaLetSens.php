@@ -1015,7 +1015,7 @@ class AdminCaLetSensController extends ModuleAdminController
         $r = ($id_employee['caTotal'] > 0)
             ? ($id_employee['caTotal'])
             - $id_employee['caAvoir']
-            + $id_employee['caImpaye']
+            + $id_employee['ajustement']
             : '';
 
         return ($r != 0) ? $r : '';
