@@ -694,7 +694,7 @@ class CaTools
      */
     public static function getObjectifCoach($id_employee)
     {
-        $sql = 'SELECT SUM(`somme`) AS somme, MIN(`date_start`) AS date_start, MAX(`date_end`) AS date_end,
+        $sql = 'SELECT SUM(`somme`) AS somme, `date_start`, `date_end`,
                 `id_employee`
                 FROM `' . _DB_PREFIX_ . 'objectif_coach` 
                 WHERE `id_employee` = ' . (int)$id_employee . ' 
@@ -702,7 +702,6 @@ class CaTools
                 AND NOW() < `date_end` ';
 
         $req = Db::getInstance()->getRow($sql);
-
         return $req;
     }
 

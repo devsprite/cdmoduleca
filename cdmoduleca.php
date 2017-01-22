@@ -1183,7 +1183,7 @@ class CdModuleCA extends ModuleGrid
 
             if (empty($id_code_action)) {
                 $data = array(
-                   'id_code_action' => '',
+                    'id_code_action' => '',
                     'name' => pSQL($code_action),
                     'description' => pSQL($code_action),
                     'groupe' => 2
@@ -1215,7 +1215,7 @@ class CdModuleCA extends ModuleGrid
         $order = CaTools::getOrderDetailsCoach($idOrder);
 
         if ( (empty($order['id_code_action']) || empty($order['id_employee'])) &&
-             (!empty($order['code_action']) && !empty($order['coach']) )
+            (!empty($order['code_action']) && !empty($order['coach']) )
         ) {
             // Correspondance entre le coach et le code action en id correspondant
             $id_coach = $this->getIdCoach($order['coach']);
