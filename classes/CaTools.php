@@ -288,6 +288,7 @@ class CaTools
      */
     public static function isProjectifAtteint($objectifCoachs)
     {
+        var_dump($objectifCoachs);
         if ($objectifCoachs[0]["id_employee"] != null) {
             foreach ($objectifCoachs as $objectifCoach => $objectif) {
                 $dateBetween = '"' . $objectif['date_start'] . '" AND "' . $objectif['date_end'] . '"';
@@ -295,7 +296,6 @@ class CaTools
                 $ca = CaTools::getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
 
                 $ajustement = CaTools::getAjustement($objectif['id_employee'], $dateBetween);
-                $impaye = AjoutSomme::getImpaye($objectif['id_employee'], $dateBetween);
                 $avoir = CaTools::getCaCoachsAvoir($objectif['id_employee'], $dateBetween);
                 $jourTravaille = CaTools::getJourOuvreEmploye($objectif['id_employee'], $dateBetween);
 
@@ -319,9 +319,9 @@ class CaTools
                 $joursTravailleTotal = CaTools::getNbOpenDays($dateBetween);
                 $joursAbsent = CaTools::getAbsenceEmployee($objectif['id_employee'], $dateBetween);
                 $joursAbs = $joursAbsent['jours'];
-                $caCoach = $ca + $ajustement - $impaye - $avoir;
+                $caCoach = $ca + $ajustement - $avoir;
                 $objectifCoachs[$objectifCoach]['resteAFaire'] = $objectif['somme'] - $caCoach;
-                $caCoach = $ca + $ajustement - $impaye - $avoir;
+                $caCoach = $ca + $ajustement - $avoir;
 
                 $projectif = '';
                 if ($joursTravaille != 0) {
