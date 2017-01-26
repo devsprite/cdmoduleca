@@ -417,11 +417,11 @@ class AdminCaLetSensController extends ModuleAdminController
     private function setIdFilterCoach()
     {
         $this->idFilterCoach = (int)$this->context->employee->id;
-        $this->employees_actif = 1;
+        $this->employees_actif = "checked";
         if ($this->module->viewAllCoachs[$this->context->employee->id_profile]) {
             if (Tools::isSubmit('submitFilterCoachs')) {
                 $this->context->cookie->cdmoculeca_id_filter_coach = Tools::getValue('filterCoach');
-                $this->context->cookie->cdmoculeca_id_filter_coach_actif = Tools::getValue('filterCoachActif');
+                $this->context->cookie->cdmoculeca_id_filter_coach_actif = (empty(Tools::getValue('filterCoachActif')) ? "notChecked" : "checked");
             }
             $this->idFilterCoach = $this->context->cookie->cdmoculeca_id_filter_coach;
             $this->employees_actif = $this->context->cookie->cdmoculeca_id_filter_coach_actif;
@@ -486,15 +486,15 @@ class AdminCaLetSensController extends ModuleAdminController
                     $isOk = false;
                 }
                 if (!empty($data[0]) && !empty($data[6])) {
-                $reqEmploye = new DbQuery();
-                $reqEmploye->select('DISTINCT id_employee')
-                    ->from('employee')
-                    ->where('lastname = "' . pSQL($data[5]) . '"');
+                    $reqEmploye = new DbQuery();
+                    $reqEmploye->select('DISTINCT id_employee')
+                        ->from('employee')
+                        ->where('lastname = "' . pSQL($data[5]) . '"');
 
-                $listCoachs = Db::getInstance()->executeS($reqEmploye);
-                if (count($listCoachs) != 1) {
-                    $isOk = false;
-                };
+                    $listCoachs = Db::getInstance()->executeS($reqEmploye);
+                    if (count($listCoachs) != 1) {
+                        $isOk = false;
+                    };
                     if ($isOk) {
                         $aj = new AjoutSomme();
                         $aj->date_ajout_somme = $data[0];
@@ -1323,7 +1323,7 @@ class AdminCaLetSensController extends ModuleAdminController
     {
         $r = 0;
         $seuil = Configuration::get('CDMODULECA_SEUIL_PRIME_FICHIER');
-        if($employe['CaContact'] > $seuil ) {
+        if ($employe['CaContact'] > $seuil) {
             $r = CaTools::primeFichier($employe['id_employee'], $this->getDateBetween());
         }
         return ($r != 0) ? $r : '';
@@ -1611,7 +1611,7 @@ class AdminCaLetSensController extends ModuleAdminController
             $this->context->cookie->cdmoculeca_id_filter_coach = '0';
         }
         if (empty($this->context->cookie->cdmoculeca_id_filter_coach_actif)) {
-            $this->context->cookie->cdmoculeca_id_filter_coach_actif = 'on';
+            $this->context->cookie->cdmoculeca_id_filter_coach_actif = 'checked';
         }
         if (empty($this->context->cookie->cdmoculeca_filter_commande)) {
             $this->context->cookie->cdmoculeca_filter_commande = '1';

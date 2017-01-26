@@ -41,7 +41,7 @@ class CaTools
         $sql = 'SELECT gl.`id_group`,e.`id_employee`, e.`firstname`, e.`lastname`
 			FROM `' . _DB_PREFIX_ . 'employee` AS e ';
         $sql .= 'LEFT JOIN `' . _DB_PREFIX_ . 'group_lang` AS gl ON e.`id_employee` = gl.`id_employee` ';
-        $sql .= ($active == 'on') ? 'WHERE e.`active` = 1 ' : '';
+        $sql .= ($active == 'checked') ? 'WHERE e.`active` = 1 ' : '';
         $sql .= ($id) ? ' WHERE e.`id_employee` = ' . (int)$id : '';
         $sql .= ' ORDER BY e.`lastname` ASC';
 
@@ -288,13 +288,11 @@ class CaTools
      */
     public static function isProjectifAtteint($objectifCoachs)
     {
-        var_dump($objectifCoachs);
         if ($objectifCoachs[0]["id_employee"] != null) {
             foreach ($objectifCoachs as $objectifCoach => $objectif) {
                 $dateBetween = '"' . $objectif['date_start'] . '" AND "' . $objectif['date_end'] . '"';
                 $betweenDateNow = '"' . $objectif['date_start'] . '" AND "' . date('Y-m-d 23:59:59') . '"';
                 $ca = CaTools::getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
-
                 $ajustement = CaTools::getAjustement($objectif['id_employee'], $dateBetween);
                 $avoir = CaTools::getCaCoachsAvoir($objectif['id_employee'], $dateBetween);
                 $jourTravaille = CaTools::getJourOuvreEmploye($objectif['id_employee'], $dateBetween);
@@ -584,6 +582,7 @@ class CaTools
                 WHERE `date_ajout_somme` BETWEEN ' . $getDateBetween;
         $sql .= $filter;
         $req = Db::getInstance()->getValue($sql);
+
         return $req;
     }
 

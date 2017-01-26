@@ -44,7 +44,7 @@
                         <div class="checkbox">
                             <label for="filterCoachActif">
                                 <input type="checkbox" name="filterCoachActif" id="filterCoachActif"
-                                       onchange="this.form.submit();" {if $filterCoachActif}checked{/if}>
+                                       onchange="this.form.submit();" {if $filterCoachActif == "checked"}checked{/if}>
                                 Actif</label>
                         </div>
                     </div>
