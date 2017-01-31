@@ -100,72 +100,84 @@ class CdModuleCA extends ModuleGrid
                 'header' => $this->l('Commande'),
                 'dataIndex' => 'id',
                 'align' => 'center',
+                'data-sort' => 'int'
             ),
             array(
                 'id' => 'id_customer',
                 'header' => $this->l('Client'),
                 'dataIndex' => 'id_customer',
-                'align' => 'left'
+                'align' => 'left',
+                'data-sort' => 'string-ins'
             ),
             array(
                 'id' => 'impaye',
                 'header' => $this->l('Impayé'),
                 'dataIndex' => 'impaye',
                 'align' => 'right',
+                'data-sort' => 'float'
             ),
             array(
                 'id' => 'avoir',
                 'header' => $this->l('Avoir'),
                 'dataIndex' => 'avoir',
                 'align' => 'right',
+                'data-sort' => 'float'
             ),
             array(
                 'id' => 'ajustement',
                 'header' => $this->l('Ajustement'),
                 'dataIndex' => 'ajustement',
                 'align' => 'right',
+                'data-sort' => 'float'
             ),
             array(
                 'id' => 'hthp',
                 'header' => $this->l('ht-hp'),
                 'dataIndex' => 'hthp',
                 'align' => 'right',
+                'data-sort' => 'float'
             ),
             array(
                 'id' => 'id_employee',
                 'header' => $this->l('Coach'),
                 'dataIndex' => 'id_employee',
-                'align' => 'center'
+                'align' => 'center',
+                'data-sort' => 'float'
             ),
             array(
                 'id' => 'commentaire',
                 'header' => $this->l('Commentaire'),
                 'dataIndex' => 'commentaire',
-                'align' => 'left'
+                'align' => 'left',
+                'data-sort' => 'float'
             ),
             array(
                 'id' => 'current_state',
                 'header' => $this->l('Etat Commande'),
                 'dataIndex' => 'current_state',
-                'align' => 'left'
+                'align' => 'left',
+                'data-sort' => 'float'
             ),
             array(
                 'id' => 'CodeAction',
                 'header' => $this->l('Code action'),
                 'dataIndex' => 'CodeAction',
-                'align' => 'left'
+                'align' => 'left',
+                'data-sort' => 'float'
             ),
             array(
                 'id' => 'new',
                 'header' => $this->l('Nouveau Client'),
                 'dataIndex' => 'new',
-                'align' => 'center'
+                'align' => 'center',
+                'data-sort' => 'float'
             ),
             array(
                 'id' => 'date_add',
                 'header' => $this->l('Date'),
                 'dataIndex' => 'date_add',
-                'align' => 'center'
+                'align' => 'center',
+                'data-sort' => 'float'
             ),
         );
     }

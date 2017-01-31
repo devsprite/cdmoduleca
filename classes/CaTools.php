@@ -171,7 +171,7 @@ class CaTools
             $filter_current_state = Tools::substr($filter_current_state, 0, -4) . ' )';
         }
 
-        $sql = 'SELECT SQL_CALC_FOUND_ROWS id_order
+        $sql = 'SELECT COUNT(id_order) as total
                 FROM `' . _DB_PREFIX_ . 'orders` AS o
                 WHERE `valid` = 1 ';
         $sql .= $filterCoach;
@@ -179,11 +179,8 @@ class CaTools
         $sql .= $filter_current_state;
         $sql .= ' AND `date_add` BETWEEN ' . $dateBetween;
 
-        Db::getInstance()->executeS($sql);
-        $nbr = Db::getInstance()->getValue('SELECT FOUND_ROWS()');
-        $nbr = ($nbr) ? $nbr : '';
-
-        return $nbr;
+        $res = Db::getInstance()->getValue($sql);
+        return $res;
     }
 
     /**
@@ -450,18 +447,16 @@ class CaTools
             $sql_code_action = ' AND `id_code_action` = "' . (int)$code_action . '" ';
         }
 
-        $sql = 'SELECT SQL_CALC_FOUND_ROWS id_order
+        $sql = 'SELECT COUNT(id_order) as total
 				FROM `' . _DB_PREFIX_ . 'orders` AS o
 				WHERE `valid` = 1 ';
         $sql .= $sql_code_action;
         $sql .= $filterCoach;
         $sql .= ' AND o.`current_state` != 460'; // Commande gratuite
         $sql .= ' AND `date_add` BETWEEN ' . $dateBetween;
-        $nbrVenteFID = Db::getInstance()->executeS($sql);
+        $nbrVenteFID = Db::getInstance()->getValue($sql);
 
-        $nbrRows = Db::getInstance()->getValue('SELECT FOUND_ROWS()');
-
-        return ($nbrRows) ? $nbrRows : ''; // ($nbrVenteFID) ? $nbrVenteFID : '';
+        return $nbrVenteFID;
     }
 
     /**
@@ -483,6 +478,37 @@ class CaTools
         }
 
         $sql = "SELECT SUM(ROUND(o.`total_products` - o.`total_discounts_tax_excl`, 2)) as total 
+                FROM `" . _DB_PREFIX_ . "orders` as o 
+                LEFT JOIN `" . _DB_PREFIX_ . "customer` as c ON o.`id_customer` = c.`id_customer`
+                LEFT JOIN `" . _DB_PREFIX_ . "employee` as e ON o.`id_employee` = e.`id_employee`";
+        $sql .= ' WHERE o.`date_add` BETWEEN ' . $dateBetween;
+        $sql .= $filterCoach;
+        $sql .= $sql_code_action;
+
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
+    }
+
+    /**
+     * Retourne la somme des commandes par parrainage
+     * @param int $idFilterCoach
+     * @param null $code_action
+     * @param $dateBetween
+     * @return mixed
+     */
+    public static function getNbrParrainage($idFilterCoach = 0, $code_action = null, $dateBetween)
+    {
+        $filterCoach = ($idFilterCoach != 0)
+            ? " AND e . `id_employee` = '" . (int)$idFilterCoach . "'" : '';
+
+        $sql_code_action = '';
+        if ($code_action) {
+            $code_action = CaTools::getCodeActionByName($code_action);
+            $sql_code_action = " AND o.`id_code_action` = '" . (int)$code_action . "'";
+        }
+
+        $sql = "SELECT COUNT(`id_order`) as total 
                 FROM `" . _DB_PREFIX_ . "orders` as o 
                 LEFT JOIN `" . _DB_PREFIX_ . "customer` as c ON o.`id_customer` = c.`id_customer`
                 LEFT JOIN `" . _DB_PREFIX_ . "employee` as e ON o.`id_employee` = e.`id_employee`";
@@ -535,7 +561,7 @@ class CaTools
 
         $sqlTotal = ($totalMoney)
             ? "SELECT SUM(ROUND(o.`total_products` - o.`total_discounts_tax_excl`, 2)) as total "
-            : "SELECT SQL_CALC_FOUND_ROWS o.`id_order` ";
+            : "SELECT COUNT(o.`id_order`) as total ";
 
         $sql = $sqlTotal . "
             FROM `" . _DB_PREFIX_ . "orders` as o
@@ -550,9 +576,8 @@ class CaTools
         $sql .= $filter_current_state;
 
         $nbrGrVentes = Db::getInstance()->getValue($sql);
-        $nbrRows = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('SELECT FOUND_ROWS()');
 
-        return ($totalMoney) ? (($nbrGrVentes) ? $nbrGrVentes : '') : (($nbrRows) ? $nbrRows : '');
+        return ($totalMoney) ? (($nbrGrVentes) ? $nbrGrVentes : '') : (($nbrGrVentes) ? $nbrGrVentes : '');
     }
 
     public static function getGroupeCoach($id_employee)

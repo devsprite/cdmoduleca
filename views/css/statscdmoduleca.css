@@ -17,3 +17,7 @@
 .content_ca {
     display: none;
 }
+
+.title_box {
+    cursor: pointer;
+}

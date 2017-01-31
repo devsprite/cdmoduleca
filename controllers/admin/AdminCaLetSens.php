@@ -96,6 +96,7 @@ class AdminCaLetSensController extends ModuleAdminController
     public function initContent()
     {
         $this->context->controller->addCSS(_PS_MODULE_DIR_ . 'cdmoduleca/views/css/statscdmoduleca.css');
+        $this->context->controller->addJS(_PS_MODULE_DIR_ . 'cdmoduleca/views/js/stupidtable.js');
         $this->context->controller->addJS(_PS_MODULE_DIR_ . 'cdmoduleca/views/js/statscdmoduleca.js');
 
         $engine_params = array(
@@ -229,8 +230,6 @@ class AdminCaLetSensController extends ModuleAdminController
             $datasEmployees[$employee['id_employee']]['caDeduit'] = $this->caDeduit($datasEmployees[$id_employe]);
 
             $datasEmployees[$employee['id_employee']]['caDejaInscrit'] = $this->caDejaInscrit($id_employe);
-
-            $datasEmployees[$employee['id_employee']]['totalVenteGrPar'] = $this->totalVenteGrPar($id_employe);
 
             $datasEmployees[$employee['id_employee']]['pourVenteGrPar'] = $this->pourVenteGrPar($datasEmployees[$id_employe]);
 
@@ -421,7 +420,12 @@ class AdminCaLetSensController extends ModuleAdminController
         if ($this->module->viewAllCoachs[$this->context->employee->id_profile]) {
             if (Tools::isSubmit('submitFilterCoachs')) {
                 $this->context->cookie->cdmoculeca_id_filter_coach = Tools::getValue('filterCoach');
-                $this->context->cookie->cdmoculeca_id_filter_coach_actif = (empty(Tools::getValue('filterCoachActif')) ? "notChecked" : "checked");
+                $actif = Tools::getValue('filterCoachActif');
+                $value = "checked";
+                if (empty($actif)) {
+                    $value = "notChecked";
+                }
+                $this->context->cookie->cdmoculeca_id_filter_coach_actif = $value;
             }
             $this->idFilterCoach = $this->context->cookie->cdmoculeca_id_filter_coach;
             $this->employees_actif = $this->context->cookie->cdmoculeca_id_filter_coach_actif;
@@ -1016,6 +1020,7 @@ class AdminCaLetSensController extends ModuleAdminController
             ? ($id_employee['caTotal'])
             - $id_employee['caAvoir']
             + $id_employee['ajustement']
+//            + $id_employee['totalVenteGrPar']
             : '';
 
         return ($r != 0) ? $r : '';
@@ -1277,14 +1282,10 @@ class AdminCaLetSensController extends ModuleAdminController
 
     private function nbrVenteGrPar($id_employe)
     {
-        $r = CaTools::getNbrGrVentes(
+        $r = CaTools::getNbrParrainage(
             $id_employe,
             'PAR',
-            null,
-            false,
-            false,
-            $this->getDateBetween(),
-            $this->module->lang
+            $this->getDateBetween()
         );
 
         return ($r != 0) ? $r : '';

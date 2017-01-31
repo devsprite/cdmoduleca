@@ -29,4 +29,6 @@ $( document ).ready(function() {
         });
     });
 
+    $("#grid_1").stupidtable();
+
 });
