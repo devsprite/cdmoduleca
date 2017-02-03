@@ -330,7 +330,7 @@ class AdminCaLetSensController extends ModuleAdminController
                 $datasEmployeesTotal['totalVenteGrPar'] += $data['totalVenteGrPar'];
                 $datasEmployeesTotal['totalVenteGrAbo'] += $data['totalVenteGrAbo'];
                 $datasEmployeesTotal['primeParrainage'] += $data['primeParrainage'];
-                $datasEmployeesTotal['ajustement'] += $data['ajustement'];
+//                $datasEmployeesTotal['ajustement'] += $data['ajustement'];
             }
             $datasEmployeesTotal['nbrJourOuvre'] = CaTools::getNbOpenDays($this->getDateBetween());
             $datasEmployeesTotal['caTotalAvecAbo'] = $datasEmployeesTotal['caAjuste'] + $datasEmployeesTotal['totalVenteGrAbo'];
@@ -342,6 +342,10 @@ class AdminCaLetSensController extends ModuleAdminController
         $objectifCoachs = CaTools::getObjectifCoachs($this->idFilterCoach, $this->getDateBetween());
         $objectifs = CaTools::isProjectifAtteint($objectifCoachs);
         $objectifs = $this->addTotalObjectifs($objectifs);
+        $datasEmployeesTotal['caAjuste'] += end($ajoutSommes)['somme'] - $datasEmployeesTotal['ajustement'];
+        $datasEmployeesTotal['caTotalAvecAbo'] += end($ajoutSommes)['somme'] - $datasEmployeesTotal['ajustement'];
+        $datasEmployeesTotal['ajustement'] += end($ajoutSommes)['somme'];
+
         $this->smarty->assign(array(
             'datasEmployees' => ($this->histoTable) ? $this->histoTable : $datasEmployees,
             'datasEmployeesTotal' => ($this->histoMain) ? $this->histoMain : $datasEmployeesTotal,
