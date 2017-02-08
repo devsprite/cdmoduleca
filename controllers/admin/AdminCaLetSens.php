@@ -1390,7 +1390,7 @@ class AdminCaLetSensController extends ModuleAdminController
     private function insertHistoMain()
     {
         $histoMain = new HistoStatsMainClass();
-        if (isset($this->smarty->tpl_vars['datasEmployeesTotal']->value['caAjuste'])) {
+        if (!empty($this->smarty->tpl_vars['datasEmployeesTotal']->value['caAjuste'])) {
             $data = $this->smarty->tpl_vars['datasEmployeesTotal'];
             $histoMain->filterCoach = 'Tous les coachs';
             $histoMain->datepickerFrom = substr($this->getDateBetween(), 2, 10);
