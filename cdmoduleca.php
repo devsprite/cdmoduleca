@@ -1226,8 +1226,8 @@ class CdModuleCA extends ModuleGrid
         $idOrder = Order::getOrderByCartId($this->context->cart->id);
         $order = CaTools::getOrderDetailsCoach($idOrder);
 
-        if ( (empty($order['id_code_action']) || empty($order['id_employee'])) &&
-            (!empty($order['code_action']) && !empty($order['coach']) )
+        if ((empty($order['id_code_action']) || empty($order['id_employee'])) &&
+            (!empty($order['code_action']) && !empty($order['coach']))
         ) {
             // Correspondance entre le coach et le code action en id correspondant
             $id_coach = $this->getIdCoach($order['coach']);

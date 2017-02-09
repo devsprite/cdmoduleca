@@ -304,6 +304,7 @@ class AdminCaLetSensController extends ModuleAdminController
         if (count($datasEmployees) > 1) {
             $total = $this->total($datasEmployees);
             $datasEmployeesTotal = array(
+                'total' => 'total',
                 'caAjuste' => 0,
                 'caTotal' => 0,
                 'caFidTotal' => 0,
@@ -1390,7 +1391,7 @@ class AdminCaLetSensController extends ModuleAdminController
     private function insertHistoMain()
     {
         $histoMain = new HistoStatsMainClass();
-        if (!empty($this->smarty->tpl_vars['datasEmployeesTotal']->value['caAjuste'])) {
+        if (!empty($this->smarty->tpl_vars['datasEmployeesTotal']->value['total'])) {
             $data = $this->smarty->tpl_vars['datasEmployeesTotal'];
             $histoMain->filterCoach = 'Tous les coachs';
             $histoMain->datepickerFrom = substr($this->getDateBetween(), 2, 10);
