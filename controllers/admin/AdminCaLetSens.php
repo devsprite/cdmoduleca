@@ -975,8 +975,11 @@ class AdminCaLetSensController extends ModuleAdminController
 
     private function pourCaAvoir($caRembourse)
     {
-        $r = ($caRembourse['caTotal'] != 0) ? round((($caRembourse['caAvoir'] * 100)
-                / $caRembourse['caTotal']), 2) . ' %' : '';
+//        (Montant des retours en € *100) / (Montant CA TOTAL FINAL + Montant des retours en €)
+        $r = ($caRembourse['caTotal'] != 0) ?
+                round((($caRembourse['caAvoir'] * 100)
+                / ($caRembourse['caTotal'] ) ), 2) . ' %' : '';
+
         return ($r != 0) ? $r : '';
     }
 
