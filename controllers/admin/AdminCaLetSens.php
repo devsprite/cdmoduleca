@@ -297,8 +297,8 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['primeCA'] = $this->primeCA($datasEmployees[$id_employe]);
 
+//            var_dump($datasEmployees[$employee['id_employee']]);
         }
-
         $datasEmployeesTotal = array();
         $total = array();
         if (count($datasEmployees) > 1) {
