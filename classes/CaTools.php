@@ -515,6 +515,7 @@ class CaTools
                 LEFT JOIN `" . _DB_PREFIX_ . "customer` as c ON o.`id_customer` = c.`id_customer`
                 LEFT JOIN `" . _DB_PREFIX_ . "employee` as e ON o.`id_employee` = e.`id_employee`";
         $sql .= ' WHERE o.`date_add` BETWEEN ' . $dateBetween;
+        $sql .= ' AND o.`valid` = 1 ';
         $sql .= $filterCoach;
         $sql .= $sql_code_action;
 
