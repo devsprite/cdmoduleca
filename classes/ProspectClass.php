@@ -308,7 +308,7 @@ class ProspectClass extends ObjectModel
 
     /**
      * Retourne les prospects n'ayant pas de coach affecté
-     * @return array
+     * @return array *
      */
     public static function getProspectsIsole()
     {
