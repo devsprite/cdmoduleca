@@ -514,9 +514,7 @@ class AdminProspectsController extends ModuleAdminController
         $id_pa = (int)Tools::getValue('id_pa');
         if (ProspectAttribueClass::isExist($id_pa)) {
             $pa = new ProspectAttribueClass($id_pa);
-
             $this->changeGroupProspects($pa, '1');
-
             $this->deleteProspectsNonTraite($pa->id_prospect_attribue);
             $pa->delete();
             $this->confirmations = $this->module->l('Enregistrement éffacé.');

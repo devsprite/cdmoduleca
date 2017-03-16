@@ -316,7 +316,7 @@ class ProspectClass extends ObjectModel
                 WHERE `id_prospect_attribue`
                 NOT IN 
                 (SELECT `id_prospect_attribue` FROM `' . _DB_PREFIX_ . 'prospect_attribue` )
-                AND `traite` != "Nouveau"
+                AND `traite` = "non"
                 AND `injoignable` = "non"';
         $req = Db::getInstance()->executeS($sql);
 
