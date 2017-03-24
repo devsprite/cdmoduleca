@@ -450,7 +450,11 @@ class AdminProspectsController extends ModuleAdminController
         $sql = 'SELECT COUNT(DISTINCT c.`id_customer`) AS total
                 FROM `' . _DB_PREFIX_ . 'customer` as c 
                 LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON c.`id_customer` = cg.`id_customer`
+                LEFT JOIN ps_prospect as pp ON c.id_customer = pp.id_customer
                 WHERE c.`date_add` > "' . pSQL($indexDate) . '"
+                AND ( pp.traite IS NULL
+                OR pp.traite = "non"
+                OR pp.traite = "Nouveau" )
                 AND c.`id_default_group` = 1
                 AND c.`active` = 0
                 AND c.`deleted` = 0';
@@ -467,8 +471,12 @@ class AdminProspectsController extends ModuleAdminController
         $sql = 'SELECT COUNT(DISTINCT c.`id_customer`) AS total
                 FROM `' . _DB_PREFIX_ . 'customer` as c 
                 LEFT JOIN `' . _DB_PREFIX_ . 'customer_group` AS cg ON c.`id_customer` = cg.`id_customer`
+                LEFT JOIN ps_prospect as pp ON c.id_customer = pp.id_customer
                 WHERE c.`date_add` < "' . pSQL($indexDate) . '"
                 AND c.`date_add` > "' . pSQL($indexDateMax) . '"
+                AND ( pp.traite IS NULL
+                OR pp.traite = "non"
+                OR pp.traite = "Nouveau" )
                 AND c.`id_default_group` = 1
                 AND c.`active` = 0
                 AND c.`deleted` = 0';
@@ -550,8 +558,7 @@ class AdminProspectsController extends ModuleAdminController
         $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'prospect`
                 WHERE `id_prospect_attribue` = ' . (int)$id_prospect_attribue . '
                 AND `traite` = "Nouveau"
-                AND `injoignable` = "Non"
-                AND `contacte` = "" ';
+                AND `injoignable` = "non"';
         $req = Db::getInstance()->execute($sql);
 
         return $req;
