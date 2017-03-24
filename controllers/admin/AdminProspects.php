@@ -259,7 +259,7 @@ class AdminProspectsController extends ModuleAdminController
         $sql .= ' GROUP BY e.`id_employee`';
         $sql .= ' ORDER BY e.`lastname` ASC ';
 
-        var_dump($sql);
+
         $req = Db::getInstance()->executeS($sql);
 
         return $req;
