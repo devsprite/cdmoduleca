@@ -248,8 +248,8 @@ class AdminProspectsController extends ModuleAdminController
                 ON ppr.`id_prospect_attribue` = ppa.`id_prospect_attribue`
                 WHERE e.`id_employee` = ppa.`id_employee`
                 AND ppr.`date_debut` BETWEEN ' . $dateBetween . '
-                AND ppr.`traite` !=1
-                AND ppr.`injoignable` !=1) AS total_prospect
+              	AND ppr.`injoignable` = "non"
+                AND ppr.`traite` != "oui" ) AS total_prospect
             FROM `' . _DB_PREFIX_ . 'employee` AS e 
             LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS pa ON e.`id_employee` = pa.`id_employee`
             LEFT JOIN `' . _DB_PREFIX_ . 'prospect` AS p ON pa.`id_prospect_attribue` = p.`id_prospect_attribue`
@@ -259,6 +259,7 @@ class AdminProspectsController extends ModuleAdminController
         $sql .= ' GROUP BY e.`id_employee`';
         $sql .= ' ORDER BY e.`lastname` ASC ';
 
+        var_dump($sql);
         $req = Db::getInstance()->executeS($sql);
 
         return $req;

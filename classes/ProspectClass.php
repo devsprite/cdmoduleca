@@ -312,12 +312,14 @@ class ProspectClass extends ObjectModel
      */
     public static function getProspectsIsole()
     {
-        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'prospect` 
-                WHERE `id_prospect_attribue`
+        $sql = 'SELECT * FROM `' . _DB_PREFIX_ . 'prospect` as pp
+                LEFT JOIN `' . _DB_PREFIX_ . 'customer` as pc ON pp.id_customer = pc.id_customer
+                WHERE pp.`id_prospect_attribue`
                 NOT IN 
                 (SELECT `id_prospect_attribue` FROM `' . _DB_PREFIX_ . 'prospect_attribue` )
-                AND `traite` = "non"
-                AND `injoignable` = "non"';
+                AND pc.active = 0
+                AND pp.`traite` = "non"
+                AND pp.`injoignable` = "non"';
         $req = Db::getInstance()->executeS($sql);
 
         return $req;
