@@ -571,6 +571,7 @@ class AdminProspectsController extends ModuleAdminController
         $list = ProspectClass::getProspectsByIdPa($id_pa);
         $listProspects = array();
         foreach ($list as $l) {
+            $l['groups'] = Customer::getGroupsStatic((int)$l['id_customer']);
             $l['contacte'] = $this->contact($l['contacte']);
             $listProspects[] = $l;
         }

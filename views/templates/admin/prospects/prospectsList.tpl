@@ -33,6 +33,7 @@
         <tr>
             <th class="handler" data-sort="string">Id</th>
             <th class="handler" data-sort="string">Nom</th>
+            <th class="handler text-center" data-sort="string">Groupe</th>
             <th>Coach</th>
             <th class="handler" data-sort="string">Traité</th>
             <th class="handler" data-sort="string">Injoignable</th>
@@ -46,6 +47,11 @@
             <tr>
                 <td>{$prosp['id_customer']|escape:'htmlall':'UTF-8'}</td>
                 <td>{$prosp['lastname']|upper} {$prosp['firstname']|lower|capitalize|escape:'htmlall':'UTF-8'}</td>
+                <td class="text-center">
+                    {foreach item=group from=$prosp['groups']}
+                    {$group}&nbsp;
+                    {/foreach}
+                </td>
                 <td>{$prosp['coach']|escape:'htmlall':'UTF-8'}</td>
                 <td>{$prosp['traite']|escape:'htmlall':'UTF-8'}</td>
                 <td>{$prosp['injoignable']|escape:'htmlall':'UTF-8'}</td>

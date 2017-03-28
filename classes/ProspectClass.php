@@ -112,7 +112,7 @@ class ProspectClass extends ObjectModel
      */
     public static function getProspectsByIdPa($id_prospect_attribue)
     {
-        $sql = 'SELECT p.* , pa.*, cu.`firstname`, cu.`lastname`, cu.`date_add`, e.`lastname` as coach 
+        $sql = 'SELECT p.* , pa.*, cu.`id_default_group`,cu.`firstname`, cu.`lastname`, cu.`date_add`, e.`lastname` as coach 
                 FROM `' . _DB_PREFIX_ . 'prospect` AS p 
                 LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS pa 
                 ON p.`id_prospect_attribue` = pa.`id_prospect_attribue`
