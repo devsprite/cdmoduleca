@@ -64,7 +64,7 @@ class CdModuleCA extends ModuleGrid
     {
         $this->name = 'cdmoduleca';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.21';
+        $this->version = '1.0.22';
         $this->author = 'Dominique';
         $this->need_instance = 0;
         $this->bootstrap = true;
