@@ -163,7 +163,7 @@
                                 <div class="col-lg-4 col-md-6 col-xs-12">
                                     <label class="control-label"
                                            for="{$employe['lastname']|escape:'htmlall':'UTF-8'}{$employe['firstname']|escape:'htmlall':'UTF-8'}"><strong>{$employe['lastname']|escape:'htmlall':'UTF-8'}</strong>
-                                        {if !empty({$employe['total_prospect']})} - {$employe['total_prospect']|escape:'htmlall':'UTF-8'} Prospects{/if}
+                                        {if !empty({$employe['total_prospect']})} - {$employe['total_prospect_traite']|escape:'htmlall':'UTF-8'}/{$employe['total_prospect']|escape:'htmlall':'UTF-8'} Prospects{/if}
                                         <p>({$employe['firstname']|escape:'htmlall':'UTF-8'}
                                             - {$employe['id_group']|escape:'htmlall':'UTF-8'}
                                             )</p></label>

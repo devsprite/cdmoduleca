@@ -249,7 +249,13 @@ class AdminProspectsController extends ModuleAdminController
                 WHERE e.`id_employee` = ppa.`id_employee`
                 AND ppr.`date_debut` BETWEEN ' . $dateBetween . '
               	AND ppr.`injoignable` = "non"
-                AND ppr.`traite` != "oui" ) AS total_prospect
+                AND ppr.`traite` != "oui" ) AS total_prospect_traite,
+             (  SELECT COUNT(ppr.`id_prospect_attribue`)
+                FROM `' . _DB_PREFIX_ . 'prospect` as ppr
+                LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS ppa 
+                ON ppr.`id_prospect_attribue` = ppa.`id_prospect_attribue`
+                WHERE e.`id_employee` = ppa.`id_employee`
+                AND ppr.`date_debut` BETWEEN ' . $dateBetween . ') AS total_prospect
             FROM `' . _DB_PREFIX_ . 'employee` AS e 
             LEFT JOIN `' . _DB_PREFIX_ . 'prospect_attribue` AS pa ON e.`id_employee` = pa.`id_employee`
             LEFT JOIN `' . _DB_PREFIX_ . 'prospect` AS p ON pa.`id_prospect_attribue` = p.`id_prospect_attribue`
@@ -269,13 +275,16 @@ class AdminProspectsController extends ModuleAdminController
     {
         $newProspects = false;
         $nbr_prospects_disponible = $this->getNbrAncienProspects();
+
         if ($nbr_prospects_disponible <= 0 ) {
             $nbr_prospects_disponible = $this->getNbrNouveauProspects();
             $newProspects = true;
         }
         if ($nbr_prospects_disponible >= $ap->nbr_prospect_attribue) {
             $ap->add();
+
             $prospects = ProspectClass::getAllProspectsGroup(1, $ap->nbr_prospect_attribue, $newProspects);
+
             $this->addProspects($prospects, $id_group, $ap);
         }else {
             $this->errors[] = $this->module->l('Il n\'y a pas assez de prospects disponible');
