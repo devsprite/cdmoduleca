@@ -310,8 +310,8 @@ class CaTools
                 }
 
                 $joursTravaille = CaTools::getNbOpenDays($betweenDateNow);
-
                 $joursTravailleTotal = CaTools::getNbOpenDays($dateBetween);
+
                 $joursAbsent = CaTools::getAbsenceEmployee($objectif['id_employee'], $dateBetween);
                 $joursAbs = $joursAbsent['jours'];
                 $caCoach = $ca + $ajustement - $avoir;
@@ -320,9 +320,13 @@ class CaTools
 
                 $projectif = '';
                 if ($joursTravaille != 0) {
-                    // modif le 09/03/17 $projectif = ($caCoach / ($joursTravaille - $joursAbsent['jours'])) * ($joursTravailleTotal - $joursAbsent['jours']);
-                    $projectif = ($caCoach / ($joursTravaille)) * ($joursTravailleTotal - $joursAbsent['jours']);
-                    $p = "($caCoach / $joursTravaille) * ($joursTravailleTotal - $joursAbs)";
+                    if ($joursTravaille == $joursTravailleTotal) { // Est-ce que l'on calcule le projectif du mois complet ou le mois en cours
+                        $projectif = ($caCoach / ($joursTravaille - $joursAbsent['jours'])) * ($joursTravailleTotal - $joursAbsent['jours']);
+                        $p = "($caCoach / ($joursTravaille - $joursAbs )) * ($joursTravailleTotal - $joursAbs)";
+                    }else {
+                        $projectif = ($caCoach / ($joursTravaille)) * ($joursTravailleTotal - $joursAbsent['jours']);
+                        $p = "($caCoach / $joursTravaille) * ($joursTravailleTotal - $joursAbs)";
+                    }
                  }
 
                 $objectifCoachs[$objectifCoach]['resteAFaire'] = $objectif['somme'] - $caCoach;
