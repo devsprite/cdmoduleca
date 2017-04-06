@@ -27,8 +27,13 @@
     <tr>
         <td>
             <span style="font-size: 18pt;color: #448B01;">Groupe(s)</span>
+            {if isset($histo)}
+            <span style="font-size: 10pt">Du {$datasEmployeesTotal['datepickerFrom']|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}
+                                        au {$datasEmployeesTotal['datepickerTo']|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}</span>
+            {else}
             <span style="font-size: 10pt">Du {$datepickerFrom|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}
                 au {$datepickerTo|escape|date_format:'%A %e %B %Y'|escape:'htmlall':'UTF-8'}</span>
+            {/if}
         </td>
     </tr>
     <tr>

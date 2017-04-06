@@ -960,6 +960,13 @@ class AdminCaLetSensController extends ModuleAdminController
             $name .= $this->histoMain['filterCoach'];
         }
 
+        $histoId = Tools::getValue('id_histo', false);
+
+        if ($histoId) {
+            $histoMain = new HistoStatsMainClass((int)$histoId);
+            $name = $histoMain->datepickerFrom . "_" . $histoMain->datepickerTo . "_" . $histoMain->filterCoach;
+        }
+
         setlocale(LC_ALL, "en_US.utf8");
         $name = iconv('UTF-8', 'ASCII//TRANSLIT', $name);
         setlocale(LC_ALL, "fr_FR.utf8");
