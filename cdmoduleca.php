@@ -1349,6 +1349,7 @@ class CdModuleCA extends ModuleGrid
         $this->query .= $filterGroupe;
         $this->query .= ' WHERE os.`date_add` BETWEEN ' . $this->getDate();
         $this->query .= $filterCoach;
+        $this->query .= 'AND o.current_state != 6';
         $this->query .= $filterCodeAction;
         $this->query .= ' GROUP BY o.`id_order` ';
         $this->query .= ') UNION (';

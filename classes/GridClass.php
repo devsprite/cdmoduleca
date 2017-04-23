@@ -295,6 +295,7 @@ class GridClass extends Module
         $sql .= $filterGroupe;
         $sql .= ' WHERE os.`date_add` BETWEEN ' . $data['date'];
         $sql .= $filterCoach;
+        $sql .= 'AND o.current_state != 6';
         $sql .= $filterCodeAction;
         $sql .= ' GROUP BY o.`id_order` ';
         $sql .= ') UNION (';
