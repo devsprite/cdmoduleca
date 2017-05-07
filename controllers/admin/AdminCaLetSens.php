@@ -283,7 +283,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['totalVenteGrProsp'] = $this->totalVenteGrProsp($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['nbrVenteGrPar'] = $this->nbrVenteGrPar($id_employe);
+            $datasEmployees[$employee['id_employee']]['nbrVenteGrPar'] = $this->totalVenteGrpParrainnage($id_employe);
 
             $datasEmployees[$employee['id_employee']]['primeParrainage'] = $this->primeParrainage($datasEmployees[$id_employe]);
 
@@ -984,8 +984,8 @@ class AdminCaLetSensController extends ModuleAdminController
     {
 //        (Montant des retours en € *100) / (Montant CA TOTAL FINAL + Montant des retours en €)
         $r = ($caRembourse['caTotal'] != 0) ?
-                round((($caRembourse['caAvoir'] * 100)
-                / ($caRembourse['caTotal'] ) ), 2) . ' %' : '';
+            round((($caRembourse['caAvoir'] * 100)
+                / ($caRembourse['caTotal'])), 2) . ' %' : '';
 
         return ($r != 0) ? $r : '';
     }
@@ -1295,6 +1295,16 @@ class AdminCaLetSensController extends ModuleAdminController
         return ($r != 0) ? $r : '';
     }
 
+    private function totalVenteGrpParrainnage($id_employe)
+    {
+        $r1 = $this->nbrVenteGrPar($id_employe);
+        $r2 = $this->getNbrVenteGrPar($id_employe);
+
+        $total = $r1 + $r2;
+
+        return ($total != 0) ? $total : '';
+    }
+
     private function nbrVenteGrPar($id_employe)
     {
         $r = CaTools::getNbrParrainage(
@@ -1304,6 +1314,17 @@ class AdminCaLetSensController extends ModuleAdminController
         );
 
         return ($r != 0) ? $r : '';
+    }
+
+    private function getNbrVenteGrPar($id_employe)
+    {
+        $r = CaTools::getNbrParGroupe(
+            $id_employe,
+            $this->getDateBetween()
+        );
+
+        return ($r != 0) ? $r : '';
+
     }
 
     private function primeParrainage($id_employe)

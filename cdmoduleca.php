@@ -64,7 +64,7 @@ class CdModuleCA extends ModuleGrid
     {
         $this->name = 'cdmoduleca';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.23';
+        $this->version = '1.0.30';
         $this->author = 'Dominique';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -106,6 +106,13 @@ class CdModuleCA extends ModuleGrid
                 'id' => 'id_customer',
                 'header' => $this->l('Client'),
                 'dataIndex' => 'id_customer',
+                'align' => 'left',
+                'data-sort' => 'string-ins'
+            ),
+            array(
+                'group' => 'groupe',
+                'header' => $this->l('Groupe'),
+                'dataIndex' => 'groupe',
                 'align' => 'left',
                 'data-sort' => 'string-ins'
             ),
@@ -1317,8 +1324,10 @@ class CdModuleCA extends ModuleGrid
           (SELECT osl.`name` FROM `' . _DB_PREFIX_ . 'order_state_lang` AS osl 
           WHERE `id_lang` = "' . $this->lang . '" AND osl.`id_order_state` = o.`current_state` ) as current_state ,
           IF((SELECT so.`id_order` FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.`id_customer` = o.`id_customer`
-          AND so.`id_order` < o.`id_order` LIMIT 1) > 0, "", "Oui") as new
-				FROM `' . _DB_PREFIX_ . 'orders` AS o ';
+          AND so.`id_order` < o.`id_order` LIMIT 1) > 0, "", "Oui") as new,
+          (SELECT GROUP_CONCAT(pcg.id_group) FROM ps_customer_group AS pcg WHERE o.id_customer = pcg.id_customer GROUP BY o.id_order ORDER BY pcg.id_group ASC) as groupe,
+		  ""
+		  FROM `' . _DB_PREFIX_ . 'orders` AS o ';
         $this->query .= $filterGroupe;
         $this->query .= ' WHERE o.`date_add` BETWEEN ' . $this->getDate();
         $this->query .= $filterCoach;
@@ -1326,6 +1335,7 @@ class CdModuleCA extends ModuleGrid
         $this->query .= ' AND o.`current_state` != 460';
         $this->query .= $filterValid;
         $this->query .= ' GROUP BY o.`id_order` ';
+        //*******************
         $this->query .= ') UNION ( 
         SELECT os.`id_order` AS id,
         IF((os.`total_products_tax_excl`) != 0, CONCAT(ROUND(os.`total_products_tax_excl`, 2)," €"), "") AS avoir,
@@ -1343,7 +1353,7 @@ class CdModuleCA extends ModuleGrid
         "",
         (SELECT osl.`name` FROM `' . _DB_PREFIX_ . 'order_state_lang` AS osl 
           WHERE `id_lang` = "' . $this->lang . '" AND osl.`id_order_state` = o.`current_state` ) as current_state ,
-        ""
+        "","",""
         FROM `' . _DB_PREFIX_ . 'order_slip` AS os
         LEFT JOIN `' . _DB_PREFIX_ . 'orders` AS o ON os.`id_order` = o.`id_order` ';
         $this->query .= $filterGroupe;
@@ -1352,6 +1362,7 @@ class CdModuleCA extends ModuleGrid
         $this->query .= 'AND o.current_state != 6';
         $this->query .= $filterCodeAction;
         $this->query .= ' GROUP BY o.`id_order` ';
+        //*********************
         $this->query .= ') UNION (';
         $this->query .= 'SELECT 
         `id_order`,
@@ -1364,7 +1375,7 @@ class CdModuleCA extends ModuleGrid
         e.`lastname`,
         "",
         a.`date_ajout_somme`,
-        "","","","","" ';
+        "","","","","","","" ';
         $this->query .= ' FROM `' . _DB_PREFIX_ . 'ajout_somme` AS a 
         LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.`id_employee` = e.`id_employee`
         WHERE `impaye` = 1
@@ -1372,6 +1383,7 @@ class CdModuleCA extends ModuleGrid
         $this->query .= ($this->idFilterCoach != 0)
             ? ' AND a.`id_employee` = ' . $this->idFilterCoach
             : '';
+        //***********************
         $this->query .= ') UNION (';
         $this->query .= 'SELECT 
         `id_order`,
@@ -1384,7 +1396,7 @@ class CdModuleCA extends ModuleGrid
         e.`lastname`,
         "",
         a.`date_ajout_somme`,
-        "","","","","" ';
+        "","","","","","","" ';
         $this->query .= ' FROM `' . _DB_PREFIX_ . 'ajout_somme` AS a 
         LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.`id_employee` = e.`id_employee`
         WHERE `impaye` IS NULL
@@ -1393,8 +1405,40 @@ class CdModuleCA extends ModuleGrid
             ? ' AND a.`id_employee` = ' . $this->idFilterCoach
             : '';
         $this->query .= ' ORDER BY `date_ajout_somme` ASC';
-        $this->query .= ')';
 
+        //***********************
+        $this->query .= ') UNION (';
+        $this->query .= 'SELECT 
+        o.id_order,
+        "",
+        "",
+        "",
+        "",
+        "",
+        CONCAT ( ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2), " €") AS hthp,
+        o.coach,
+        cu.lastname,
+        o.date_add,
+        "","",
+        (SELECT ca.`name` FROM `' . _DB_PREFIX_ . 'code_action` AS ca 
+          WHERE o.`id_code_action` = ca.`id_code_action`) as CodeAction,
+        (SELECT osl.`name` FROM `' . _DB_PREFIX_ . 'order_state_lang` AS osl 
+          WHERE `id_lang` = "' . $this->lang . '" AND osl.`id_order_state` = o.`current_state` ) as current_state,
+          IF((SELECT so.`id_order` FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.`id_customer` = o.`id_customer`
+          AND so.`id_order` < o.`id_order` LIMIT 1) > 0, "", "Oui") as new,
+        (SELECT GROUP_CONCAT(pcg.id_group) FROM ps_customer_group AS pcg WHERE o.id_customer = pcg.id_customer GROUP BY o.id_order ORDER BY pcg.id_group ASC) as groupe,
+        ""';
+        $this->query .= ' FROM `' . _DB_PREFIX_ . 'orders` as o 
+        LEFT JOIN `'._DB_PREFIX_.'customer_group` as c on o.id_customer = c.id_customer
+        LEFT JOIN `'._DB_PREFIX_.'customer` as cu ON o.id_customer = cu.id_customer
+        WHERE o.id_employee != '.$this->idFilterCoach.'
+        AND o.valid = 1
+        AND o.`current_state` != 460
+        AND id_code_action = 27
+        AND c.id_group = '.(int)CaTools::getGroupeCoach($this->idFilterCoach).'
+        AND o.`date_add` BETWEEN ' . $this->getDate();
+        $this->query .= ' GROUP BY o.`id_order` ';
+        $this->query .= ')';
 
         if (Validate::IsName($this->_sort)) {
             $this->query .= ' ORDER BY `' . bqSQL($this->_sort) . '`';

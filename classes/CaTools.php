@@ -926,4 +926,22 @@ class CaTools
 
         return $req;
     }
+
+    public static function getNbrParGroupe($id_employe, $dateBetween)
+    {
+        $groupeCoach = CaTools::getGroupeCoach($id_employe);
+        $sql = "SELECT count(*) FROM ps_orders as o
+                LEFT JOIN ps_customer_group as c on o.id_customer = c.id_customer
+                WHERE o.id_employee != ".(int)$id_employe."
+                AND o.valid = 1
+                AND o.`current_state` != 460
+                AND id_code_action = 27
+                AND o.date_add BETWEEN " . $dateBetween . "
+                AND c.id_group = ".(int)$groupeCoach;
+
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
+
+    }
 }
