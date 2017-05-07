@@ -263,7 +263,7 @@ class GridClass extends Module
           (SELECT osl.`name` FROM `' . _DB_PREFIX_ . 'order_state_lang` AS osl 
           WHERE `id_lang` = "' . $data['lang'] . '" AND osl.`id_order_state` = o.`current_state` ) as current_state ,
           IF((SELECT so.`id_order` FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.`id_customer` = o.`id_customer`
-          AND so.`id_order` < o.`id_order` LIMIT 1) > 0, "", "Oui") as new
+          AND so.`id_order` < o.`id_order` LIMIT 1) > 0, "", "Oui") as new, ""
                 FROM `' . _DB_PREFIX_ . 'orders` AS o ';
         $sql .= $filterGroupe;
         $sql .= ' WHERE o.`date_add` BETWEEN ' . $data['date'];
@@ -289,7 +289,7 @@ class GridClass extends Module
         "",
         (SELECT osl.`name` FROM `' . _DB_PREFIX_ . 'order_state_lang` AS osl 
           WHERE `id_lang` = "' . $data['lang'] . '" AND osl.`id_order_state` = o.`current_state` ) as current_state ,
-        ""
+        "", ""
         FROM `' . _DB_PREFIX_ . 'order_slip` AS os
         LEFT JOIN `' . _DB_PREFIX_ . 'orders` AS o ON os.`id_order` = o.`id_order` ';
         $sql .= $filterGroupe;
@@ -310,7 +310,7 @@ class GridClass extends Module
         e.`lastname`,
         "",
         a.`date_ajout_somme`,
-        "","","","","" ';
+        "","","","","", "" ';
         $sql .= ' FROM `' . _DB_PREFIX_ . 'ajout_somme` AS a 
         LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.`id_employee` = e.`id_employee`
         WHERE `impaye` = 1
@@ -330,7 +330,7 @@ class GridClass extends Module
         e.`lastname`,
         "",
         a.`date_ajout_somme`,
-        "","","","","" ';
+        "","","","","","" ';
         $sql .= ' FROM `' . _DB_PREFIX_ . 'ajout_somme` AS a 
         LEFT JOIN `' . _DB_PREFIX_ . 'employee` AS e ON a.`id_employee` = e.`id_employee`
         WHERE `impaye` IS NULL
@@ -341,6 +341,38 @@ class GridClass extends Module
         $sql .=' ORDER BY `date_ajout_somme` ASC';
         $sql .= ')';
 
+        $sql .= ' UNION (';
+        $sql .= 'SELECT 
+        o.id_order,
+        "",
+        "",
+        "",
+        "",
+        "",
+        CONCAT ( ROUND(o.`total_products` - o.`total_discounts_tax_excl`,2), " €") AS hthp,
+        o.coach,
+        cu.lastname,
+        o.date_add,
+        "",
+        (SELECT ca.`name` FROM `' . _DB_PREFIX_ . 'code_action` AS ca 
+          WHERE o.`id_code_action` = ca.`id_code_action`) as CodeAction,
+        "",
+        (SELECT osl.`name` FROM `' . _DB_PREFIX_ . 'order_state_lang` AS osl 
+          WHERE `id_lang` = "' . $data['lang'] . '" AND osl.`id_order_state` = o.`current_state` ) as current_state,
+        IF((SELECT so.`id_order` FROM `' . _DB_PREFIX_ . 'orders` so WHERE so.`id_customer` = o.`id_customer`
+          AND so.`id_order` < o.`id_order` LIMIT 1) > 0, "", "Oui") as new,
+        ""';
+        $sql .= ' FROM `' . _DB_PREFIX_ . 'orders` as o 
+        LEFT JOIN `'._DB_PREFIX_.'customer_group` as c on o.id_customer = c.id_customer
+        LEFT JOIN `'._DB_PREFIX_.'customer` as cu ON o.id_customer = cu.id_customer
+        WHERE o.id_employee != '.$data['idFilterCoach'].'
+        AND o.valid = 1
+        AND o.`current_state` != 460
+        AND id_code_action = 27
+        AND c.id_group = '.(int)CaTools::getGroupeCoach($data['idFilterCoach']).'
+        AND o.`date_add` BETWEEN ' . $data['date'];
+        $sql .= ' GROUP BY o.`id_order` ';
+        $sql .= ')';
 
 
         if (Validate::IsName($this->_sort)) {
