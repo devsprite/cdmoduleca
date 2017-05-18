@@ -881,7 +881,7 @@ class CaTools
 
         $sql = 'SELECT SUM(`total_products_tax_excl`) FROM `' . _DB_PREFIX_ . 'order_slip` AS os
                 LEFT JOIN `' . _DB_PREFIX_ . 'orders` AS o ON o.`id_order` = os.`id_order` 
-                WHERE current_state != 6
+                WHERE current_state != 6 AND current_state != 495
                 AND os.date_add BETWEEN ' . $dateBetween;
         $sql .= $filterCoach;
 

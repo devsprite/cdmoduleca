@@ -64,7 +64,7 @@ class CdModuleCA extends ModuleGrid
     {
         $this->name = 'cdmoduleca';
         $this->tab = 'analytics_stats';
-        $this->version = '1.0.30';
+        $this->version = '1.0.23';
         $this->author = 'Dominique';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -1359,7 +1359,8 @@ class CdModuleCA extends ModuleGrid
         $this->query .= $filterGroupe;
         $this->query .= ' WHERE os.`date_add` BETWEEN ' . $this->getDate();
         $this->query .= $filterCoach;
-        $this->query .= 'AND o.current_state != 6';
+        /**$this->query .= 'AND o.current_state != 6';*/
+		$this->query .= 'AND o.current_state != 6 AND o.current_state != 495';
         $this->query .= $filterCodeAction;
         $this->query .= ' GROUP BY o.`id_order` ';
         //*********************
