@@ -1621,10 +1621,10 @@ class AdminCaLetSensController extends ModuleAdminController
         );
         foreach ($datasEmployees as $data) {
             foreach ($datas as $d => $v) {
-                if ($data[$d] > 0) {
+                // if ($data[$d] > 0) {
                     $datas[$d] += $data[$d];
                     $cpt[$d] += 1;
-                }
+                // }
             }
         }
 
