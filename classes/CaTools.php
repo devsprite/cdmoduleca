@@ -390,7 +390,7 @@ class CaTools
     public static function caProsp($data)
     {
         return ($data['caTotal'] > 0)
-            ? $data['caTotal'] - $data['caDejaInscrit'] - $data['totalVenteGrPar']
+            ? $data['caTotal'] - $data['caDejaInscrit'] - $data['totalVenteGrPar'] - $data['caAvoir']
             : '';
     }
 
@@ -891,7 +891,23 @@ class CaTools
 
         return $req;
     }
+    public static function getCaCoachsAvoirFID($idCoach = 0, $dateBetween)
+    {
+        $filterCoach = ($idCoach != 0)
+            ? ' AND `id_employee` = ' . (int)$idCoach : '';
 
+        $sql = 'SELECT SUM(`total_products_tax_excl`) FROM `' . _DB_PREFIX_ . 'order_slip` AS os
+                LEFT JOIN `' . _DB_PREFIX_ . 'orders` AS o ON o.`id_order` = os.`id_order`
+                LEFT JOIN `'._DB_PREFIX_.'code_action` AS ca ON ca.id_code_action = o.id_code_action
+                WHERE current_state != 6 AND current_state != 495
+                AND ca.groupe = 20
+                AND os.date_add BETWEEN ' . $dateBetween;
+        $sql .= $filterCoach;
+
+        $req = Db::getInstance()->getValue($sql);
+
+        return $req;
+    }
     /**
      * Fait la somme des jours ouvrés d'un employé
      * @param $id_employee

@@ -205,7 +205,9 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['caAvoir'] = $this->caAvoir($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['caTotal'] = $this->caTotal($id_employe);
+            $datasEmployees[$employee['id_employee']]['caAvoirFID'] = $this->caAvoirFID($id_employe);
+
+            $datasEmployees[$employee['id_employee']]['caTotal'] = $this->caTotal($id_employe) - $this->caAvoirFID($id_employe);
 
 //            $datasEmployees[$employee['id_employee']]['caRembourse'] = $this->caRembourse($id_employe);
 
@@ -239,7 +241,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['PourcCaFID'] = $this->PourcCaFID($datasEmployees[$id_employe]);
 
-            $datasEmployees[$employee['id_employee']]['caFidTotal'] = $this->caFidTotal($id_employe);
+            $datasEmployees[$employee['id_employee']]['caFidTotal'] = $this->caFidTotal($id_employe, $datasEmployees[$id_employe]);
 
             $datasEmployees[$employee['id_employee']]['NbreVentesTotal'] = $this->NbreVentesTotal($id_employe);
 
@@ -297,7 +299,7 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['primeCA'] = $this->primeCA($datasEmployees[$id_employe]);
 
-//            var_dump($datasEmployees[$employee['id_employee']]);
+            //var_dump($datasEmployees[$employee['id_employee']]);die;
         }
         $datasEmployeesTotal = array();
         $total = array();
@@ -980,6 +982,12 @@ class AdminCaLetSensController extends ModuleAdminController
         return ($r != 0) ? $r : '';
     }
 
+    private function caAvoirFID($id_employee)
+    {
+        $r = round(CaTools::getCaCoachsAvoirFID($id_employee, $this->getDateBetween()), 2);
+        return ($r != 0) ? $r : '';
+    }
+
     private function pourCaAvoir($caRembourse)
     {
 //        (Montant des retours en € *100) / (Montant CA TOTAL FINAL + Montant des retours en €)
@@ -1089,10 +1097,10 @@ class AdminCaLetSensController extends ModuleAdminController
         return ($r != 0) ? $r : '';
     }
 
-    private function caFidTotal($id_employe)
+    private function caFidTotal($id_employe, $datas)
     {
         $r = CaTools::getCaDejaInscrit($id_employe, $this->getDateBetween());
-        return ($r != 0) ? $r : '';
+        return ($r != 0) ? $r - $datas['caAvoirFID'] : '';
     }
 
     private function NbreVentesTotal($id_employe)
@@ -1110,7 +1118,7 @@ class AdminCaLetSensController extends ModuleAdminController
     private function CaContact($id_employe)
     {
         $r = ($id_employe['NbreDeProspects'])
-            ? round((($id_employe['CaProsp'] - $id_employe['caRembAvoir']) / $id_employe['NbreDeProspects']), 2)
+            ? round((($id_employe['CaProsp']) / $id_employe['NbreDeProspects']), 2)
             : '';
         return ($r != 0) ? $r : '';
     }
@@ -1621,10 +1629,10 @@ class AdminCaLetSensController extends ModuleAdminController
         );
         foreach ($datasEmployees as $data) {
             foreach ($datas as $d => $v) {
-                // if ($data[$d] > 0) {
+                 if ($data[$d] > 0) {
                     $datas[$d] += $data[$d];
                     $cpt[$d] += 1;
-                // }
+                 }
             }
         }
 
