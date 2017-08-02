@@ -203,11 +203,11 @@ class AdminCaLetSensController extends ModuleAdminController
 
             $datasEmployees[$employee['id_employee']]['firstname'] = $employee['firstname'];
 
-            $datasEmployees[$employee['id_employee']]['caAvoir'] = $this->caAvoir($id_employe);
-
             $datasEmployees[$employee['id_employee']]['caAvoirFID'] = $this->caAvoirFID($id_employe);
 
-            $datasEmployees[$employee['id_employee']]['caTotal'] = $this->caTotal($id_employe) - $this->caAvoirFID($id_employe);
+            $datasEmployees[$employee['id_employee']]['caAvoir'] = $this->caAvoir($id_employe);
+
+            $datasEmployees[$employee['id_employee']]['caTotal'] = $this->caTotal($id_employe);
 
 //            $datasEmployees[$employee['id_employee']]['caRembourse'] = $this->caRembourse($id_employe);
 
@@ -1067,8 +1067,8 @@ class AdminCaLetSensController extends ModuleAdminController
     {
         $r = ($id_employee['caImpaye']
             + $id_employee['caAvoir'] > 0)
-            ? $id_employee['caImpaye']
-            + $id_employee['caAvoir'] : '';
+            ? abs($id_employee['caImpaye'])
+            + abs($id_employee['caAvoir']) : '';
 
         return ($r != 0) ? $r : '';
     }

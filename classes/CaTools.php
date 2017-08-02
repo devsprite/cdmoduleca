@@ -292,6 +292,7 @@ class CaTools
                 $ca = CaTools::getCaCoachsTotal($objectif['id_employee'], 0, $dateBetween);
                 $ajustement = CaTools::getAjustement($objectif['id_employee'], $dateBetween);
                 $avoir = CaTools::getCaCoachsAvoir($objectif['id_employee'], $dateBetween);
+                $avoirFID = CaTools::getCaCoachsAvoirFID($objectif['id_employee'], $dateBetween);
                 $jourTravaille = CaTools::getJourOuvreEmploye($objectif['id_employee'], $dateBetween);
 
                 // Si la periode choisi n'est pas le mois complet, on prend l'intervalle réel
@@ -390,7 +391,7 @@ class CaTools
     public static function caProsp($data)
     {
         return ($data['caTotal'] > 0)
-            ? $data['caTotal'] - $data['caDejaInscrit'] - $data['totalVenteGrPar'] - $data['caAvoir']
+            ? $data['caTotal'] - $data['caDejaInscrit'] - $data['totalVenteGrPar'] - $data['caAvoir'] + $data['caAvoirFID']
             : '';
     }
 
@@ -883,7 +884,6 @@ class CaTools
                 LEFT JOIN `' . _DB_PREFIX_ . 'orders` AS o ON o.`id_order` = os.`id_order`
                 LEFT JOIN `'._DB_PREFIX_.'code_action` AS ca ON ca.id_code_action = o.id_code_action
                 WHERE current_state != 6 AND current_state != 495
-                AND ca.groupe = 2
                 AND os.date_add BETWEEN ' . $dateBetween;
         $sql .= $filterCoach;
 
