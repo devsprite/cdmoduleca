@@ -1627,12 +1627,13 @@ class AdminCaLetSensController extends ModuleAdminController
             'nbrVenteProsp' => 0,
             'nbrVenteFid' => 0
         );
+
         foreach ($datasEmployees as $data) {
             foreach ($datas as $d => $v) {
-                 if ($data[$d] > 0) {
-                    $datas[$d] += $data[$d];
+                $datas[$d] += $data[$d];
+                if ($data[$d] != 0) {
                     $cpt[$d] += 1;
-                 }
+                }
             }
         }
 
@@ -1644,9 +1645,10 @@ class AdminCaLetSensController extends ModuleAdminController
         $datas['PourcCaProspect'] = round(($datas['CaProsp'] * 100) / $datas['caAjuste'], 2) . ' %';
         $datas['PourcCaFID'] = round($datas['caDejaInscrit'] * 100 / $datas['caAjuste'], 2) . ' %';
         $datas['pourCaAvoir'] = round(($datas['caAvoir'] * 100) / $datas['caAjuste'], 2) . ' %';
-        $datas['pourCaImpaye'] = round(($datas['caImpaye'] * 100) / $datas['caAjuste'], 2) . ' %';
         $datas['pourcenDesabo'] = round(($datas['nbrVenteGrDesaAbo'] * 100) / $datas['nbrVenteGrAbo'], 2) . ' %';
         $datas['pourVenteGrPar'] = round(($datas['totalVenteGrPar'] * 100) / $datas['caAjuste'], 2) . ' %';
+        $datas['pourCaImpaye'] = ($datas['pourCaImpaye'] / $cpt['pourCaImpaye']) . ' %';
+
         return $datas;
     }
 
